@@ -8,18 +8,18 @@ import type {
 import { useReveal } from './Reveal';
 
 /**
- * closed  → preview : fareyle öğede kısa bir duraksama ya da klavyeyle odaklanma
- * preview → pinned  : tıklama, dokunma, Enter/Space, önizlemedeki balona tıklama
- * pinned  → closed  : aynı öğeye tekrar tıklama, boş alana ya da dışarı tıklama, Esc
+ * closed  → preview : a short mouse dwell on an element, or keyboard focus
+ * preview → pinned  : click, tap, Enter/Space, or a click on the preview balloon
+ * pinned  → closed  : clicking the same element again, clicking empty space or outside, Esc
  */
 export type InspectMode = 'closed' | 'preview' | 'pinned';
 
-/** Demolarda incelenebilir öğeleri işaretleyen nitelik; değeri katalogdaki kimliktir. */
+/** Attribute that marks inspectable elements in demos; its value is the catalog ID. */
 export const TARGET_SELECTOR = '[data-inspect]';
 
-/** İmleç bir öğede bu kadar durunca özet balonu açılır; ad etiketi ise hemen görünür. */
+/** Once the cursor rests on an element this long, the summary balloon opens; the name tag shows right away. */
 const DWELL_MS = 280;
-/** İmleç hedeften balona geçerken balonun kapanmaması için tanınan süre. */
+/** Grace period so the balloon stays open while the cursor moves from the target to the balloon. */
 const CLOSE_DELAY_MS = 220;
 
 export function useInspectSurface() {
@@ -65,7 +65,7 @@ export function useInspectSurface() {
       clearTimers();
       const surface = surfaceRef.current;
       if (restoreFocus && surface && panelRef.current?.contains(document.activeElement)) {
-        // Odak örneğe dönerken önizleme yeniden açılmasın
+        // Don't reopen the preview while focus returns to the example
         restoringFocus.current = true;
         surface.focus({ preventScroll: true });
         restoringFocus.current = false;
@@ -82,8 +82,8 @@ export function useInspectSurface() {
     }, CLOSE_DELAY_MS);
   };
 
-  // Fare: ad etiketi hemen gelir, özet balonu kısa bir duraksamadan sonra açılır.
-  // Önizleme bir kez açıldıysa öğeler arasında gezerken balon beklemeden güncellenir.
+  // Mouse: the name tag appears right away; the summary balloon opens after a short dwell.
+  // Once the preview is open, the balloon updates without delay as the cursor moves between elements.
   const onPointerMove = (event: ReactPointerEvent) => {
     if (event.pointerType !== 'mouse') return;
     const element = findTarget(event.target);
@@ -133,7 +133,7 @@ export function useInspectSurface() {
     setMode('pinned');
   };
 
-  // Klavye: örnek tek bir sekme durağıdır; oklar öğeler arasında gezdirir
+  // Keyboard: the example is a single tab stop; arrow keys move between elements
   const listTargets = () =>
     [...(surfaceRef.current?.querySelectorAll(TARGET_SELECTOR) ?? [])].filter(
       (element) => element.getClientRects().length > 0,
@@ -200,7 +200,7 @@ export function useInspectSurface() {
     const next = event.relatedTarget;
     if (isInside(next)) return;
     setKeyboardActive(false);
-    // Odak başka bir öğeye geçtiyse kapan; pencere değişimi gibi durumlarda (next yok) yerinde kal
+    // Close if focus moved to another element; stay put in cases like a window switch (no next)
     if (next) close();
   };
 
@@ -212,7 +212,7 @@ export function useInspectSurface() {
     if (event.pointerType === 'mouse' && modeRef.current === 'preview' && !keyboardActive) scheduleClose();
   };
 
-  // Önizlemedeki balonun içine tıklamak onu sabitler
+  // Clicking inside the preview balloon pins it
   const onPanelPointerDown = () => {
     setMode((current) => (current === 'preview' ? 'pinned' : current));
   };
@@ -226,8 +226,8 @@ export function useInspectSurface() {
     };
     const onDocumentPointerDown = (event: PointerEvent) => {
       if (isInside(event.target)) return;
-      // Fare dışarı basınca hemen kapanır. Dokunmatikte bu bir kaydırma olabilir:
-      // kaydırmada tarayıcı pointercancel gönderir, dokunmada pointerup gelir.
+      // A mouse press outside closes right away. On touch it may be a scroll:
+      // on scroll the browser sends pointercancel, on a tap pointerup arrives.
       if (event.pointerType === 'mouse') close();
       else pendingTouchId = event.pointerId;
     };
@@ -261,9 +261,9 @@ export function useInspectSurface() {
     target,
     hoverEl,
     keyboardActive,
-    /** Örnek şu an inceleniyor mu (hareketli demolar bu sırada durur). */
+    /** Whether the example is being inspected right now (animated demos pause meanwhile). */
     active: pointerInside || keyboardActive || open,
-    /** Balonu kapatır ve odağı örneğe geri verir (× düğmesi için). */
+    /** Closes the balloon and returns focus to the example (for the × button). */
     closeFromPanel: () => close(true),
     surfaceProps: { onPointerEnter, onPointerMove, onPointerLeave, onClick, onFocus, onBlur, onKeyDown },
     panelProps: {

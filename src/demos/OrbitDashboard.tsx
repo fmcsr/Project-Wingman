@@ -23,11 +23,11 @@ const ROWS = [
 
 const PILL = { Paid: styles.pillPaid, Pending: styles.pillPending, Overdue: styles.pillOverdue };
 
-/** Haftalık gelir eğrisi (küçük y = yüksek değer). */
+/** Weekly revenue curve (smaller y = higher value). */
 const VALUES = [120, 112, 116, 98, 102, 88, 92, 76, 70, 74, 56, 44];
 const POINTS = VALUES.map((y, i) => [(i / (VALUES.length - 1)) * 600, y] as const);
 
-/** Noktalardan yumuşak bir eğri üretir (Catmull-Rom → kübik Bezier). */
+/** Builds a smooth curve through the points (Catmull-Rom → cubic Bezier). */
 function smoothPath(points: readonly (readonly [number, number])[]) {
   let d = `M${points[0][0]} ${points[0][1]}`;
   for (let i = 0; i < points.length - 1; i++) {
@@ -45,7 +45,7 @@ function smoothPath(points: readonly (readonly [number, number])[]) {
 const LINE = smoothPath(POINTS);
 const AREA = `${LINE}L600 160L0 160Z`;
 
-/** Örnek proje [02]: bir analiz paneli. Etkileşim yoktur, yalnızca incelenir. */
+/** Example project [02]: an analytics dashboard. Not interactive; for inspection only. */
 export function OrbitDashboard() {
   return (
     <div className={styles.root}>

@@ -2,7 +2,7 @@
   padding-block: 96px 64px;
 }
 
-/* Balon katmanı bütün çerçeveleri kapsar; böylece balon bir çerçevenin dışına taşabilir */
+/* The balloon layer covers all frames, so a balloon can overflow outside its frame */
 .stage {
   position: relative;
   margin-top: 28px;
@@ -15,15 +15,15 @@
   pointer-events: none;
 }
 
-/* Önce iki site (her biri kendi kaydırma sahnesinde), sonra üç telefon tek sırada */
+/* First the two sites (each in its own scroll scene), then the three phones in one row */
 .scenes {
   display: grid;
-  /* Sütun içeriğe göre büyümesin: telefonlar ve siteler kapsayıcı genişliğine sığar */
+  /* Keep the column from growing with its content: phones and sites fit the container width */
   grid-template-columns: minmax(0, 1fr);
   gap: 72px;
 }
 
-/* Telefonlar her genişlikte tek sırada; sığmazlarsa birlikte küçülür (--phone-scale, Examples.tsx) */
+/* Phones stay in one row at any width; if they don't fit, they shrink together (--phone-scale, Examples.tsx) */
 .phones {
   display: flex;
   justify-content: center;
@@ -38,7 +38,7 @@
   container-type: inline-size;
 }
 
-/* Telefon çok küçülünce başlıkta yalnızca sıra numarası ve ad kalır */
+/* When the phone gets very small, only the index and name remain in its heading */
 @container (width < 200px) {
   .phoneProject .kind,
   .phoneProject .count {

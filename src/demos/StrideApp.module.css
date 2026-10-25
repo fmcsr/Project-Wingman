@@ -1,4 +1,4 @@
-/* Örnek uygulama her temada aynı kalır; iOS'a benzemesi için sistem fontu kullanır. */
+/* The example app stays the same in every theme; it uses the system font to look like iOS. */
 .app {
   position: relative;
   height: 100%;
@@ -17,7 +17,7 @@
   stroke-linejoin: round;
 }
 
-/* Fotoğraf galerisi */
+/* Photo gallery */
 .gallery {
   position: relative;
   display: grid;
@@ -44,7 +44,7 @@
   background: rgb(255 255 255 / 0.7);
 }
 
-/* Sayfa noktaları: etkin olan küçük bir hapa uzar */
+/* Pagination dots: the active one stretches into a small pill */
 .dots {
   position: absolute;
   bottom: 36px;
@@ -78,7 +78,7 @@
   z-index: 3;
 }
 
-/* Fotoğrafın üstünde yüzen yuvarlak düğmeler */
+/* Round buttons floating over the photo */
 .topBar {
   position: absolute;
   top: 48px;
@@ -110,7 +110,7 @@
   stroke: none;
 }
 
-/* Sayı rozeti: simgenin köşesine iğnelenmiş küçük hap */
+/* Count badge: a small pill pinned to the icon's corner */
 .badge {
   position: absolute;
   top: -4px;
@@ -128,7 +128,7 @@
   background: #ef4444;
 }
 
-/* Ürün bilgileri: fotoğrafın üstüne binen yuvarlak köşeli panel */
+/* Product details: a rounded-corner panel that overlaps the photo */
 .details {
   position: relative;
   z-index: 1;
@@ -262,7 +262,7 @@
   background: #111;
 }
 
-/* Tükenmiş beden: görünür ama üstü çizili */
+/* Sold-out size: visible but struck through */
 .sizeSoldOut {
   border-style: dashed;
   color: #c4c4c4;
@@ -270,7 +270,7 @@
   background: #fafafa;
 }
 
-/* Toast: alttan kayarak gelir, aynı yoldan kaybolur */
+/* Toast: slides in from below and disappears the same way */
 .toast {
   position: absolute;
   right: 14px;
@@ -314,7 +314,7 @@
   color: #93c5fd;
 }
 
-/* Sabit satın alma çubuğu: her zaman başparmağın ulaştığı yerde */
+/* Sticky buy bar: always within thumb reach */
 .buyBar {
   position: absolute;
   right: 0;

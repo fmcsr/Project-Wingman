@@ -44,7 +44,7 @@ kbd {
   outline-offset: 2px;
 }
 
-/* Sayfa genişliği ve kenar boşlukları; bütün bölümler aynı hizayı kullanır */
+/* Page width and side padding; every section shares the same alignment */
 .container {
   width: 100%;
   max-width: 1200px;
@@ -58,17 +58,17 @@ kbd {
   }
 }
 
-/* Geniş sahne: örnekler bölümü gibi yan yana çok öğe taşıyan alanlar için */
+/* Wide stage: for areas that hold many elements side by side, like the examples section */
 .container-wide {
   max-width: 1440px;
 }
 
-/* Bölüme linkle gidildiğinde başlık yapışkan üst menünün altında kalmasın */
+/* When jumping to a section via a link, keep its heading clear of the sticky header */
 section[id] {
   scroll-margin-top: 72px;
 }
 
-/* Görünmez ama ekran okuyucuların okuduğu metin */
+/* Invisible text that screen readers still read */
 .sr-only {
   position: absolute;
   width: 1px;

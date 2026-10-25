@@ -1,8 +1,8 @@
 import { createContext, useContext } from 'react';
 
 /**
- * Klavyeyle seçilen öğeyi görünür kılar. Varsayılan olarak en yakın kaydırma kabını kaydırır; içeriğini sayfa
- * kaydırmasıyla oynatan çerçeveler (BrowserFrame) bunun yerine sayfayı öğeyi gösteren konuma kaydırır.
+ * Brings the keyboard-selected element into view. By default it scrolls the nearest scroll container; frames
+ * that move their content with page scroll (BrowserFrame) instead scroll the page to where the element shows.
  */
 export const RevealContext = createContext<(element: Element) => void>((element) =>
   element.scrollIntoView({ block: 'nearest', inline: 'nearest' }),

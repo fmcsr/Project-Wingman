@@ -3,7 +3,7 @@ import { SIGN_IN_HREF } from './links';
 import { SectionHeader } from './SectionHeader';
 import styles from './Pricing.module.css';
 
-/** Fiyatlar ve içerikler yer tutucudur; ödeme aşamasında netleşecek. */
+/** Prices and contents are placeholders; they will be finalized in the payments phase. */
 const PLANS = [
   {
     id: 'free',

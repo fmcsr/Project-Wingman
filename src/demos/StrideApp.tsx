@@ -20,13 +20,13 @@ const SIZES = [
 
 const STAR = 'M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.3l-5.9 3.2 1.2-6.5-4.8-4.6 6.6-.9z';
 
-/** Boştayken bildirimin (toast) kendi kendine gelip gitme aralığı. */
+/** Interval at which the notification (toast) comes and goes on its own while idle. */
 const TOAST_CYCLE_MS = 2800;
 
 /**
- * Örnek proje [05]: bir alışveriş uygulamasının ürün sayfası. PM'lerin en sık adını aradığı öğeleri
- * (toast, sayı rozeti, sayfa noktaları, adet seçici, tükenmiş beden, sabit satın alma çubuğu) bir arada gösterir.
- * Toast boştayken gelip gider; örnek incelenirken görünür kalır.
+ * Example project [05]: a shopping app's product page. Shows the elements whose names PMs look up most often
+ * (toast, count badge, pagination dots, quantity stepper, sold-out size, sticky buy bar) in one place.
+ * The toast comes and goes while idle; it stays visible during inspection.
  */
 export function StrideApp() {
   const exploring = useInspectActivity();
@@ -34,7 +34,7 @@ export function StrideApp() {
 
   useEffect(() => {
     if (exploring) return;
-    // Hareketi azaltma açıksa toast görünür ve sabit durur
+    // If reduced motion is on, the toast stays visible and static
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setCycleToast(true);
       return;

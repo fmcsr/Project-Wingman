@@ -1,7 +1,7 @@
 import { setTheme, useTheme } from '../theme';
 import styles from './ThemeToggle.module.css';
 
-/** Açık/koyu tema düğmesi. İlk açılışta sistem ayarını izler; seçim yapılınca onu hatırlar. */
+/** Light/dark theme button. Follows the system setting on first visit; remembers the choice once one is made. */
 export function ThemeToggle() {
   const theme = useTheme();
   const next = theme === 'dark' ? 'light' : 'dark';

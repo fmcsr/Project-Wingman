@@ -5,12 +5,12 @@ type ButtonLinkProps = {
   href: string;
   variant?: 'primary' | 'secondary';
   size?: 'sm' | 'md' | 'lg';
-  /** Bulunduğu alanın tüm genişliğini kaplasın mı (plan kartları gibi). */
+  /** Whether it fills the full width of its container (as in the pricing plan cards). */
   block?: boolean;
   children: ReactNode;
 };
 
-/** Buton görünümlü link. Sayfa içi bölümlere ya da ileride gelecek sayfalara gider. */
+/** A link styled as a button. Leads to in-page sections or to pages that will come later. */
 export function ButtonLink({ href, variant = 'secondary', size = 'md', block = false, children }: ButtonLinkProps) {
   const className = [
     styles.button,

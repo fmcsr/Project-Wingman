@@ -47,8 +47,8 @@ function FeatureCards() {
 }
 
 /**
- * Değer kartları: kayan yazı gibi yavaşça sola akan, kesintisiz bir şerit. İmleç üzerindeyken ya da düğmeyle
- * durur; "hareketi azalt" açıkken akmaz, kartlar sıralı durur. İkinci kopya yalnızca döngü içindir, gizlidir.
+ * Feature cards: a seamless strip drifting slowly left, like a marquee. It pauses on hover or via the button; with
+ * "reduced motion" on it stays still and the cards sit in order. The second copy only serves the loop and is hidden.
  */
 export function Features() {
   const [paused, setPaused] = useState(false);

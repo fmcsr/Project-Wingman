@@ -14,7 +14,7 @@
   gap: 5px;
 }
 
-/* İki sınıflı seçiciler, demoların genel "svg" kurallarını ezer */
+/* Two-class selectors override the demos' generic "svg" rules */
 .icons .signal {
   fill: currentColor;
   stroke: none;

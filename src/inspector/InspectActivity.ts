@@ -1,11 +1,11 @@
 import { createContext, useContext } from 'react';
 
-/** Kullanıcı bu örneği şu an inceliyor mu: imleç üzerinde, klavye odağı içinde ya da bir balon açık. */
+/** Is the user inspecting this example right now: cursor over it, keyboard focus inside, or a balloon open. */
 export const InspectActivityContext = createContext(false);
 
 /**
- * Kendi kendine hareket eden demolar (ör. açılıp kapanan menü) bunu okuyarak incelenirken sabit durur;
- * böylece hareketli öğeler de rahatça incelenebilir.
+ * Self-animating demos (e.g. a menu that opens and closes) read this and hold still while inspected,
+ * so moving elements can be inspected comfortably too.
  */
 export function useInspectActivity() {
   return useContext(InspectActivityContext);

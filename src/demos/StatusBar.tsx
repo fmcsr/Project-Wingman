@@ -1,6 +1,6 @@
 import styles from './StatusBar.module.css';
 
-/** Mobil demoların ortak durum çubuğu: saat, sinyal, Wi-Fi, pil. Rengi kapsayıcısından alır. */
+/** Shared status bar for the mobile demos: time, signal, Wi-Fi, battery. Inherits color from its container. */
 export function StatusBar({ className }: { className?: string }) {
   return (
     <div className={className ? `${styles.statusBar} ${className}` : styles.statusBar} data-inspect="status-bar">

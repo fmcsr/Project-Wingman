@@ -33,11 +33,11 @@ const TABS: { label: string; active?: boolean; icon: ReactNode }[] = [
   { label: 'Profile', icon: <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0" /> },
 ];
 
-/** İlerleme halkası: çevre ≈ 2π·26; görünen uzunluk ilerlemeye eşittir. */
+/** Progress ring: circumference ≈ 2π·26; the visible length matches the progress. */
 const RING_CIRCUMFERENCE = 2 * Math.PI * 26;
 const PROGRESS = 0.72;
 
-/** Örnek proje [03]: iOS tarzı bir alışkanlık uygulaması. Etkileşim yoktur, yalnızca incelenir. */
+/** Example project [03]: an iOS-style habit tracker. Not interactive; for inspection only. */
 export function WaveApp() {
   return (
     <div className={styles.app}>

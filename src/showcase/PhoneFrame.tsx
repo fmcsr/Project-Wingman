@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 import styles from './PhoneFrame.module.css';
 
 /**
- * Mobil örneklerin sergilendiği telefon çerçevesi: ince kasa, yuvarlak ekran ve kamera adası.
- * Sabit boyutta tasarlanır; kapsayıcıdaki `--phone-scale` ile bütünüyle küçültülür.
+ * Phone frame that showcases the mobile examples: thin bezel, rounded screen and camera island.
+ * Designed at a fixed size; scaled down as a whole via `--phone-scale` on the container.
  */
 export function PhoneFrame({ children }: { children: ReactNode }) {
   return (

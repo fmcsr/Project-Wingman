@@ -2,14 +2,14 @@ import { useEffect, useRef } from 'react';
 import { subscribeTheme } from '../theme';
 import styles from './HorizonLines.module.css';
 
-/** Bir ışının bir sonrakinin yerine kayma süresi; büyüdükçe akış yavaşlar. */
+/** Time for a ray to slide into the next one's place; larger values slow the flow. */
 const FLOW_MS = 3200;
-/** Odak noktasının hafifçe salınma döngüsü. */
+/** Cycle of the focus point's gentle sway. */
 const BREATH_MS = 16000;
-/** "Hareketi azalt" açıkken çizilen sabit an. */
+/** The fixed moment drawn while "reduced motion" is on. */
 const STILL_MS = 0;
 
-/** Kayan yıldız: 2–5 ışık soldan farklı ışınlardan gelip odakta buluşur, birleşen ışık sağda başka bir ışından çıkar. */
+/** Shooting star: 2–5 lights from different left rays meet at the focus point and exit as one on a ray to the right. */
 const STAR_IN_MS = 1100;
 const STAR_OUT_MS = 1400;
 const STAR_FIRST_MS = 3000;
@@ -17,10 +17,10 @@ const STAR_GAP_MIN_MS = 8000;
 const STAR_GAP_MAX_MS = 14000;
 const STAR_ENTRIES_MIN = 2;
 const STAR_ENTRIES_MAX = 5;
-/** İzin uzunluğu, yol biriminde (bir ışın = 1): yavaşken kısa bir damla, odaktan geçerken uzun bir ışın. */
+/** Trail length in path units (one ray = 1): a short teardrop when slow, a long ray when passing the focus point. */
 const STAR_TAIL_MIN = 0.04;
 const STAR_TAIL_MAX = 0.24;
-/** Damlanın baş genişliği (CSS piksel). */
+/** Width of the teardrop's head (CSS pixels). */
 const STAR_WIDTH = 3;
 
 type Rgb = readonly [number, number, number];
@@ -45,10 +45,10 @@ type Geometry = {
   flow: number;
 };
 
-/** Kuadratik bir ışın eğrisi: kenardaki uçtan (e) odağa (f), kontrol noktası c. */
+/** A quadratic ray curve: from the end at the edge (e) to the focus point (f), with control point c. */
 type Curve = { ex: number; ey: number; cx: number; cy: number; fx: number; fy: number };
 
-/** İzin bir eğri üzerindeki parçası. Share: o ucun izin neresine denk geldiği (0 kuyruk ucu, 1 baş). */
+/** The part of the trail on one curve. Share: where that end falls along the trail (0 tail tip, 1 head). */
 type Band = { curve: Curve; from: number; to: number; fromShare: number; toShare: number; withHead: boolean };
 
 type RayRef = { half: Half; k: number };
@@ -64,7 +64,7 @@ function rgba([r, g, b]: Rgb, alpha: number) {
   return `rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)})`;
 }
 
-/** Çizgi rengi CSS'teki `color` değerinden okunur; böylece tema değişince kendiliğinden uyar. */
+/** The line color is read from the CSS `color` value, so it adapts automatically when the theme changes. */
 function readColor(element: Element): Rgb {
   const [r = 0, g = 0, b = 0] = (getComputedStyle(element).color.match(/\d+/g) ?? []).map(Number);
   return [r, g, b];
@@ -82,18 +82,18 @@ function fieldGeometry(width: number, height: number, timeMs: number): Geometry 
 }
 
 /**
- * Bir ışının o anki eğrisi. `t`: odakta 0, kenarda 1. Solda zamanla azalır (içe akış), sağda artar (dışa akış).
- * Işınlar ufka yaklaştıkça sıklaşır (perspektif).
+ * A ray's current curve. `t`: 0 at the focus point, 1 at the edge. Over time it decreases on the left (inward flow)
+ * and increases on the right (outward flow). Rays get denser toward the horizon (perspective).
  */
 function ray(geo: Geometry, side: Side, half: Half, k: number) {
   const progress = ((k + geo.flow) % geo.perHalf) / geo.perHalf;
   const t = side < 0 ? 1 - progress : progress;
-  // Ufkun üstündeki ışınlar daha yükseğe uzanır
+  // Rays above the horizon reach higher
   const span = half < 0 ? geo.focusY * 1.05 : (geo.height - geo.focusY) * 2.2;
   const reach = t ** 1.6;
   const ex = side < 0 ? -geo.width * 0.02 : geo.width * 1.02;
   const ey = geo.focusY + half * span * reach;
-  // Kontrol noktası ufka yakın: ışınlar odağa neredeyse yatay, teğet bağlanır
+  // Control point near the horizon: rays join the focus point almost horizontally, at a tangent
   const curve: Curve = {
     ex,
     ey,
@@ -105,7 +105,7 @@ function ray(geo: Geometry, side: Side, half: Half, k: number) {
   return { curve, t };
 }
 
-/** Eğri üzerindeki nokta; v kenarda 0, odakta 1. */
+/** Point on the curve; v is 0 at the edge, 1 at the focus point. */
 function pointOn({ ex, ey, cx, cy, fx, fy }: Curve, v: number): Point {
   const a = (1 - v) * (1 - v);
   const b = 2 * (1 - v) * v;
@@ -114,8 +114,8 @@ function pointOn({ ex, ey, cx, cy, fx, fy }: Curve, v: number): Point {
 }
 
 /**
- * Simetrik ışın alanı: soldan gelen kıl inceliğindeki ışınlar ortadaki odakta küçülür, sağa doğru aynı
- * biçimde yeniden büyür. Dağınık fikirler tek bir net terimde buluşur ve oradan yeniden açılır.
+ * Symmetric ray field: hairline rays coming from the left shrink toward the focus point in the middle and grow
+ * again the same way toward the right. Scattered ideas meet in one clear term and open up again from there.
  */
 function drawField({ ctx, width, height, dpr, rgb }: Frame, geo: Geometry) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -123,14 +123,14 @@ function drawField({ ctx, width, height, dpr, rgb }: Frame, geo: Geometry) {
   ctx.lineWidth = Math.max(0.5, 1 / dpr);
 
   const [r, g, b] = rgb;
-  // Koyu zeminde açık renkli çizgi daha parlak algılanır; iki temada aynı incelik için kısılır
+  // Light lines read brighter on a dark background; they're dimmed to look equally thin in both themes
   const intensity = (r + g + b) / 3 > 128 ? 0.7 : 1;
 
   for (const side of [-1, 1] as const) {
     for (const half of [-1, 1] as const) {
       for (let k = 0; k < geo.perHalf; k++) {
         const { curve, t } = ray(geo, side, half, k);
-        // Odağa yaklaşınca söner (üst üste binip koyulaşmasın), kenarda doğar ya da kaybolur
+        // Fades out near the focus point (so overlapping lines don't darken) and fades in or out at the edge
         const alpha =
           0.22 * intensity * smoothstep(0, 0.3, t) * (1 - smoothstep(0.8, 1, t)) * (k % 5 === 0 ? 1.5 : 1);
         if (alpha < 0.004) continue;
@@ -145,9 +145,9 @@ function drawField({ ctx, width, height, dpr, rgb }: Frame, geo: Geometry) {
 }
 
 /**
- * Yıldızın yol üzerindeki konumu: 0 sol kenar, 1 odak, 2 sağ kenar. Girişte hızlanır, çıkışta yavaşlar;
- * odaktan geçerken hız sıçramasın diye çıkışın yavaşlama üssü iki sürenin oranından gelir.
- * `pace`: o anki hızın odaktaki hıza oranı (0–1).
+ * The star's position on its path: 0 left edge, 1 focus point, 2 right edge. Speeds up on entry, slows on exit;
+ * the exit's easing exponent comes from the ratio of the two durations so speed doesn't jump at the focus point.
+ * `pace`: ratio of the current speed to the speed at the focus point (0–1).
  */
 function starMotion(elapsed: number) {
   if (elapsed < STAR_IN_MS) {
@@ -160,8 +160,8 @@ function starMotion(elapsed: number) {
 }
 
 /**
- * Damla biçimli izin bir parçası: tek parça dolgulu bir şekil (noktalı görünmez). Kuyruğa doğru incelir ve
- * saydamlaşır; başta hareket yönüne bakan yarım daire damlanın dolgun ucunu oluşturur.
+ * One piece of the teardrop-shaped trail: a single filled shape (so it doesn't look dotted). It narrows and fades
+ * toward the tail; at the head, a semicircle facing the direction of travel forms the teardrop's round end.
  */
 function drawBand(ctx: CanvasRenderingContext2D, band: Band, rgb: Rgb, alpha: number) {
   const { curve, from, to, fromShare, toShare, withHead } = band;
@@ -214,8 +214,8 @@ function drawGlow(ctx: CanvasRenderingContext2D, { x, y }: Point, radius: number
 }
 
 /**
- * Kayan yıldızın o anki karesi. İz, kuyruğundan başına kadar üstünden geçtiği her ışına ayrı çizilir:
- * buluşma anında girişlerin kuyrukları odağa akarken birleşen ışığın başı sağdaki ışından çıkar.
+ * The shooting star's current frame. The trail is drawn separately on each ray it passes over, from tail to head:
+ * as they meet, the entries' tails flow into the focus point while the merged light's head exits on the right ray.
  */
 function drawStar({ ctx, rgb }: Frame, geo: Geometry, star: Star, timeMs: number) {
   const elapsed = timeMs - star.start;
@@ -224,10 +224,10 @@ function drawStar({ ctx, rgb }: Frame, geo: Geometry, star: Star, timeMs: number
   const share = (position: number) => (position - tail) / (head - tail);
   const [r, g, b] = rgb;
   const bright = (r + g + b) / 3 > 128;
-  // Koyu zeminde açık renkli iz daha parlak algılanır; açık zeminde başın ışıması lekeye dönmesin diye kısılır
+  // A light trail reads brighter on a dark background; on a light one, the head's glow is dimmed to avoid a smudge
   const strength = bright ? 0.85 : 0.7;
   const halo = bright ? 0.3 : 0.15;
-  // Sol kenarda belirir, sağ kenara yaklaşırken söner
+  // Appears at the left edge and fades out as it nears the right edge
   const alpha = strength * smoothstep(0, 0.15, head) * (1 - smoothstep(1.55, 1.95, head));
 
   if (alpha > 0.01 && head > tail) {
@@ -240,7 +240,7 @@ function drawStar({ ctx, rgb }: Frame, geo: Geometry, star: Star, timeMs: number
       }
     }
     if (head > 1) {
-      // Çıkış ışınında eğri parametresi odakta 1, kenarda 0
+      // On the exit ray the curve parameter is 1 at the focus point, 0 at the edge
       const start = Math.max(tail, 1);
       const { curve } = ray(geo, 1, star.exit.half, star.exit.k);
       drawBand(ctx, { curve, from: 2 - start, to: 2 - head, fromShare: share(start), toShare: 1, withHead: true }, rgb, alpha);
@@ -248,14 +248,14 @@ function drawStar({ ctx, rgb }: Frame, geo: Geometry, star: Star, timeMs: number
     }
   }
 
-  // Buluşma anında odakta kısa, yumuşak bir parlama
+  // A brief, soft flash at the focus point as the lights meet
   const flash = (elapsed - STAR_IN_MS + 60) / 480;
   if (flash > 0 && flash < 1) {
     drawGlow(ctx, { x: geo.focusX, y: geo.focusY }, 3 + 14 * flash, rgb, strength * 0.4 * (1 - flash));
   }
 }
 
-/** O an görünür bölgede olan (sönmekte ya da doğmakta olmayan) ışınlar. */
+/** Rays currently in the visible zone (neither fading out nor fading in). */
 function visibleRays(geo: Geometry, side: Side) {
   const rays: RayRef[] = [];
   for (const half of [-1, 1] as const) {
@@ -280,14 +280,14 @@ function shuffle<T>(items: T[]) {
   return copy;
 }
 
-/** İki ışın aynı yarıda ve birbirine `gap` ışından yakınsa aynı yer sayılır. */
+/** Two rays count as the same spot if they're in the same half and fewer than `gap` rays apart. */
 function farApart(a: RayRef, b: RayRef, gap: number) {
   return a.half !== b.half || Math.abs(a.k - b.k) >= gap;
 }
 
 /**
- * Her seferinde farklı yerlerden gelip bir öncekinden farklı bir yere giden yeni bir yıldız kurar.
- * Giriş sayısı her seferinde 2–5 arasındadır; girişler birbirinden uzak ışınlardan seçilir.
+ * Builds a new star that comes from different places each time and leaves somewhere other than the previous one.
+ * The entry count is 2–5 each time; entries are picked from rays that are far apart.
  */
 function createStar(geo: Geometry, start: number, previousExit: RayRef | null): Star | null {
   const wanted = STAR_ENTRIES_MIN + Math.floor(Math.random() * (STAR_ENTRIES_MAX - STAR_ENTRIES_MIN + 1));
@@ -310,8 +310,8 @@ type HorizonLinesProps = {
 };
 
 /**
- * Hero'nun arkasındaki hafif hareketli çizgi alanı ve arada bir kayan yıldız.
- * Ekranda görünmüyorken ve "hareketi azalt" ayarı açıkken animasyon durur.
+ * The gently moving line field behind the Hero, with an occasional shooting star.
+ * The animation stops while off-screen and while the "reduced motion" setting is on.
  */
 export function HorizonLines({ className }: HorizonLinesProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -350,7 +350,7 @@ export function HorizonLines({ className }: HorizonLinesProps) {
     };
 
     const loop = (now: number) => {
-      // Sekmeye geri dönüldüğünde çizgiler bir anda sıçramasın diye adım sınırlandırılır
+      // The time step is capped so the lines don't suddenly jump when you return to the tab
       if (last !== null) elapsed += Math.min(now - last, 64);
       last = now;
       updateStar();

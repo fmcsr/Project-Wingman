@@ -2,20 +2,20 @@ import type { ReactNode } from 'react';
 import styles from './SectionHeader.module.css';
 
 type SectionHeaderProps = {
-  /** Başlığın kimliği; bölüm `aria-labelledby` ile buna bağlanır. */
+  /** The heading's id; the section references it via `aria-labelledby`. */
   id: string;
-  /** Sıra etiketi, ör. "[01]". */
+  /** Index label, e.g. "[01]". */
   index: string;
   label: string;
   title: string;
-  /** Başlığın gri ikinci yarısı (iki tonlu başlık). */
+  /** Gray second half of the heading (two-tone heading). */
   muted?: string;
   description?: string;
-  /** Sağdaki denetimler (ör. kaydırma okları). */
+  /** Controls on the right (e.g. scroll arrows). */
   actions?: ReactNode;
 };
 
-/** Bölüm başlığı: mono sıra etiketi, iki tonlu başlık ve kısa açıklama. */
+/** Section header: mono index label, two-tone heading and a short description. */
 export function SectionHeader({ id, index, label, title, muted, description, actions }: SectionHeaderProps) {
   return (
     <div className={styles.header}>

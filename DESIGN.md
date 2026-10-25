@@ -1,125 +1,125 @@
-# Project Wingman — Tasarım kararları
+# Project Wingman — Design decisions
 
-Son güncelleme: 2026-10-25 · Durum: Açılış sayfasına uygulandı
+Last updated: 2026-10-26 · Status: Applied to the landing page
 
-## Kararlar
+## Decisions
 
-| Konu | Karar | Neden |
+| Topic | Decision | Why |
 | --- | --- | --- |
-| Ürün adı | Project Wingman | Arayüz, repo ve belgelerde tek ad. |
-| Site dili | İngilizce | Ücretli ürün ve uluslararası hedef kitle. Geliştirici belgeleri (bu dosya, README, kod yorumları) Türkçe kalır. |
-| Tema | Açık ve koyu. Varsayılan sistem ayarı; üst menüdeki düğmeyle seçilir ve hatırlanır | Token'lar `light-dark()` ile bir kez tanımlanır; düğme `<html data-theme>` ile `color-scheme`'i ezer. Seçim `localStorage`'da tutulur, `index.html`'deki küçük betik ilk boyamadan önce uygular. |
-| Görsel yön | **Sinyal**: açık temada LayerZero'nun gri sadeliği, koyu temada Stargate'in derinliği | İki referansın ortak dili (nötr taban, tek vurgu, düz yüzeyler) açık/koyu ikiliğine oturuyor. |
-| Vurgu rengi | Tek renk, sinyal yeşili; **yalnızca öğrenme anlarında** | İnceleme anahattı, ad etiketi, terim etiketleri, odak halkası. Başka yerde kullanılmaz. |
-| Tipografi | Roboto + Roboto Mono, LayerZero ile birebir | LayerZero'nun kullandığı yazı tipleri; ikisi de açık lisanslı (OFL). Fontsource ile kendi sunucumuzdan yüklenir. Başlık ve etiket ölçüleri de LayerZero'dan alındı. |
-| İmza görseli | Hero'da simetrik ışınlar (`src/brand/HorizonLines.tsx`): soldan gelir, ortada küçülür, sağa doğru aynı biçimde büyür. Arada bir kayan yıldız geçer: 2–5 ışık soldan farklı ışınlardan gelip odakta buluşur, birleşen ışık sağda başka bir ışından çıkar | LayerZero'nun kapak ekranından esinlenen motif; metaforu “dağınık fikirler tek net terimde buluşur ve oradan yeniden açılır”. Kayan yıldız bu buluşmayı canlandırır. Akış soldan sağadır. |
-| Örnek arayüzler | Site temasından etkilenmez; her biri kendi görünümünü korur (Muse bilerek koyu) | Örnekler gerçek ürünleri temsil eder; markanın değil, öğretilen kavramın parçasıdır. |
-| İnceleme modeli | Tarayıcı geliştirici araçlarındaki “öğeyi incele” gibi | Neredeyse her öğe kendini anlatabilsin; yeni öğe eklemek tek bir `data-inspect` niteliği kadar kolay olsun. |
-| Örnek sitelerde kaydırma | Kendi içinde kaydırma yok; Apple'ın ürün sayfalarındaki gibi pencere sabitlenir, sayfa kaydırması içindeki siteyi kaydırır | İç içe kaydırma (sayfanın içinde kayan bir pencere) imleci tuzağa düşürüyor ve sayfayı kullanmayı zorlaştırıyordu. |
+| Product name | Project Wingman | One name across the UI, the repo and the docs. |
+| Language | English | A paid product with an international audience. Developer docs (this file, the README, code comments) are in English too. |
+| Theme | Light and dark. Defaults to the system setting; the header toggle picks one and remembers it | Tokens are defined once with `light-dark()`; the toggle overrides `color-scheme` through `<html data-theme>`. The choice is kept in `localStorage`, and a tiny script in `index.html` applies it before the first paint. |
+| Visual direction | **Signal**: LayerZero's gray simplicity in light mode, Stargate's depth in dark mode | The two references share a language (neutral base, one accent, flat surfaces) that fits the light/dark pair. |
+| Accent color | One color, signal green, **only for learning moments** | Inspection outline, name tag, term chips, focus ring. Not used anywhere else. |
+| Typography | Roboto + Roboto Mono, the same as LayerZero | LayerZero's typefaces; both are open source (OFL). Self-hosted via Fontsource. Heading and label metrics are taken from LayerZero too. |
+| Signature visual | Symmetric rays in the hero (`src/brand/HorizonLines.tsx`): they come in from the left, narrow to a point in the middle and widen again toward the right. Every so often a shooting star passes: 2–5 beams come in along different rays on the left and meet at the focus point, and the merged beam leaves along another ray on the right | A motif inspired by LayerZero's hero. The metaphor: scattered ideas meet in one clear term and open up again from there. The shooting star animates that meeting. The flow runs left to right. |
+| Example interfaces | Not affected by the site theme; each keeps its own look (Muse is dark on purpose) | The examples stand for real products; they're part of the concept being taught, not of the brand. |
+| Inspection model | Like “Inspect element” in browser developer tools | Nearly every element can explain itself, and adding a new one takes a single `data-inspect` attribute. |
+| Scrolling in the example sites | No scrolling inside the frames. As on Apple's product pages, the window pins and page scrolling scrolls the site inside it | Nested scrolling (a window that scrolls inside the page) trapped the cursor and made the page harder to use. |
 
-## Sayfa yapısı (bilgi mimarisi)
+## Page structure (information architecture)
 
 ```
-Üst menü      Logo · Examples · Features · Pricing ········ Tema · Sign in   (yapışkan)
-Kapak         [ PROJECT WINGMAN ] · “Every PM needs a wingman.” · See examples / Get started
-[01] Examples Acme (pazarlama) · Orbit (analiz paneli) · Wave (alışkanlık) · Muse (yapay zekâ) · Stride (alışveriş)
-[02] Features Yavaşça akan kayan şerit (durdurma düğmesi)
-[03] Pricing  Free · Pro · Team (fiyatlar yer tutucu)
-Footer        Yazı linkleri · Back to top
+Header        Logo · Examples · Features · Pricing ········ Theme · Sign in   (sticky)
+Hero          [ PROJECT WINGMAN ] · “Every PM needs a wingman.” · See examples / Get started
+[01] Examples Acme (marketing) · Orbit (analytics dashboard) · Wave (habits) · Muse (AI) · Stride (shopping)
+[02] Features A slowly moving marquee (with a pause button)
+[03] Pricing  Free · Pro · Team (placeholder prices)
+Footer        Text links · Back to top
 ```
 
-- **Üst menü bar değildir ama yapışkandır:** Sayfanın tepesinde tamamen şeffaftır; aşağı inildikçe kenarlıksız bir buzlu cam zemin alır. Linkler bölümlere götürür, logo en tepeye döner, görünümdeki bölümün linki koyulaşır. Bölümler `scroll-margin-top` ile menünün altında durur.
-- **Footer:** Bar değil, sayfa zemininde duran yazı linkleridir.
-- **Ana sayfa yalnızca beş örnek proje gösterir:** Kütüphanenin tamamı ve “Sign in” sonrası alanlar sonraki aşamada gelecek.
-- **Örnek yerleşimi:**
-  - Siteler (Acme, Orbit): Her biri kendi kaydırma sahnesinde, sayfa genişliğinde, alt alta.
-    - Pencere üst menünün altına sabitlenir. Sahne, içeriğin taşan kısmı kadar uzar; sayfa kaydırması bire bir pencerenin içine aktarılır.
-    - Kullanıcı pencerenin içinde ayrıca kaydırmaz. İçerik gerçekten kaydırıldığı için (`overflow: hidden` + `scrollTop`) Acme'nin yapışkan cam navbar'ı çalışmaya devam eder.
-  - Telefonlar: Her genişlikte üçü tek sırada. Sığmazlarsa birlikte küçülürler (`--phone-scale`; telefonda ~0,35); dar sırada başlıkta yalnızca sıra numarası ve ad kalır.
+- **The header isn't a bar, but it's sticky:** Fully transparent at the top of the page; as you scroll down it takes on a borderless frosted-glass background. Links go to sections, the logo goes back to the top, and the link of the section in view gets darker. Sections stop below the header thanks to `scroll-margin-top`.
+- **Footer:** Not a bar; text links sitting on the page background.
+- **The home page shows only five example projects:** The full library and the signed-in areas come in a later phase.
+- **Example layout:**
+  - Sites (Acme, Orbit): Each in its own scroll scene, full page width, one after another.
+    - The window pins below the header. The scene grows by as much as the content overflows, and page scrolling is passed one to one into the window.
+    - Users never scroll inside the window. Because the content really scrolls (`overflow: hidden` + `scrollTop`), Acme's sticky glass navbar keeps working.
+  - Phones: All three in one row at every width. If they don't fit, they shrink together (`--phone-scale`; ~0.35 on a phone). In a narrow row, each heading keeps only the index and the name.
 
-## İnceleme etkileşimi
+## Inspection interaction
 
-| Girdi | Davranış |
+| Input | Behavior |
 | --- | --- |
-| Fare | Üzerine gelince yeşil anahat ve ad etiketi hemen; 280 ms duraksamada özet balonu. Önizleme açıkken başka öğeye geçmek balonu beklemeden günceller. Tıklamak tam açıklamayı sabitler. |
-| Dokunmatik | Dokunmak tam açıklamayı açar; başka öğeye dokunmak geçiş yapar; dışarı dokunmak kapatır, kaydırmak kapatmaz. |
-| Klavye | Her örnek tek sekme durağıdır. Oklar ve Home/End öğeler arasında gezdirir, Enter sabitler, Esc kapatır. Canlı bölge, öğenin adını ve özetini ekran okuyucuya okur. Sitelerde seçilen öğe pencerede görünmüyorsa sayfa onu gösterecek konuma kayar. |
+| Mouse | On hover, the green outline and the name tag appear at once; after a 280 ms dwell, a summary balloon. While a preview is open, moving to another element updates the balloon without waiting. A click pins the full explanation. |
+| Touch | A tap opens the full explanation; tapping another element switches to it; tapping outside closes it, scrolling doesn't. |
+| Keyboard | Each example is a single tab stop. Arrow keys and Home/End move between elements, Enter pins, Esc closes. A live region reads the element's name and summary to screen readers. In the sites, if the selected element isn't visible in the window, the page scrolls to where it shows. |
 
-Balon önizlemede dar (ad, özet, terim etiketleri), sabitlenince geniştir (gündelik karşılıklar, kavramların sade açıklaması). Altta yer yoksa üste döner; bütün çerçeveleri kapsayan ortak katmana çizildiği için çerçeve kenarında kırpılmaz.
+The balloon is narrow in preview (name, summary, term chips) and wide when pinned (everyday names, plain-language explanations of each concept). It flips above the element when there's no room below, and since it's drawn on a shared layer that covers every frame, it never gets clipped at a frame's edge.
 
-Küçültülmüş telefonlarda ve yerine oturan pencerelerde anahat ve ad etiketi ölçeğin tersiyle çizilir: anahat ince, etiket okunur kalır.
+In the scaled-down phones and in windows settling into place, the outline and the name tag are drawn at the inverse scale: the outline stays thin and the tag stays readable.
 
-**Hareketli demolar incelenirken durur.** Muse'un açılır menüsü boştayken kendi kendine açılıp kapanır. İmleç örneğin üzerindeyken, klavye odağı içindeyken ya da bir balon açıkken açık kalır ki menünün kendisi de incelenebilsin. Demolar bu durumu `useInspectActivity()` ile okur.
+**Animated demos pause while inspected.** Muse's dropdown opens and closes on its own when idle. It holds still while the pointer is over the example, keyboard focus is inside it or a balloon is open, so the menu itself can be inspected too. Demos read this state with `useInspectActivity()`.
 
-## Mobil demolar
+## Mobile demos
 
-- **Wave:** Klasik iOS dili. Açık zemin, liste satırları, açma/kapama anahtarları, FAB, alt sekme çubuğu.
-- **Muse:** Yenilikçi uygulama tipi; yapay zekâ asistanı ve Liquid Glass dili. Koyu, renkli bir zemin üzerinde yüzen cam navbar, kendi kendine açılıp kapanan cam açılır menü, sohbet balonları, yazıyor göstergesi, cam öneri çipleri, cam mesaj kutusu ve renk çemberli ses düğmesi.
-  - Liquid Glass tarifi: `backdrop-filter: blur() saturate(180%)`, yarı saydam beyaz zemin, ince beyaz kenarlık ve üst kenarda iç gölgeyle bir ışık çizgisi.
-- **Stride:** Alışveriş ürün sayfası. Koleksiyonun “mutlaka olması gereken” parçası, çünkü PM'lerin en sık adını aradığı öğeleri tek ekranda toplar:
-  - Fotoğraf galerisi ve sayfa noktaları.
-  - Sayı rozeti, favori düğmesi, indirim rozeti ve üstü çizili fiyat.
-  - Yıldız puanı, renk ve beden seçici (tükenmiş beden durumu dahil).
-  - Adet seçici ve sabit satın alma çubuğu.
-  - Kendi kendine gelip giden toast (incelenirken görünür kalır).
+- **Wave:** The classic iOS language. Light background, list rows, toggle switches, a FAB and a bottom tab bar.
+- **Muse:** A newer kind of app: an AI assistant in the Liquid Glass style. A glass navbar floating over a dark, colorful background, a glass dropdown that opens and closes on its own, chat bubbles, a typing indicator, glass suggestion chips, a glass composer and a voice button with a color ring.
+  - Liquid Glass recipe: `backdrop-filter: blur() saturate(180%)`, a translucent white background, a thin white border and a highlight along the top edge made with an inset shadow.
+- **Stride:** A shopping product page. A must-have in the collection, because it gathers the elements PMs most often look up by name on a single screen:
+  - Photo gallery and pagination dots.
+  - Count badge, favorite button, discount badge and struck-through price.
+  - Star rating, color and size pickers (including a sold-out size).
+  - Quantity stepper and a sticky buy bar.
+  - A toast that comes and goes on its own (stays visible while inspected).
 
-## Renk token'ları
+## Color tokens
 
-Tümü `src/styles/tokens.css` içindedir ve `light-dark(açık, koyu)` ile tanımlanır; bileşenler yalnızca token kullanır.
+All of them live in `src/styles/tokens.css` and are defined with `light-dark(light, dark)`; components use tokens only.
 
-| Token | Açık | Koyu | Kullanım |
+| Token | Light | Dark | Use |
 | --- | --- | --- | --- |
-| `--color-bg` | `#fcfcfc` | `#141414` | Sayfa zemini |
-| `--color-surface` | `#ffffff` | `#1a1a1a` | Kart, plan |
-| `--color-surface-2` | `#f5f5f5` | `#1c1c1c` | Değer kartı, pencere çubuğu |
-| `--color-text` | `#171717` | `#fafafa` | Ana metin |
-| `--color-text-muted` | `#5c5c5c` | `#a3a3a3` | Destekleyici metin |
-| `--color-text-subtle` | `#6b6b6b` | `#8f8f8f` | Etiket, menü linki |
-| `--color-text-faint` | `#7a7a7a` | `#6b6b6b` | Yalnızca iki tonlu büyük başlıkların ikinci yarısı |
-| `--color-border` | `#e5e5e5` | `#262626` | Kıl çizgisi |
-| `--color-primary` | `#171717` | `#fafafa` | Ana buton (koyu temada ters) |
-| `--color-fill-secondary` | siyah %6 | beyaz %8 | İkincil buton (LayerZero'daki gri düğme) |
-| `--color-accent` | `#0a8f65` | `#0fb983` | Metin dışı vurgu |
-| `--color-accent-text` | `#087a56` | `#0fb983` | Vurgulu metin |
-| `--color-inspect` | `#0a8f65` | `#0a8f65` | İnceleme anahattı (sabit: örnekler hep açık renkli) |
+| `--color-bg` | `#fcfcfc` | `#141414` | Page background |
+| `--color-surface` | `#ffffff` | `#1a1a1a` | Cards, plans |
+| `--color-surface-2` | `#f5f5f5` | `#1c1c1c` | Feature cards, window title bar |
+| `--color-text` | `#171717` | `#fafafa` | Body text |
+| `--color-text-muted` | `#5c5c5c` | `#a3a3a3` | Supporting text |
+| `--color-text-subtle` | `#6b6b6b` | `#8f8f8f` | Labels, nav links |
+| `--color-text-faint` | `#7a7a7a` | `#6b6b6b` | Only the second half of two-tone large headings |
+| `--color-border` | `#e5e5e5` | `#262626` | Hairlines |
+| `--color-primary` | `#171717` | `#fafafa` | Primary button (inverted in dark mode) |
+| `--color-fill-secondary` | black 6% | white 8% | Secondary button (LayerZero's gray button) |
+| `--color-accent` | `#0a8f65` | `#0fb983` | Non-text accent |
+| `--color-accent-text` | `#087a56` | `#0fb983` | Accent text |
+| `--color-inspect` | `#0a8f65` | `#0a8f65` | Inspection outline (fixed: the examples are always light) |
 
-Açıklama balonu açık temada ters yüzey (`#171717`), koyu temada bir kademe yükselmiş yüzey (`#202020`) kullanır.
+The explainer balloon uses an inverted surface in light mode (`#171717`) and a surface one step up in dark mode (`#202020`).
 
-## Tipografi
+## Typography
 
-Yazı tipleri ve ölçüler LayerZero'dan birebir alındı.
+Typefaces and metrics are taken one to one from LayerZero.
 
-- **Kapak başlığı:** Roboto 400, satır yüksekliği 1.08, harf aralığı `-0.048em` (LayerZero h1: 52/56, −2.5 px). Tek satırlık vaat.
-- **Bölüm başlıkları:** Roboto 400, 1.2, `-0.05em` (LayerZero h2: 40/48, −2 px). İki tonlu: ilk kısım `--color-text`, devamı `--color-text-faint`. Üstünde mono `[01] EXAMPLES` etiketi.
-- **Kart başlıkları:** Roboto 400, 20/28, `-0.025em`.
-- **Gövde:** Roboto 400, 16 px / 1.5.
-- **Mono:** Roboto Mono 400, 12/16, normal harf aralığı. `[ PROJECT WINGMAN ]` etiketi, sıra numaraları, teknik terimler, sayaçlar.
+- **Hero headline:** Roboto 400, line height 1.08, letter spacing `-0.048em` (LayerZero h1: 52/56, −2.5 px). A one-line promise.
+- **Section titles:** Roboto 400, 1.2, `-0.05em` (LayerZero h2: 40/48, −2 px). Two-tone: the first part in `--color-text`, the rest in `--color-text-faint`. A mono `[01] EXAMPLES` label above.
+- **Card titles:** Roboto 400, 20/28, `-0.025em`.
+- **Body:** Roboto 400, 16 px / 1.5.
+- **Mono:** Roboto Mono 400, 12/16, normal letter spacing. The `[ PROJECT WINGMAN ]` label, indexes, technical terms, counters.
 
-## Şekil, yüzey ve hareket
+## Shape, surface and motion
 
-- **Köşeler:** Butonlar tam yuvarlak (hap); tema düğmesi ve kart okları daire. Kartlar 8–12 px; etiket ve rozetler tam yuvarlak.
-- **Yüzeyler düz:** Gölge yok; ayrım kıl çizgileriyle yapılır. Yalnızca yüzen öğeler (balon, telefon) gölge alır.
-- **Hareket:**
-  - Çizgiler ~3,2 saniyede bir ışın aralığı kadar soldan sağa akar; odak 16 saniyelik döngüyle hafifçe salınır.
-  - Kayan yıldız seyrektir: ilki ~3 saniye sonra, sonrakiler 8–14 saniyelik rastgele aralıklarla gelir.
-    - Yol: 2–5 ışık (her seferinde rastgele) soldan birbirinden uzak ışınlardan hızlanarak gelir ve odakta aynı anda buluşur (kısa, yumuşak bir parlama). Birleşen ışık sağda bir öncekinden farklı bir ışından yavaşlayarak çıkar ve kenara yaklaşırken söner. Işık, kaydığı ışını her karede yeniden hesaplayarak izler; akan çizginin içinden ayrılmaz.
-    - Biçim: Damla. Dolgun, yuvarlak bir baş ve arkasında incelip saydamlaşan tek parça bir kuyruk; noktalı iz yok. Yavaşken kısa bir damla, odaktan geçerken uzun bir ışın olur. Rengi çizgilerle aynıdır, temaya uyar; açık temada başın ışıması kısılır.
-  - Site sahneleri: Pencere sabitleneceği konuma gelirken %92'den %100'e büyüyerek oturur. Sabitlenince içerik kaymaya başlamadan önce ve sonunda kısa bir bekleme olur (ekran yüksekliğinin ~%12'si, en fazla 120 px). Kaydırırken sağda macOS'taki gibi ince bir kaydırma çubuğu belirir.
-  - Features şeridi: İki özdeş grup uç uca dizilir ve 80 saniyede bir grup boyu (~25–30 px/sn) sola akar; kenarlar yumuşakça kaybolur. İmleç üzerindeyken ya da düğmeyle durur.
-  - İnceleme anahattı öğeler arasında 120 ms'de kayar.
-  - Tema değişimi, destekleyen tarayıcılarda View Transitions ile yumuşak bir çapraz geçişle olur.
-  - `prefers-reduced-motion` açıkken çizgiler sabit kalır ve kayan yıldız çıkmaz, Muse'un menüsü açık durur, Features şeridi akmaz (kartlar sıralı durur), pencereler büyüyerek oturmaz; diğer animasyonlar ve yumuşak kaydırma da durur. Site sahnelerinde içerik yine sayfayla birlikte kayar; bu, normal kaydırmayla aynı hızdadır.
+- **Corners:** Buttons are fully rounded (pills); the theme toggle and the pause button are circles. Cards 8–12 px; chips and badges fully rounded.
+- **Flat surfaces:** No shadows; hairlines separate things. Only floating elements (balloon, phone, browser window) get a shadow.
+- **Motion:**
+  - The rays drift left to right by one ray spacing every ~3.2 seconds; the focus point sways gently on a 16-second cycle.
+  - The shooting star is rare: the first one after ~3 seconds, then at random 8–14 second intervals.
+    - Path: 2–5 beams (random each time) speed in from rays far apart on the left and meet at the focus point at the same moment (a short, soft flash). The merged beam slows down as it leaves along a different ray on the right than the last one, and fades as it nears the edge. Each beam follows its ray, recomputed every frame, so it never leaves the moving line.
+    - Shape: A teardrop. A full, round head with a single tapering, fading tail; no dotted trail. A short drop when slow, a long beam as it passes the focus point. Same color as the lines, so it follows the theme; the glow around the head is dimmed in light mode.
+  - Site scenes: The window grows from 92% to 100% as it reaches its pinned position. Once pinned, there's a short hold before the content starts scrolling and before the window is released (~12% of the viewport height, at most 120 px). While scrolling, a thin macOS-style scrollbar appears on the right.
+  - Features marquee: Two identical groups sit end to end and drift left by one group's width every 80 seconds (~25–30 px/s); the edges fade out softly. It stops under the pointer or with the button.
+  - The inspection outline slides between elements in 120 ms.
+  - Theme changes cross-fade smoothly with View Transitions where supported.
+  - With `prefers-reduced-motion`, the lines stay still and no shooting star appears, Muse's menu stays open, the Features marquee doesn't move (the cards sit in rows) and windows don't grow into place; other animations and smooth scrolling stop too. In the site scenes the content still moves with the page, at the same speed as normal scrolling.
 
-## Erişilebilirlik notları
+## Accessibility notes
 
-- Açık temada yeşil metin için `#087a56` kullanılır (~5.2:1); `#0a8f65` (~4:1) yalnızca çerçeve ve ikonlar içindir.
-- İki tonlu başlıkların gri kısmı büyük metin kuralını karşılar: açıkta ~4.2:1, koyuda ~3.5:1.
-- Örnek demolar ekran okuyuculardan gizlidir (`aria-hidden`); yerine her örnek odaklanabilir tek bir bölgedir ve gezilen öğe canlı bölgeyle duyurulur.
-- Demolarda gerçek link/düğme yoktur (href'siz `<a>`, `<span>`); böylece sekme sırası bozulmaz.
-- Features şeridi kendiliğinden hareket ettiği için görünür bir durdurma düğmesi vardır (WCAG 2.2.2). Döngü için eklenen ikinci kopya ekran okuyuculardan gizlidir.
+- In light mode, green text uses `#087a56` (~5.2:1); `#0a8f65` (~4:1) is only for borders and icons.
+- The gray part of two-tone headings meets the large-text rule: ~4.2:1 in light mode, ~3.5:1 in dark mode.
+- The example demos are hidden from screen readers (`aria-hidden`); instead, each example is a single focusable region and the element being browsed is announced through a live region.
+- Demos contain no real links or buttons (`<a>` without `href`, `<span>`), so the tab order stays intact.
+- Because the Features marquee moves on its own, it has a visible pause button (WCAG 2.2.2). The second copy added for the loop is hidden from screen readers.
 
-## Referanslar
+## References
 
-- [layerzero.network](https://layerzero.network): açık tema, monokrom, kapaktaki birleşen ışınlar, `[ ]` etiketleri, iki tonlu başlıklar, gri ikincil butonlar, yazı tipleri (Roboto, Roboto Mono) ve tipografi ölçüleri.
-- [apple.com](https://www.apple.com) ürün sayfaları: sabitlenen ve sayfa kaydırıldıkça değişen sahneler.
-- [stargate.finance/overview](https://stargate.finance/overview): koyu tema, tek zümrüt vurgu, düz ve kenarlıklı kartlar, Geist.
+- [layerzero.network](https://layerzero.network): light theme, monochrome, converging rays in the hero, `[ ]` labels, two-tone headings, gray secondary buttons, typefaces (Roboto, Roboto Mono) and type metrics.
+- [apple.com](https://www.apple.com) product pages: scenes that pin and change as you scroll.
+- [stargate.finance/overview](https://stargate.finance/overview): dark theme, a single emerald accent, flat bordered cards, Geist.

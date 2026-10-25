@@ -12,7 +12,7 @@
   cursor: pointer;
 }
 
-/* İnceleme anahattı (devtools'taki gibi); öğeler arasında kayarak geçer */
+/* Inspection outline (as in devtools); slides from element to element */
 .outline {
   position: absolute;
   top: 0;
@@ -37,7 +37,7 @@
   background: rgb(10 143 101 / 0.08);
 }
 
-/* Klavye odağı: etkin öğenin anahattı kalınlaşır */
+/* Keyboard focus: the active element's outline thickens */
 .surface:focus-visible .outline[data-kind='active'],
 .surface:focus-visible .outline[data-kind='pinned'] {
   border-style: solid;

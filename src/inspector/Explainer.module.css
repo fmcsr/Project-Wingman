@@ -2,7 +2,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  /* Önizleme dar, sabit balon geniş; katmana her zaman sığar (8px = useAnchorPosition EDGE_GAP) */
+  /* Preview is narrow, the pinned balloon wide; always fits the layer (8px = useAnchorPosition EDGE_GAP) */
   width: min(320px, calc(100% - 16px));
   container-type: inline-size;
   padding: 16px 18px 12px;
@@ -30,7 +30,7 @@
   outline: none;
 }
 
-/* Balon sayfanın sonuna taşarsa alt kenara yapışmasın */
+/* If the balloon runs past the end of the page, keep it off the bottom edge */
 .panel::after {
   content: '';
   position: absolute;
@@ -41,7 +41,7 @@
   pointer-events: none;
 }
 
-/* Önizlemede imleç hedeften balona geçerken aradaki boşlukta kapanmasın diye görünmez köprü */
+/* Invisible bridge so the preview doesn't close while the cursor crosses the gap from target to balloon */
 .panel[data-mode='preview']::before {
   content: '';
   position: absolute;
@@ -104,7 +104,7 @@
   color: var(--balloon-text);
 }
 
-/* Terim = öğrenme anı: sinyal yeşili */
+/* Term = learning moment: signal green */
 .tag,
 .term {
   padding: 2px 8px;
@@ -204,7 +204,7 @@
   border-top: 1px solid var(--balloon-line);
 }
 
-/* Balon yeterince genişse Görünüm ve Davranış yan yana */
+/* If the balloon is wide enough, Look and Behavior sit side by side */
 @container (width >= 480px) {
   .groups {
     grid-template-columns: 1fr 1fr;
@@ -260,7 +260,7 @@
   color: var(--balloon-text);
 }
 
-/* Sabit balondaki ipucu cihaza göre değişir */
+/* The hint in the pinned balloon depends on the device */
 @media (hover: none) {
   .forHover {
     display: none;

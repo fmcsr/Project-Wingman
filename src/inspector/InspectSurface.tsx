@@ -9,12 +9,12 @@ import { useAnchorPosition } from './useAnchorPosition';
 import { TARGET_SELECTOR, useInspectSurface } from './useInspectSurface';
 import styles from './InspectSurface.module.css';
 
-/** Yerel (ölçeklenmemiş) piksellerle kutu; `scale` kapsayıcının ekrandaki ölçeği. */
+/** Box in local (unscaled) pixels; `scale` is the container's on-screen scale. */
 type Box = { top: number; left: number; width: number; height: number; scale: number };
 
 /**
- * Bir öğenin, kapsayıcısına göre konum ve boyutunu izler (yapışkan öğeler için kaydırmada da).
- * Kapsayıcı ölçeklenmişse (küçültülmüş telefon, yerine oturan pencere) ekran pikseli yerel piksele çevrilir.
+ * Tracks an element's position and size relative to its container (also on scroll, for sticky elements).
+ * If the container is scaled (shrunk phone, window settling into place), converts screen pixels to local pixels.
  */
 function useRelativeBox(element: Element | null, containerRef: RefObject<HTMLElement | null>) {
   const [box, setBox] = useState<Box | null>(null);
@@ -49,7 +49,7 @@ function useRelativeBox(element: Element | null, containerRef: RefObject<HTMLEle
     observer.observe(container);
     observer.observe(element);
     document.addEventListener('scroll', update, true);
-    // Ölçek değişimi düzeni değiştirmez; ResizeObserver yakalamaz
+    // A scale change doesn't alter layout, so ResizeObserver misses it
     window.addEventListener('resize', update);
     return () => {
       observer.disconnect();
@@ -61,7 +61,7 @@ function useRelativeBox(element: Element | null, containerRef: RefObject<HTMLEle
   return element ? box : null;
 }
 
-/** Anahat ve ad etiketi ölçeğin tersiyle çizilir; küçültülmüş örnekte de ince ve okunur kalır. */
+/** Outline and name tag are drawn at the inverse scale, so they stay thin and legible in a shrunk example. */
 function boxStyle(box: Box) {
   return {
     transform: `translate(${box.left}px, ${box.top}px)`,
@@ -71,25 +71,25 @@ function boxStyle(box: Box) {
   } as CSSProperties;
 }
 
-/** Ad etiketi öğenin üstüne sığmıyorsa (örneğin en üstteki navbar) altına alınır; öğeyi örtmez. */
+/** If the name tag doesn't fit above the element (e.g. the topmost navbar), it goes below instead of covering it. */
 function tagPlacement(box: Box) {
   return box.top * box.scale < 22 ? 'below' : 'above';
 }
 
 type InspectSurfaceProps = {
-  /** Örneğin ekran okuyucuya okunan adı, ör. "Acme marketing site". */
+  /** The example's name as read to screen readers, e.g. "Acme marketing site". */
   label: string;
-  /** İncelenebilir farklı öğe sayısı bulununca çağrılır (proje başlığındaki sayaç için). */
+  /** Called once the number of distinct inspectable elements is known (for the counter in the project header). */
   onCount?: (count: number) => void;
-  /** Kapsayıcısının tam yüksekliğini doldursun mu (telefon ekranı gibi sabit yükseklikli çerçeveler için). */
+  /** Whether to fill the container's full height (for fixed-height frames such as a phone screen). */
   fill?: boolean;
   children: ReactNode;
 };
 
 /**
- * Bir demoyu "öğeyi incele" moduna sokar. Demodaki `data-inspect` nitelikli her öğe incelenebilir:
- * üzerine gelince adı, kısa bir duraksamada özeti, tıklayınca tam açıklaması görünür.
- * Demo yalnızca görseldir; ekran okuyucular için örnek tek bir odak durağı ve canlı bölge ile anlatılır.
+ * Puts a demo into "inspect element" mode. Every element in the demo with a `data-inspect` attribute is
+ * inspectable: hovering shows its name, a short dwell its summary, and a click its full explanation.
+ * The demo is visual only; for screen readers the example is conveyed by a single focus stop and a live region.
  */
 export function InspectSurface({ label, onCount, fill = false, children }: InspectSurfaceProps) {
   const id = useId();

@@ -1,7 +1,7 @@
 import { SECTION_LINKS, SIGN_IN_HREF } from './links';
 import styles from './SiteFooter.module.css';
 
-/** Footer: bar değil, yazı olarak bölüm linkleri. */
+/** Footer: section links as plain text, not a bar. */
 export function SiteFooter() {
   return (
     <footer className={styles.footer}>

@@ -1,6 +1,6 @@
 import type { UiElementSpec } from './types';
 
-/** Acme pazarlama sitesindeki öğeler. `value` alanları AcmeSite.module.css'teki gerçek değerlerdir. */
+/** Elements on the Acme marketing site. `value` fields are the actual values from AcmeSite.module.css. */
 export const marketing: UiElementSpec[] = [
   {
     id: 'navbar',

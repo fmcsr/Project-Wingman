@@ -1,16 +1,16 @@
 /*
- * Sinyal tasarım sistemi token'ları.
- * Açık tema LayerZero'nun gri sadeliğinden, koyu tema Stargate'in derinliğinden beslenir.
- * Tek vurgu rengi (sinyal yeşili) yalnızca öğrenme anlarında kullanılır: inceleme çerçevesi,
- * terim etiketleri, odak halkası.
+ * Signal design system tokens.
+ * The light theme draws on LayerZero's gray simplicity, the dark theme on Stargate's depth.
+ * The single accent color (signal green) is used only in learning moments: the inspection outline,
+ * term tags, the focus ring.
  *
- * Her renk light-dark(açık, koyu) ile bir kez tanımlanır. Hangisinin kullanılacağını color-scheme
- * belirler: varsayılan sistem ayarıdır, tema düğmesi <html data-theme="light|dark"> ile bunu ezer.
+ * Each color is defined once with light-dark(light, dark); color-scheme decides which one applies:
+ * the default is the system setting, and the theme toggle overrides it with <html data-theme="light|dark">.
  */
 :root {
   color-scheme: light dark;
 
-  /* LayerZero'nun yazı tipleri: Roboto ve Roboto Mono (ikisi de açık lisanslı) */
+  /* LayerZero's typefaces: Roboto and Roboto Mono (both openly licensed) */
   --font-sans: 'Roboto Variable', Roboto, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'Roboto Mono Variable', 'Roboto Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
@@ -20,14 +20,14 @@
   --color-text: light-dark(#171717, #fafafa);
   --color-text-muted: light-dark(#5c5c5c, #a3a3a3);
   --color-text-subtle: light-dark(#6b6b6b, #8f8f8f);
-  /* Yalnızca büyük metin (iki tonlu başlıkların ikinci yarısı) için; zemine karşı ≥3:1 */
+  /* Only for large text (the second half of two-tone headings); ≥3:1 against the background */
   --color-text-faint: light-dark(#7a7a7a, #6b6b6b);
   --color-border: light-dark(#e5e5e5, #262626);
   --color-border-strong: light-dark(#d4d4d4, #333333);
   --color-primary: light-dark(#171717, #fafafa);
   --color-primary-hover: light-dark(#333333, #e5e5e5);
   --color-on-primary: light-dark(#fcfcfc, #141414);
-  /* İkincil buton zemini (LayerZero'daki gri düğmeler gibi) */
+  /* Secondary button background (like LayerZero's gray buttons) */
   --color-fill-secondary: light-dark(rgb(0 0 0 / 0.06), rgb(255 255 255 / 0.08));
   --color-fill-secondary-hover: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.13));
 
@@ -36,11 +36,11 @@
   --color-accent-soft: light-dark(#e6f6ef, rgb(15 185 131 / 0.14));
   --color-focus: light-dark(#0a8f65, #0fb983);
 
-  /* Örnek arayüzler her temada açık renkli kalır; inceleme rengi bu yüzden sabittir */
+  /* Example UIs stay light in every theme, so the inspection color is fixed */
   --color-inspect: #0a8f65;
   --color-inspect-strong: #087a56;
 
-  /* Açıklama balonu: açık temada ters (koyu) yüzey, koyu temada zeminden bir kademe yukarıda */
+  /* Balloon: an inverted (dark) surface in the light theme, one step above the background in the dark theme */
   --balloon-bg: light-dark(#171717, #202020);
   --balloon-text: #fafafa;
   --balloon-body: #d4d4d4;

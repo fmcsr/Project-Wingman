@@ -1,5 +1,5 @@
-/* Örnek uygulama her temada açık renkli kalır; renkler bilerek sabittir. */
-/* Container sorguları kapsayıcının kendisine değil alt öğelerine uygulanır; ızgara bu yüzden içeride */
+/* The example app stays light in every theme; the colors are hardcoded on purpose. */
+/* Container queries apply to child elements, not the container itself; that's why the grid sits inside it */
 .root {
   container-type: inline-size;
 }
@@ -24,7 +24,7 @@
   stroke-linejoin: round;
 }
 
-/* Kenar çubuğu */
+/* Sidebar */
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -71,7 +71,7 @@
   background: #eef2ff;
 }
 
-/* Üst bar */
+/* Top bar */
 .main {
   min-width: 0;
 }
@@ -129,7 +129,7 @@
   background: #e0e7ff;
 }
 
-/* İçerik */
+/* Content */
 .content {
   display: grid;
   gap: 14px;
@@ -259,7 +259,7 @@
   vector-effect: non-scaling-stroke;
 }
 
-/* Tablo */
+/* Table */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -316,7 +316,7 @@
   background: #fee2e2;
 }
 
-/* Dar ekranda kenar çubuğu ikonlara iner */
+/* On narrow screens the sidebar collapses to icons */
 @container (width < 640px) {
   .app {
     grid-template-columns: 60px minmax(0, 1fr);

@@ -12,7 +12,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Project Wingman · The PM's best friend for design</title>
     <script>
-      // Seçilmiş temayı ilk boyamadan önce uygula; yoksa sayfa bir an yanlış temada görünür
+      // Apply the chosen theme before the first paint; otherwise the page flashes in the wrong theme
       try {
         var theme = localStorage.getItem('pw-theme');
         if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;

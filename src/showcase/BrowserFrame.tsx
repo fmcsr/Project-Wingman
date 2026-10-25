@@ -5,16 +5,16 @@ import { useScrollScene } from './useScrollScene';
 import styles from './BrowserFrame.module.css';
 
 type BrowserFrameProps = {
-  /** Adres çubuğunda görünen alan adı. */
+  /** Domain shown in the address bar. */
   url: string;
-  /** Pencerenin üstünde, onunla birlikte sabitlenen başlık (proje adı gibi). */
+  /** Header above the window, pinned along with it (e.g. the project name). */
   header?: ReactNode;
   children: ReactNode;
 };
 
 /**
- * Web örneklerinin sergilendiği sahte tarayıcı penceresi. İçerik kendi içinde kaydırılmaz: pencere ekrana
- * sabitlenir ve sayfa kaydırıldıkça içindeki site kayar (Apple'ın ürün sayfalarındaki gibi).
+ * Mock browser window that showcases the web examples. The content doesn't scroll on its own: the window is
+ * pinned to the screen and the site inside moves as the page scrolls (like on Apple's product pages).
  */
 export function BrowserFrame({ url, header, children }: BrowserFrameProps) {
   const sceneRef = useRef<HTMLDivElement>(null);

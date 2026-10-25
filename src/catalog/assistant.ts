@@ -1,6 +1,6 @@
 import type { UiElementSpec } from './types';
 
-/** Muse yapay zekâ asistanındaki öğeler. `value` alanları MuseApp.module.css'teki gerçek değerlerdir. */
+/** Elements in the Muse AI assistant. `value` fields are the actual values from MuseApp.module.css. */
 export const assistant: UiElementSpec[] = [
   {
     id: 'liquid-glass-navbar',

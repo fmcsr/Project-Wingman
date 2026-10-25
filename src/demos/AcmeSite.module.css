@@ -1,4 +1,4 @@
-/* Örnek site her temada açık renkli kalır; renkler bilerek sabittir. */
+/* The example site stays light in every theme; the colors are hardcoded on purpose. */
 .page {
   --demo-nav-h: 60px;
   container-type: inline-size;
@@ -12,11 +12,11 @@
   position: sticky;
   top: 0;
   z-index: 2;
-  /* Hero navbar'ın altından başlasın; böylece bulanıklık ilk anda görünür */
+  /* Start the hero under the navbar so the blur is visible right away */
   margin-bottom: calc(var(--demo-nav-h) * -1);
 }
 
-/* Navbar: yarı saydam zemin + backdrop-filter = buzlu cam */
+/* Navbar: semi-transparent background + backdrop-filter = frosted glass */
 .navbar {
   display: flex;
   align-items: center;
@@ -204,7 +204,7 @@
   background: #fff;
 }
 
-/* Logo bulutu */
+/* Logo cloud */
 .logos {
   padding: 28px 24px;
   border-block: 1px solid rgb(15 23 42 / 0.06);
@@ -229,7 +229,7 @@
   color: #94a3b8;
 }
 
-/* Özellik kartları */
+/* Feature cards */
 .features {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -297,7 +297,7 @@
   color: #64748b;
 }
 
-/* Banner ve footer */
+/* Banner and footer */
 .banner {
   display: flex;
   flex-wrap: wrap;
@@ -341,7 +341,7 @@
   color: #94a3b8;
 }
 
-/* Breakpoint: dar ekranda linkler hamburger menüye geçer, kartlar alt alta dizilir */
+/* Breakpoint: on narrow screens the links collapse into a hamburger menu and the cards stack vertically */
 @container (width < 640px) {
   .navbar {
     gap: 10px;

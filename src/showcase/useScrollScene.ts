@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 
-/** Pencere sabitlenince içerik kaymaya başlamadan önce ve sonunda serbest kalmadan önce kısa bir bekleme. */
+/** Short pause once the window is pinned: before the content starts moving, and at the end before release. */
 const DWELL_RATIO = 0.12;
 const DWELL_MAX = 120;
-/** Pencere, sabitleneceği konuma bu mesafeden (ekran yüksekliğine oranla) itibaren büyüyerek oturur. */
+/** From this distance (relative to screen height), the window grows as it settles into its pinned spot. */
 const ENTER_RATIO = 0.6;
 const ENTER_SCALE = 0.92;
-/** Kaydırma çubuğunun, kaydırma durduktan sonra görünür kalma süresi. */
+/** How long the scrollbar stays visible after scrolling stops. */
 const THUMB_IDLE_MS = 900;
-/** Klavyeyle seçilen öğe pencere kenarına yapışmasın. */
+/** Keeps the keyboard-selected element off the window edge. */
 const REVEAL_MARGIN = 24;
 
 type SceneRefs = {
@@ -27,10 +27,10 @@ function clamp(value: number, min: number, max: number) {
 }
 
 /**
- * Apple'ın ürün sayfalarındaki gibi kaydırma: pencere ekrana sabitlenir, sayfa kaydırıldıkça içindeki site kayar.
- * Kullanıcı pencerenin içinde ayrıca kaydırmaz; sahne, içeriğin taşan kısmı kadar uzar ve sayfa kaydırması
- * bire bir içeriğe aktarılır. İçerik gerçekten kaydırıldığı için (overflow: hidden + scrollTop) sitedeki
- * yapışkan öğeler de çalışır. Klavyeyle seçilen öğeyi göstermek için sayfayı kaydıran bir `reveal` döndürür.
+ * Scrolling like Apple's product pages: the window pins to the screen and page scroll moves the site inside.
+ * The user doesn't scroll inside the window separately; the scene grows by the content's overflow and page scroll
+ * maps one-to-one onto the content. Because the content is really scrolled (overflow: hidden + scrollTop), sticky
+ * elements in the site work too. Returns a `reveal` that scrolls the page to show the keyboard-selected element.
  */
 export function useScrollScene({ scene, sticky, frame, viewport, thumb }: SceneRefs) {
   const metrics = useRef<Metrics>({ overflow: 0, dwell: 0, stickyTop: 0 });
@@ -55,12 +55,12 @@ export function useScrollScene({ scene, sticky, frame, viewport, thumb }: SceneR
       const next = Math.round(progress * overflow);
       if (next !== expected) {
         expected = next;
-        // Kaydırırken macOS'taki gibi ince bir kaydırma çubuğu belirir
+        // While scrolling, a thin scrollbar appears, like on macOS
         thumbEl.dataset.active = '';
         window.clearTimeout(idleTimer);
         idleTimer = window.setTimeout(() => delete thumbEl.dataset.active, THUMB_IDLE_MS);
       }
-      // Odak gibi başka bir sebeple kayan içerik de sayfanın belirlediği konuma döner
+      // Content that scrolled for another reason, such as focus, returns to the position set by the page
       if (viewportEl.scrollTop !== expected) viewportEl.scrollTop = expected;
       thumbEl.style.setProperty('--progress', progress.toFixed(4));
 
@@ -75,7 +75,7 @@ export function useScrollScene({ scene, sticky, frame, viewport, thumb }: SceneR
 
     const measure = () => {
       const overflow = Math.max(0, viewportEl.scrollHeight - viewportEl.clientHeight);
-      // Az taşan içerikte (ör. panel) bekleme de kısa olur; pencere boşuna uzun süre sabit kalmasın
+      // Little overflow (e.g. the dashboard) means a short pause too, so the window isn't pinned needlessly long
       const dwell = Math.round(Math.min(DWELL_MAX, window.innerHeight * DWELL_RATIO, overflow / 2));
       metrics.current = { overflow, dwell, stickyTop: parseFloat(getComputedStyle(stickyEl).top) || 0 };
       sceneEl.style.setProperty('--scene-extra', `${overflow + dwell * 2}px`);
@@ -88,7 +88,7 @@ export function useScrollScene({ scene, sticky, frame, viewport, thumb }: SceneR
     const resizeObserver = new ResizeObserver(measure);
     resizeObserver.observe(viewportEl);
     if (viewportEl.firstElementChild) resizeObserver.observe(viewportEl.firstElementChild);
-    // Yakalama aşamasında dinlenir: balon ve anahatlar konumlarını içerik kaydırıldıktan sonra hesaplasın
+    // Listen in the capture phase so the balloon and outlines compute their positions after the content scrolls
     window.addEventListener('scroll', update, { capture: true, passive: true });
     window.addEventListener('resize', measure);
     reducedMotion.addEventListener('change', update);
@@ -109,7 +109,7 @@ export function useScrollScene({ scene, sticky, frame, viewport, thumb }: SceneR
       const { overflow, dwell, stickyTop } = metrics.current;
       const viewportRect = viewportEl.getBoundingClientRect();
       const rect = element.getBoundingClientRect();
-      // Pencere yerine otururken ölçeklidir; ekran pikseli yerel piksele çevrilir
+      // The window is scaled while settling into place; convert screen pixels to local pixels
       const scale = viewportEl.offsetHeight > 0 ? viewportRect.height / viewportEl.offsetHeight : 1;
       const elementTop = (rect.top - viewportRect.top) / scale + viewportEl.scrollTop;
       const elementBottom = elementTop + rect.height / scale;
@@ -122,7 +122,7 @@ export function useScrollScene({ scene, sticky, frame, viewport, thumb }: SceneR
       const scrolled = stickyTop - sceneEl.getBoundingClientRect().top;
       const pinned = scrolled >= 0 && scrolled <= overflow + dwell * 2;
       if (pinned && Math.abs(offset - viewportEl.scrollTop) < 1) return;
-      // İçeriğin bu konuma gelmesi için sayfanın kaydırılması gereken yer; html'deki scroll-behavior uygulanır
+      // Where the page must scroll for the content to reach this position; scroll-behavior on html applies
       window.scrollTo({ top: window.scrollY - scrolled + (overflow > 0 ? dwell + offset : 0) });
     },
     [scene, viewport],

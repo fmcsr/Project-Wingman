@@ -24,8 +24,8 @@
 }
 
 /*
- * Kayan şerit: iki özdeş grup uç uca dizilir. Şerit bir grup boyu kaydığında başa döner; ikinci grup birincinin
- * yerini aldığı için kesinti görünmez. Kenarlar yumuşakça kaybolur.
+ * Marquee: two identical groups sit end to end. Once the strip has moved one group's width it jumps back to the
+ * start; the second group has taken the first one's place, so no seam shows. The edges fade out softly.
  */
 .marquee {
   overflow: hidden;
@@ -44,7 +44,7 @@
   animation-play-state: paused;
 }
 
-/* Grubun sonundaki boşluk, iki grup arasını kartlar arasıyla eşitler */
+/* Trailing space on each group makes the gap between groups match the gap between cards */
 .group {
   display: flex;
   gap: 16px;
@@ -94,7 +94,7 @@
   color: var(--color-text-muted);
 }
 
-/* LayerZero'daki kart başlıkları gibi: 20/28, hafif sıkı */
+/* Like the card titles on LayerZero: 20/28, slightly tight */
 .cardTitle {
   font-size: 20px;
   font-weight: 400;
@@ -114,7 +114,7 @@
   }
 }
 
-/* Hareketi azalt: şerit akmaz; kartlar sayfa genişliğinde sıralanır, kopya grup ve düğme gizlenir */
+/* Reduced motion: the strip stays still; cards wrap at page width; the duplicate group and button are hidden */
 @media (prefers-reduced-motion: reduce) {
   .toggle {
     display: none;

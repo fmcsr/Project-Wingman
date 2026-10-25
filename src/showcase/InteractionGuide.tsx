@@ -42,7 +42,7 @@ const ITEMS: { label: string; icon: () => ReactNode; text: ReactNode }[] = [
   },
 ];
 
-/** Örneklerin hangi girdilerle incelendiğini anlatan kısa rehber. */
+/** Short guide to the inputs the examples can be inspected with. */
 export function InteractionGuide() {
   return (
     <ul className={styles.guide} aria-label="Ways to explore">

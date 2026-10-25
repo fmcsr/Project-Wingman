@@ -1,6 +1,6 @@
 import type { UiElementSpec } from './types';
 
-/** Stride alışveriş uygulamasındaki öğeler. `value` alanları StrideApp.module.css'teki gerçek değerlerdir. */
+/** Elements in the Stride shopping app. `value` fields are the actual values from StrideApp.module.css. */
 export const commerce: UiElementSpec[] = [
   {
     id: 'image-carousel',

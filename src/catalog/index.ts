@@ -5,15 +5,15 @@ import { marketing } from './marketing';
 import { mobile } from './mobile';
 import type { UiElementSpec } from './types';
 
-/** Vitrindeki tüm UI öğeleri, `data-inspect` kimliğine göre. Yeni bir öğe ilgili listeye eklenir. */
+/** All UI elements in the showcase, keyed by `data-inspect` id. New elements go in the matching list. */
 export const catalog: Record<string, UiElementSpec> = Object.fromEntries(
   [...marketing, ...dashboard, ...mobile, ...assistant, ...commerce].map((spec) => [spec.id, spec]),
 );
 
-/** Bir demodaki `data-inspect` kimliğinin açıklamasını döndürür; kayıtlı değilse geliştirmede uyarır. */
+/** Returns the explanation for a demo's `data-inspect` id; warns in development if it isn't registered. */
 export function getSpec(id: string | undefined): UiElementSpec | undefined {
   const spec = id ? catalog[id] : undefined;
-  if (!spec && import.meta.env.DEV) console.warn(`[catalog] "${id}" için açıklama yok`);
+  if (!spec && import.meta.env.DEV) console.warn(`[catalog] no description for "${id}"`);
   return spec;
 }
 

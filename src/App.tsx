@@ -5,7 +5,7 @@ import { Pricing } from './landing/Pricing';
 import { SiteFooter } from './landing/SiteFooter';
 import { SiteHeader } from './landing/SiteHeader';
 
-/** Açılış sayfası: kapak, örnekler, değer kartları ve planlar. Giriş sonrası alanlar sonraki aşamada. */
+/** Landing page: hero, examples, feature cards and plans. Signed-in areas come in a later phase. */
 export function App() {
   return (
     <div id="top">

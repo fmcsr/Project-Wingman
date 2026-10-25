@@ -1,77 +1,97 @@
 # Project Wingman
 
-Ürün yöneticileri ve kuruculara UI/UX terimlerini öğreten; “arkası bulanık üst menü” gibi gündelik tasvirleri
-Claude Code veya Cursor gibi araçların anlayacağı net tasarım direktiflerine dönüştürmeyi hedefleyen ürün.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/hero-dark.png">
+  <img alt="Project Wingman landing page: the headline “Every PM needs a wingman.” above converging line art, with a shooting star heading for the focus point" src="docs/screenshots/hero-light.png">
+</picture>
 
-## Şu anki durum: açılış sayfası
+**The PM's best friend for design.** Project Wingman teaches product managers and founders the real names behind
+interface elements. Next, it will turn everyday descriptions like “the top menu with the blurry background” into clear
+design briefs that AI coding tools such as Claude Code and Cursor understand.
 
-İngilizce açılış sayfası; yapışkan üst menü (tema düğmesiyle), kapak, örnekler, değer kartları, planlar ve
-footer'dan oluşur. Örnekler bölümünde beş proje (pazarlama sitesi, analiz paneli, üç mobil uygulama) vardır ve
-neredeyse her öğe üzerine gelince adını, kısa bir duraksamada özetini, tıklayınca tam açıklamasını gösterir.
+## A look inside
 
-Kapsam dışı (sonraki aşamalar): kimlik doğrulama ve giriş sonrası alanlar (“Sign in” şimdilik yer tutucu),
-ödeme/abonelik (planlardaki fiyatlar yer tutucu), gerçek LLM entegrasyonu.
+Hover anything in the examples to learn what it's called. Click to pin the full explanation: how it looks, how it
+behaves, and the exact CSS behind it.
 
-## Çalıştırma
+![The Acme example pinned in its scroll scene, with the frosted-glass navbar's explanation open](docs/screenshots/inspect-light.png)
 
-Gereksinim: Node.js 20.19+ veya 22.12+
+Three mobile apps side by side, here in dark mode, with a preview of Muse's Liquid Glass navbar:
+
+![The Wave, Muse and Stride phone examples in one row on the dark theme, with a balloon describing the Liquid Glass navbar](docs/screenshots/phones-dark.png)
+
+## Current status: landing page
+
+An English landing page with a sticky header (with a theme toggle), a hero, examples, feature cards, pricing and a
+footer. The examples section has five projects (a marketing site, an analytics dashboard and three mobile apps), and
+nearly every element shows its name on hover, a summary after a short pause and the full explanation on click.
+
+Out of scope for now (later phases): authentication and signed-in areas (“Sign in” is a placeholder), payments and
+subscriptions (plan prices are placeholders), and a real LLM integration.
+
+## Getting started
+
+Requires Node.js 20.19+ or 22.12+
 
 ```bash
 npm install
 npm run dev
 ```
 
-| Komut | Ne yapar |
+| Command | What it does |
 | --- | --- |
-| `npm run dev` | Geliştirme sunucusu, varsayılan olarak http://localhost:5173 |
-| `npm run build` | Tip kontrolü + üretim derlemesi (`dist/`) |
-| `npm run preview` | Derlenmiş sürümü yerelde sunar |
-| `npm run typecheck` | Yalnızca TypeScript kontrolü |
+| `npm run dev` | Development server, at http://localhost:5173 by default |
+| `npm run build` | Type check + production build (`dist/`) |
+| `npm run preview` | Serves the production build locally |
+| `npm run typecheck` | TypeScript check only |
 
-## Yığın
+## Stack
 
-Vite + React 19 + TypeScript; stil için CSS Modules ve CSS değişkenleri (`src/styles/tokens.css`).
-UI kütüphanesi ya da Tailwind yok: örneklerde kullanılan CSS değerleri, balonda anlatılan kavramlarla birebir aynı.
-Fontlar (Roboto, Roboto Mono; LayerZero ile aynı) Fontsource ile kendi sunucumuzdan yüklenir; tema sistem ayarına
-göre açık ya da koyu olur. Görsel kararların tamamı [DESIGN.md](DESIGN.md) içinde.
+Vite + React 19 + TypeScript, styled with CSS Modules and CSS custom properties (`src/styles/tokens.css`).
+No UI library or Tailwind: the CSS values used in the examples are exactly the ones the balloons explain.
+Fonts (Roboto and Roboto Mono, the same as LayerZero) are self-hosted via Fontsource. The theme follows the system
+setting (light or dark) and can be switched from the header. All visual decisions are in [DESIGN.md](DESIGN.md).
 
-## Klasör yapısı
+## Project structure
 
 ```
 src/
-  landing/     Açılış sayfası bölümleri: üst menü, tema düğmesi, kapak, örnekler, değer kartları, planlar, footer
-  demos/       İncelenen örnek projeler: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ ortak StatusBar)
-  catalog/     Öğe açıklamaları (İngilizce, tipli veri): marketing, dashboard, mobile, assistant, commerce
-  inspector/   “Öğeyi incele” katmanı: InspectSurface, açıklama balonu, konumlandırma
-  showcase/    Çerçeveler ve etkileşim rehberi: kaydırma sahnesi olarak tarayıcı (useScrollScene), ölçeklenen telefon
-  brand/       Logo ve kapaktaki hareketli çizgiler (kayan yıldızla birlikte)
-  styles/      Tasarım token'ları (light-dark) ve global stiller
-  theme.ts     Açık/koyu tema: okuma, seçme, değişimi dinleme
+  landing/     Landing page sections: header, theme toggle, hero, examples, feature cards, pricing, footer
+  demos/       Inspectable example projects: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ shared StatusBar)
+  catalog/     Element descriptions (English, typed data): marketing, dashboard, mobile, assistant, commerce
+  inspector/   The “inspect element” layer: InspectSurface, explainer balloon, positioning
+  showcase/    Frames and the interaction guide: the browser frame as a scroll scene (useScrollScene), a scalable phone
+  brand/       Logo and the hero's animated line art (with the shooting star)
+  styles/      Design tokens (light-dark) and global styles
+  theme.ts     Light/dark theme: read, set, subscribe to changes
+docs/
+  screenshots/ Images used in this README
 ```
 
-## Yeni bir UI öğesi eklemek
+## Adding a UI element
 
-1. Açıklamayı yaz: ilgili katalog dosyasına (`src/catalog/marketing.ts`, `dashboard.ts`, `mobile.ts`, `assistant.ts`
-   ya da `commerce.ts`) bir
-   `UiElementSpec` ekle; `value` alanlarına demodaki gerçek CSS değerlerini yaz.
-2. Demoda işaretle: öğeye `data-inspect="<id>"` niteliğini ekle.
+1. Write the description: add a `UiElementSpec` to the matching catalog file (`src/catalog/marketing.ts`,
+   `dashboard.ts`, `mobile.ts`, `assistant.ts` or `commerce.ts`), with the demo's real CSS values in its `value`
+   fields.
+2. Mark it in the demo: add a `data-inspect="<id>"` attribute to the element.
 
-Hover, tıklama, dokunma, klavye, anahat, balon ve sayaç kendiliğinden çalışır. Katalogda karşılığı olmayan bir
-kimlik, geliştirme sırasında konsola uyarı düşer.
+Hover, click, touch, keyboard, outline, balloon and the element counter all work automatically. An id with no catalog
+entry logs a warning to the console during development.
 
-## Yeni bir örnek proje eklemek
+## Adding an example project
 
-1. `src/demos/` altına bileşeni yaz. Gerçek link ve düğme kullanma (href'siz `<a>`, `<span>`), renkleri sabit tut.
-2. `src/landing/Examples.tsx` içinde `BrowserFrame` ya da `PhoneFrame` ile sar ve `InspectSurface` içine koy
-   (telefon için `fill`). `BrowserFrame` bir kaydırma sahnesidir: pencere sabitlenir, sayfa kaydırması içeriği
-   kaydırır. Telefonlar tek sırada durur ve sığmazlarsa birlikte küçülür.
-3. Demo kendi kendine hareket ediyorsa (açılıp kapanan menü ya da gelip giden toast gibi) `useInspectActivity()` ile
-   incelenirken durdur.
+1. Write the component under `src/demos/`. Don't use real links or buttons (use `<a>` without `href`, or `<span>`),
+   and keep its colors fixed.
+2. In `src/landing/Examples.tsx`, wrap it in a `BrowserFrame` or a `PhoneFrame` and put it inside an `InspectSurface`
+   (`fill` for phones). `BrowserFrame` is a scroll scene: the window pins and page scrolling scrolls its content.
+   Phones stay in one row and shrink together when they don't fit.
+3. If the demo animates on its own (a menu that opens and closes, a toast that comes and goes), pause it while it's
+   being inspected with `useInspectActivity()`.
 
-## Etkileşim modeli
+## Interaction model
 
-| Girdi | Önizleme (özet) | Sabit (tam açıklama) | Kapanır |
+| Input | Preview (summary) | Pinned (full explanation) | Closes |
 | --- | --- | --- | --- |
-| Fare | Üzerine gel, 280 ms bekle | Tıkla | Dışarı tıkla, aynı öğeye tekrar tıkla, Esc |
-| Dokunmatik | — | Dokun | Dışarı dokun (kaydırmak kapatmaz) |
-| Klavye | Örneğe Tab ile gir, oklarla gez | Enter | Esc, Tab ile çık |
+| Mouse | Hover, wait 280 ms | Click | Click outside, click the same element again, Esc |
+| Touch | — | Tap | Tap outside (scrolling doesn't close it) |
+| Keyboard | Tab into an example, move with the arrow keys | Enter | Esc, Tab out |

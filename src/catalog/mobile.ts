@@ -1,6 +1,6 @@
 import type { UiElementSpec } from './types';
 
-/** Wave mobil uygulamasındaki öğeler. `value` alanları WaveApp.module.css'teki gerçek değerlerdir. */
+/** Elements in the Wave mobile app. `value` fields are the actual values from WaveApp.module.css. */
 export const mobile: UiElementSpec[] = [
   {
     id: 'status-bar',

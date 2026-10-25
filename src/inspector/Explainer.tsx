@@ -22,8 +22,8 @@ type ExplainerProps = Pick<
 };
 
 /**
- * Açıklama balonu. Önizlemede kısa özet ve terim etiketleri; sabitlenince gündelik karşılıklar
- * ve kavramların sade dille açıklaması ("üzerine gel: adını öğren, tıkla: anla").
+ * Explainer balloon. In preview, a short summary and term chips; once pinned, everyday names
+ * and plain-language explanations of the concepts ("hover: learn its name, click: understand it").
  */
 export function Explainer({ ref, id, spec, mode, position, onClose, ...handlers }: ExplainerProps) {
   const titleId = `${id}title`;

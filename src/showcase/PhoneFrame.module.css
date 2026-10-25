@@ -1,4 +1,4 @@
-/* Telefonun sayfada kapladığı yer: tasarım boyutu × ölçek. Telefonun kendisi bu kutuya sığacak kadar küçülür. */
+/* Space the phone takes up on the page: design size × scale. The phone itself shrinks to fit this box. */
 .slot {
   flex: none;
   width: calc(300px * var(--phone-scale, 1));
@@ -6,7 +6,7 @@
   border-radius: calc(52px * var(--phone-scale, 1));
 }
 
-/* Klavye odağı ölçeklenmeyen kutuya çizilir; telefon ne kadar küçük olursa olsun aynı kalınlıkta */
+/* Keyboard focus is drawn on the unscaled box; same thickness however small the phone gets */
 .slot:has(:focus-visible) {
   outline: 2px solid var(--color-focus);
   outline-offset: 4px;
@@ -27,7 +27,7 @@
     0 30px 60px -30px rgb(0 0 0 / 0.45);
 }
 
-/* Yan tuşlar */
+/* Side buttons */
 .phone::before,
 .phone::after {
   content: '';

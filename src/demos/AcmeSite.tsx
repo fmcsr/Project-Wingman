@@ -9,8 +9,8 @@ const FEATURES = [
 ];
 
 /**
- * Örnek proje [01]: bir SaaS pazarlama sitesi. Buzlu cam efektli sticky navbar'ın altından renkli içerik
- * kayar; böylece backdrop-filter gözle görülür. Etkileşim yoktur (linklerin href'i yok), yalnızca incelenir.
+ * Example project [01]: a SaaS marketing site. Colorful content scrolls under a sticky navbar with a frosted glass
+ * effect, so the backdrop-filter is clearly visible. Not interactive (the links have no href); for inspection only.
  */
 export function AcmeSite() {
   return (

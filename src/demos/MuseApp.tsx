@@ -11,12 +11,12 @@ const MODELS = [
 
 const SUGGESTIONS = ['Summarize my notes', 'Draft a PRD', "Explain like I'm new"];
 
-/** Boştayken menünün kendi kendine açılıp kapanma aralığı. */
+/** Interval at which the menu opens and closes on its own while idle. */
 const MENU_CYCLE_MS = 2600;
 
 /**
- * Örnek proje [04]: Liquid Glass tasarım diliyle bir yapay zekâ asistanı. Model seçici menü boştayken
- * kendi kendine açılıp kapanır; örnek incelenirken açık kalır ki menünün kendisi de incelenebilsin.
+ * Example project [04]: an AI assistant in the Liquid Glass design language. The model picker menu opens and
+ * closes on its own while idle; it stays open during inspection so the menu itself can be inspected too.
  */
 export function MuseApp() {
   const exploring = useInspectActivity();
@@ -24,7 +24,7 @@ export function MuseApp() {
 
   useEffect(() => {
     if (exploring) return;
-    // Hareketi azaltma açıksa menü açık ve sabit durur
+    // If reduced motion is on, the menu stays open and static
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setCycleOpen(true);
       return;

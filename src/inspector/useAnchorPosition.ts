@@ -1,11 +1,11 @@
 import { useLayoutEffect, useState } from 'react';
 import type { RefObject } from 'react';
 
-/** Balonun katman kenarlarına bırakacağı en az boşluk (Explainer.module.css genişliğiyle uyumlu). */
+/** Minimum gap the balloon keeps from the layer edges (matches the width in Explainer.module.css). */
 const EDGE_GAP = 8;
-/** Hedef öğe ile balon arasındaki mesafe. */
+/** Distance between the target element and the balloon. */
 const OFFSET_Y = 12;
-/** Okun balon köşelerine en fazla ne kadar yaklaşabileceği. */
+/** The closest the arrow may get to the balloon's corners. */
 const ARROW_INSET = 18;
 
 export type Placement = 'top' | 'bottom';
@@ -13,8 +13,8 @@ export type Placement = 'top' | 'bottom';
 export type AnchorPosition = { top: number; left: number; arrowX: number; placement: Placement };
 
 /**
- * Balonu katman içinde hedef öğeye göre konumlandırır: varsayılan olarak altına, altta yer yoksa üstüne.
- * Yatayda hedefe ortalar ama katmandan taşırmaz. Boyut ya da kaydırma değişince yeniden hesaplar.
+ * Positions the balloon in the layer relative to the target element: below by default, above if no room below.
+ * Centers horizontally on the target without overflowing the layer. Recomputes when size or scroll changes.
  */
 export function useAnchorPosition(
   open: boolean,
@@ -76,7 +76,7 @@ export function useAnchorPosition(
   return position;
 }
 
-/** Alt sınır üst sınırdan büyükse alt sınır kazanır (dar katmanda balon sola yaslanır). */
+/** If the lower bound exceeds the upper, the lower bound wins (in a narrow layer the balloon hugs the left). */
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(value, max));
 }

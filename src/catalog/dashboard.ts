@@ -1,6 +1,6 @@
 import type { UiElementSpec } from './types';
 
-/** Orbit analiz panelindeki öğeler. `value` alanları OrbitDashboard.module.css'teki gerçek değerlerdir. */
+/** Elements in the Orbit analytics dashboard. `value` fields are the actual values from OrbitDashboard.module.css. */
 export const dashboard: UiElementSpec[] = [
   {
     id: 'sidebar',

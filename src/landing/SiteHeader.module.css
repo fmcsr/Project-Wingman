@@ -8,7 +8,7 @@
     backdrop-filter 200ms;
 }
 
-/* Kaydırınca bar değil buzlu cam: kenarlık yok, yalnızca arkadan geçen içerik yumuşatılır */
+/* On scroll, frosted glass rather than a bar: no border, only the content passing behind is softened */
 .header[data-scrolled] {
   background: color-mix(in srgb, var(--color-bg) 72%, transparent);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
@@ -56,7 +56,7 @@
   gap: 8px;
 }
 
-/* Dar ekranda bölüm linkleri gizlenir; logo ve düğmeler kalır */
+/* On narrow screens the section links are hidden; the logo and buttons stay */
 @media (max-width: 639px) {
   .inner {
     justify-content: space-between;

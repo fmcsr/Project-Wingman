@@ -1,6 +1,6 @@
 import styles from './BrandMark.module.css';
 
-/** Project Wingman logosu: temaya göre renk değiştiren "W" işareti. */
+/** Project Wingman logo: a "W" mark that changes color with the theme. */
 export function BrandMark({ className }: { className?: string }) {
   return (
     <svg className={className ? `${styles.mark} ${className}` : styles.mark} viewBox="0 0 32 32" aria-hidden="true">

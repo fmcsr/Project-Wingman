@@ -5,7 +5,7 @@ import { SECTION_IDS, SECTION_LINKS, SIGN_IN_HREF } from './links';
 import { ThemeToggle } from './ThemeToggle';
 import styles from './SiteHeader.module.css';
 
-/** Sayfa kaydırıldı mı ve hangi bölüm görünümde? Üst menünün zeminini ve etkin linkini belirler. */
+/** Has the page been scrolled, and which section is in view? Drives the header's background and active link. */
 function useScrollState() {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState<string | null>(null);
@@ -15,7 +15,7 @@ function useScrollState() {
     const update = () => {
       frame = 0;
       setScrolled(window.scrollY > 8);
-      // Ekranın üst üçte birindeki çizgiyi geçmiş son bölüm etkin sayılır
+      // The last section to cross a line in the top third of the screen counts as active
       const line = window.innerHeight * 0.3;
       let current: string | null = null;
       for (const id of SECTION_IDS) {
@@ -41,8 +41,8 @@ function useScrollState() {
 }
 
 /**
- * Üst menü: bar değil, sayfa zemininde duran yazı linkleri. Kaydırırken yukarıda kalır;
- * tepede tamamen şeffaftır, aşağı inildikçe arkasındaki içerik buzlu camla yumuşatılır.
+ * Header: text links sitting on the page background, not a bar. Stays at the top while scrolling;
+ * fully transparent at the very top, and as you scroll down, frosted glass softens the content behind it.
  */
 export function SiteHeader() {
   const { scrolled, active } = useScrollState();

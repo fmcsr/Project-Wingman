@@ -15,7 +15,7 @@ import styles from './Examples.module.css';
 
 type ProjectId = 'acme' | 'orbit' | 'wave' | 'muse' | 'stride';
 
-/** Telefon çerçevesinin tasarım genişliği (PhoneFrame.module.css ile aynı). */
+/** Design width of the phone frame (matches PhoneFrame.module.css). */
 const PHONE_WIDTH = 300;
 const PHONE_COUNT = 3;
 
@@ -37,7 +37,7 @@ function ProjectMeta({ index, name, kind, count }: ProjectMetaProps) {
   );
 }
 
-/** Üç telefonu her genişlikte tek sıraya sığdıran ölçek; en fazla 1 (asıl boyut). */
+/** Scale that fits the three phones in a single row at any width; capped at 1 (actual size). */
 function usePhoneScale() {
   const rowRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -59,9 +59,9 @@ function usePhoneScale() {
 }
 
 /**
- * Ana sayfadaki demo: beş örnek proje. Asıl kütüphane girişten sonra açılacağı için burada yalnızca birkaç
- * proje gösterilir. Siteler sayfa kaydırıldıkça kendi pencerelerinde kayar; telefonlar tek sırada durur.
- * Balonlar bütün çerçeveleri kapsayan ortak katmana çizilir.
+ * Demo on the home page: five example projects. The full library opens after sign-in, so only a few
+ * projects are shown here. Sites scroll in their own windows as the page scrolls; phones sit in one row.
+ * Balloons are drawn on a shared layer that covers all the frames.
  */
 export function Examples() {
   const [counts, setCounts] = useState<Partial<Record<ProjectId, number>>>({});

@@ -1,4 +1,4 @@
-/* Örnek uygulama her temada açık renkli kalır; iOS'a benzemesi için sistem fontu kullanır. */
+/* The example app stays light in every theme; it uses the system font to look like iOS. */
 .app {
   position: relative;
   height: 100%;
@@ -52,7 +52,7 @@
   background: #dbeafe;
 }
 
-/* Günlük hedef kartı ve ilerleme halkası */
+/* Daily goal card and progress ring */
 .goal {
   display: flex;
   align-items: center;
@@ -110,7 +110,7 @@
   color: #8e8e93;
 }
 
-/* Filtre çipleri */
+/* Filter chips */
 .chips {
   display: flex;
   gap: 8px;
@@ -137,7 +137,7 @@
   background: #000;
 }
 
-/* Liste */
+/* List */
 .sectionTitle {
   margin: 14px 30px 6px;
   font-size: 12px;
@@ -165,7 +165,7 @@
   padding: 8px 12px;
 }
 
-/* İçeriden başlayan ayırıcı: ikonun bittiği yerden */
+/* Inset separator: starts where the icon ends */
 .row:not(:last-child)::after {
   content: '';
   position: absolute;
@@ -202,7 +202,7 @@
   color: #8e8e93;
 }
 
-/* Açma/kapama anahtarı: ray + topuz */
+/* Toggle switch: track + thumb */
 .switch,
 .switchOn {
   position: relative;
@@ -232,7 +232,7 @@
   transform: translateX(18px);
 }
 
-/* Yüzen eylem butonu */
+/* Floating action button */
 .fab {
   position: absolute;
   right: 16px;
@@ -248,7 +248,7 @@
   box-shadow: 0 8px 20px rgb(10 132 255 / 0.4);
 }
 
-/* Alt sekme çubuğu */
+/* Bottom tab bar */
 .tabBar {
   position: absolute;
   right: 0;
