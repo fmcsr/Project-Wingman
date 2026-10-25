@@ -1,0 +1,40 @@
+.statusBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 46px;
+  padding: 4px 24px 0 30px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* İki sınıflı seçiciler, demoların genel "svg" kurallarını ezer */
+.icons .signal {
+  fill: currentColor;
+  stroke: none;
+}
+
+.icons .wifi {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.icons .battery {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: 0.9;
+}
+
+.icons .level {
+  fill: currentColor;
+  stroke: none;
+}

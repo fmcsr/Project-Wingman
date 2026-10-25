@@ -1,0 +1,49 @@
+/* Butonlar tam yuvarlak (hap): yumuşak ve dokunulası */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background-color 150ms;
+}
+
+.small {
+  height: 32px;
+  padding: 0 14px;
+}
+
+.large {
+  height: 46px;
+  padding: 0 24px;
+  font-size: 15px;
+}
+
+.block {
+  display: flex;
+  width: 100%;
+}
+
+.primary {
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+}
+
+.primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.secondary {
+  color: var(--color-text);
+  background: var(--color-fill-secondary);
+}
+
+.secondary:hover {
+  background: var(--color-fill-secondary-hover);
+}

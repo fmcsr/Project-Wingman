@@ -1,0 +1,384 @@
+/* Örnek uygulama her temada aynı kalır; iOS'a benzemesi için sistem fontu kullanır. */
+.app {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  font-size: 14px;
+  color: #111;
+  background: #fff;
+}
+
+.icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Fotoğraf galerisi */
+.gallery {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 272px;
+  padding-top: 30px;
+  background: radial-gradient(120% 90% at 50% 30%, #ffe9dc, #ffd1bd);
+}
+
+.shoe {
+  width: 228px;
+  height: auto;
+  transform: rotate(-8deg);
+}
+
+.counter {
+  position: absolute;
+  right: 14px;
+  bottom: 32px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgb(255 255 255 / 0.7);
+}
+
+/* Sayfa noktaları: etkin olan küçük bir hapa uzar */
+.dots {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  display: flex;
+  gap: 5px;
+  transform: translateX(-50%);
+}
+
+.dot,
+.dotActive {
+  height: 6px;
+  border-radius: 999px;
+}
+
+.dot {
+  width: 6px;
+  background: rgb(0 0 0 / 0.25);
+}
+
+.dotActive {
+  width: 16px;
+  background: #111;
+}
+
+.statusBar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 3;
+}
+
+/* Fotoğrafın üstünde yüzen yuvarlak düğmeler */
+.topBar {
+  position: absolute;
+  top: 48px;
+  right: 14px;
+  left: 14px;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+}
+
+.topActions {
+  display: flex;
+  gap: 8px;
+}
+
+.roundButton {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.85);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.08);
+}
+
+.heart {
+  fill: #ef4444;
+  stroke: none;
+}
+
+/* Sayı rozeti: simgenin köşesine iğnelenmiş küçük hap */
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: #ef4444;
+}
+
+/* Ürün bilgileri: fotoğrafın üstüne binen yuvarlak köşeli panel */
+.details {
+  position: relative;
+  z-index: 1;
+  margin-top: -20px;
+  padding: 18px 18px 0;
+  border-radius: 24px 24px 0 0;
+  background: #fff;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.discount {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #e11d48;
+}
+
+.subtitle {
+  margin-top: 2px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.defs {
+  position: absolute;
+}
+
+.star {
+  width: 14px;
+  height: 14px;
+}
+
+.score {
+  margin-left: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.reviews {
+  margin-left: 4px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.now {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.was {
+  font-size: 14px;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.label {
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.swatches {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.swatchSelected {
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px #111;
+}
+
+.sizes {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.size,
+.sizeSelected,
+.sizeSoldOut {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 34px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sizeSelected {
+  border-color: #111;
+  color: #fff;
+  background: #111;
+}
+
+/* Tükenmiş beden: görünür ama üstü çizili */
+.sizeSoldOut {
+  border-style: dashed;
+  color: #c4c4c4;
+  text-decoration: line-through;
+  background: #fafafa;
+}
+
+/* Toast: alttan kayarak gelir, aynı yoldan kaybolur */
+.toast {
+  position: absolute;
+  right: 14px;
+  bottom: 96px;
+  left: 14px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  background: #111;
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.2);
+  transform: translateY(16px);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 250ms ease,
+    visibility 0s linear 250ms;
+}
+
+.toast[data-visible] {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.toastIcon {
+  flex: none;
+  color: #4ade80;
+}
+
+.toastAction {
+  margin-left: auto;
+  font-weight: 600;
+  color: #93c5fd;
+}
+
+/* Sabit satın alma çubuğu: her zaman başparmağın ulaştığı yerde */
+.buyBar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 84px;
+  padding: 10px 14px 26px;
+  border-top: 1px solid #f0f0f0;
+  background: rgb(255 255 255 / 0.9);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.stepper {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+}
+
+.stepButton {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 18px;
+  background: #f5f5f5;
+}
+
+.qty {
+  width: 22px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.addButton {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  height: 46px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #fff;
+  background: #111;
+}
+
+.homeIndicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  z-index: 5;
+  width: 112px;
+  height: 5px;
+  border-radius: 999px;
+  background: #111;
+  transform: translateX(-50%);
+}

@@ -1,15 +1,16 @@
-# PM Wingman
+# Project Wingman
 
 Ürün yöneticileri ve kuruculara UI/UX terimlerini öğreten; “arkası bulanık üst menü” gibi gündelik tasvirleri
 Claude Code veya Cursor gibi araçların anlayacağı net tasarım direktiflerine dönüştürmeyi hedefleyen ürün.
 
-## Aşama 1 — İnteraktif UI vitrini
+## Şu anki durum: açılış sayfası
 
-Örnek bir sayfadaki navbar'ın üzerine gelince, tıklayınca, dokununca ya da klavyeyle odaklanınca bir açıklama
-balonu açılır. Balon teknik adı, kısa açıklamayı ve arkasındaki CSS kavramlarını (`backdrop-filter`,
-`linear-gradient`, `position: sticky`, breakpoint) sade dille gösterir.
+İngilizce açılış sayfası; yapışkan üst menü (tema düğmesiyle), kapak, örnekler, değer kartları, planlar ve
+footer'dan oluşur. Örnekler bölümünde beş proje (pazarlama sitesi, analiz paneli, üç mobil uygulama) vardır ve
+neredeyse her öğe üzerine gelince adını, kısa bir duraksamada özetini, tıklayınca tam açıklamasını gösterir.
 
-Kapsam dışı (sonraki aşamalar): kimlik doğrulama, ödeme/abonelik, gerçek LLM entegrasyonu.
+Kapsam dışı (sonraki aşamalar): kimlik doğrulama ve giriş sonrası alanlar (“Sign in” şimdilik yer tutucu),
+ödeme/abonelik (planlardaki fiyatlar yer tutucu), gerçek LLM entegrasyonu.
 
 ## Çalıştırma
 
@@ -30,36 +31,47 @@ npm run dev
 ## Yığın
 
 Vite + React 19 + TypeScript; stil için CSS Modules ve CSS değişkenleri (`src/styles/tokens.css`).
-UI kütüphanesi ya da Tailwind yok: örnekte kullanılan CSS değerleri balonda anlatılan kavramlarla birebir aynı
-ve kodda düz okunuyor.
+UI kütüphanesi ya da Tailwind yok: örneklerde kullanılan CSS değerleri, balonda anlatılan kavramlarla birebir aynı.
+Fontlar (Roboto, Roboto Mono; LayerZero ile aynı) Fontsource ile kendi sunucumuzdan yüklenir; tema sistem ayarına
+göre açık ya da koyu olur. Görsel kararların tamamı [DESIGN.md](DESIGN.md) içinde.
 
 ## Klasör yapısı
 
 ```
 src/
-  catalog/     UI öğelerinin açıklama içerikleri (tipli veri)
-  demos/       Açıklanan örnek bileşenler (NavbarDemo)
-  inspector/   Hedef + açıklama balonu etkileşimi (yeniden kullanılabilir)
-  showcase/    Sahne: sahte tarayıcı çerçevesi, örnek sayfa, etkileşim rehberi
-  styles/      Tasarım token'ları ve global stiller
+  landing/     Açılış sayfası bölümleri: üst menü, tema düğmesi, kapak, örnekler, değer kartları, planlar, footer
+  demos/       İncelenen örnek projeler: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ ortak StatusBar)
+  catalog/     Öğe açıklamaları (İngilizce, tipli veri): marketing, dashboard, mobile, assistant, commerce
+  inspector/   “Öğeyi incele” katmanı: InspectSurface, açıklama balonu, konumlandırma
+  showcase/    Çerçeveler ve etkileşim rehberi: kaydırma sahnesi olarak tarayıcı (useScrollScene), ölçeklenen telefon
+  brand/       Logo ve kapaktaki hareketli çizgiler (kayan yıldızla birlikte)
+  styles/      Tasarım token'ları (light-dark) ve global stiller
+  theme.ts     Açık/koyu tema: okuma, seçme, değişimi dinleme
 ```
 
 ## Yeni bir UI öğesi eklemek
 
-1. İçeriği yaz: `src/catalog/card.ts` (`UiElementSpec` tipinde) ve `src/catalog/index.ts` içine kaydet.
-2. Örneği çiz: `src/demos/CardDemo.tsx`. Bileşen yalnızca görünümden sorumludur.
-3. Sahnede sar: `<Inspectable spec={catalog.card}><CardDemo /></Inspectable>`.
+1. Açıklamayı yaz: ilgili katalog dosyasına (`src/catalog/marketing.ts`, `dashboard.ts`, `mobile.ts`, `assistant.ts`
+   ya da `commerce.ts`) bir
+   `UiElementSpec` ekle; `value` alanlarına demodaki gerçek CSS değerlerini yaz.
+2. Demoda işaretle: öğeye `data-inspect="<id>"` niteliğini ekle.
 
-Hover, tıklama, dokunma, klavye, konumlandırma ve erişilebilirlik `Inspectable` tarafından sağlanır.
+Hover, tıklama, dokunma, klavye, anahat, balon ve sayaç kendiliğinden çalışır. Katalogda karşılığı olmayan bir
+kimlik, geliştirme sırasında konsola uyarı düşer.
+
+## Yeni bir örnek proje eklemek
+
+1. `src/demos/` altına bileşeni yaz. Gerçek link ve düğme kullanma (href'siz `<a>`, `<span>`), renkleri sabit tut.
+2. `src/landing/Examples.tsx` içinde `BrowserFrame` ya da `PhoneFrame` ile sar ve `InspectSurface` içine koy
+   (telefon için `fill`). `BrowserFrame` bir kaydırma sahnesidir: pencere sabitlenir, sayfa kaydırması içeriği
+   kaydırır. Telefonlar tek sırada durur ve sığmazlarsa birlikte küçülür.
+3. Demo kendi kendine hareket ediyorsa (açılıp kapanan menü ya da gelip giden toast gibi) `useInspectActivity()` ile
+   incelenirken durdur.
 
 ## Etkileşim modeli
 
-| Durum | Açılır | Kapanır |
-| --- | --- | --- |
-| Önizleme | Fareyle üzerine gelme, klavyeyle odaklanma (Tab) | İmleç ayrılınca, odak başka yere geçince, Esc |
-| Sabit | Tıklama, dokunma, Enter/Space, önizlemedeki balona tıklama | Tekrar tıklama, dışarı tıklama/dokunma, Esc, × |
-
-- Dokunmatikte tarayıcının ürettiği sahte hover yok sayılır; dışarıda kaydırmak balonu kapatmaz, dokunmak kapatır.
-- İmleç hedeften balona geçerken balon açık kalır (WCAG 1.4.13). Esc ile kapatınca odak hedefe geri döner.
-- Balon, çerçevenin kırpmasına takılmasın diye ayrı bir katmana çizilir; dar ekranda genişliğe sığar ve
-  kavramlar tek sütuna iner.
+| Girdi | Önizleme (özet) | Sabit (tam açıklama) | Kapanır |
+| --- | --- | --- | --- |
+| Fare | Üzerine gel, 280 ms bekle | Tıkla | Dışarı tıkla, aynı öğeye tekrar tıkla, Esc |
+| Dokunmatik | — | Dokun | Dışarı dokun (kaydırmak kapatmaz) |
+| Klavye | Örneğe Tab ile gir, oklarla gez | Enter | Esc, Tab ile çık |

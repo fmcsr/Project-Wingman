@@ -2,10 +2,10 @@
   position: absolute;
   top: 0;
   left: 0;
-  /* Küçük ekranda katman genişliğine sığar; yatay taşma olmaz (8px = useAnchorPosition EDGE_GAP) */
-  width: min(600px, calc(100% - 16px));
+  /* Önizleme dar, sabit balon geniş; katmana her zaman sığar (8px = useAnchorPosition EDGE_GAP) */
+  width: min(320px, calc(100% - 16px));
   container-type: inline-size;
-  padding: 18px 20px 14px;
+  padding: 16px 18px 12px;
   border-radius: var(--radius-lg);
   font-size: 14px;
   line-height: 1.5;
@@ -15,8 +15,11 @@
     var(--shadow-pop),
     inset 0 0 0 1px var(--balloon-line);
   pointer-events: auto;
-  transform-origin: var(--arrow-x, 50%) 0;
-  animation: balloon-in 160ms var(--ease-out);
+  animation: balloon-in 140ms var(--ease-out);
+}
+
+.panel[data-mode='pinned'] {
+  width: min(440px, calc(100% - 16px));
 }
 
 .panel[hidden] {
@@ -38,32 +41,41 @@
   pointer-events: none;
 }
 
-@media (max-width: 479px) {
-  .panel {
-    padding: 16px 16px 12px;
-  }
-}
-
-/* Önizlemede imleç hedeften balona inerken aradaki boşlukta kapanmasın diye görünmez köprü */
+/* Önizlemede imleç hedeften balona geçerken aradaki boşlukta kapanmasın diye görünmez köprü */
 .panel[data-mode='preview']::before {
   content: '';
   position: absolute;
   right: 0;
-  bottom: 100%;
   left: 0;
-  height: 22px;
+  height: 14px;
+}
+
+.panel[data-placement='bottom']::before {
+  bottom: 100%;
+}
+
+.panel[data-placement='top']::before {
+  top: 100%;
 }
 
 .arrow {
   position: absolute;
-  top: -6px;
   left: var(--arrow-x, 50%);
   width: 12px;
   height: 12px;
   border-radius: 2px;
   background: var(--balloon-bg);
-  box-shadow: -1px -1px 0 var(--balloon-line);
   transform: translateX(-50%) rotate(45deg);
+}
+
+.panel[data-placement='bottom'] .arrow {
+  top: -6px;
+  box-shadow: -1px -1px 0 var(--balloon-line);
+}
+
+.panel[data-placement='top'] .arrow {
+  bottom: -6px;
+  box-shadow: 1px 1px 0 var(--balloon-line);
 }
 
 .header {
@@ -72,6 +84,7 @@
 
 .eyebrow,
 .groupTitle {
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -85,23 +98,28 @@
   align-items: center;
   gap: 8px;
   margin-top: 4px;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--balloon-text);
 }
 
+/* Terim = öğrenme anı: sinyal yeşili */
 .tag,
 .term {
-  padding: 2px 7px;
-  border-radius: 6px;
-  font-size: 12.5px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
   color: var(--balloon-accent);
   background: var(--balloon-chip);
 }
 
 .tag {
   font-weight: 500;
+}
+
+.term {
+  font-weight: 600;
 }
 
 .variant {
@@ -112,8 +130,8 @@
 
 .close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 10px;
+  right: 10px;
   display: grid;
   place-items: center;
   width: 32px;
@@ -126,7 +144,7 @@
 }
 
 .close:hover {
-  color: #fff;
+  color: var(--balloon-text);
   background: rgb(255 255 255 / 0.08);
 }
 
@@ -136,8 +154,17 @@
 }
 
 .summary {
-  margin-top: 10px;
+  margin-top: 8px;
   color: var(--balloon-body);
+}
+
+.termList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
 }
 
 .aliases {
@@ -171,7 +198,7 @@
 
 .groups {
   display: grid;
-  gap: 16px;
+  gap: 14px;
   margin-top: 14px;
   padding-top: 14px;
   border-top: 1px solid var(--balloon-line);
@@ -205,10 +232,6 @@
   gap: 2px 8px;
 }
 
-.term {
-  font-weight: 600;
-}
-
 .value {
   font-size: 12px;
   color: var(--balloon-muted);
@@ -222,7 +245,7 @@
 }
 
 .hint {
-  margin-top: 14px;
+  margin-top: 12px;
   padding-top: 10px;
   border-top: 1px solid var(--balloon-line);
   font-size: 12px;
@@ -250,9 +273,15 @@
   }
 }
 
+@media (max-width: 479px) {
+  .panel {
+    padding: 14px 14px 10px;
+  }
+}
+
 @keyframes balloon-in {
   from {
     opacity: 0;
-    transform: translateY(-4px) scale(0.98);
+    transform: scale(0.98);
   }
 }
