@@ -1,0 +1,103 @@
+.stage {
+  position: relative;
+}
+
+.frame {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Odak halkası çerçeveye çizilir; kaydırılan içerik onu örtmez */
+.frame:has(> .viewport:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.chrome {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--color-border);
+  background: #f8fafc;
+}
+
+/* Adres çubuğunu ortalamak için noktalar kadar boşluk */
+.chrome::after {
+  content: '';
+  flex: none;
+  width: 42px;
+}
+
+.dots {
+  display: flex;
+  flex: none;
+  gap: 6px;
+}
+
+.dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dots span:nth-child(1) {
+  background: #fca5a5;
+}
+
+.dots span:nth-child(2) {
+  background: #fcd34d;
+}
+
+.dots span:nth-child(3) {
+  background: #86efac;
+}
+
+.address {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 360px;
+  height: 26px;
+  margin-inline: auto;
+  padding: 0 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--color-text-subtle);
+  background: var(--color-surface);
+}
+
+.address svg {
+  flex: none;
+}
+
+.address span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewport {
+  height: clamp(360px, 60vh, 540px);
+  height: clamp(360px, 60svh, 540px);
+  overflow-y: auto;
+}
+
+.viewport:focus-visible {
+  outline: none;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}

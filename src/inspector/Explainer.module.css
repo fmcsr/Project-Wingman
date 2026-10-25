@@ -1,0 +1,258 @@
+.panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Küçük ekranda katman genişliğine sığar; yatay taşma olmaz (8px = useAnchorPosition EDGE_GAP) */
+  width: min(600px, calc(100% - 16px));
+  container-type: inline-size;
+  padding: 18px 20px 14px;
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--balloon-text);
+  background: var(--balloon-bg);
+  box-shadow:
+    var(--shadow-pop),
+    inset 0 0 0 1px var(--balloon-line);
+  pointer-events: auto;
+  transform-origin: var(--arrow-x, 50%) 0;
+  animation: balloon-in 160ms var(--ease-out);
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+.panel:focus {
+  outline: none;
+}
+
+/* Balon sayfanın sonuna taşarsa alt kenara yapışmasın */
+.panel::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 1px;
+  height: 24px;
+  pointer-events: none;
+}
+
+@media (max-width: 479px) {
+  .panel {
+    padding: 16px 16px 12px;
+  }
+}
+
+/* Önizlemede imleç hedeften balona inerken aradaki boşlukta kapanmasın diye görünmez köprü */
+.panel[data-mode='preview']::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: 22px;
+}
+
+.arrow {
+  position: absolute;
+  top: -6px;
+  left: var(--arrow-x, 50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--balloon-bg);
+  box-shadow: -1px -1px 0 var(--balloon-line);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.header {
+  padding-right: 36px;
+}
+
+.eyebrow,
+.groupTitle {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--balloon-muted);
+}
+
+.title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+.tag,
+.term {
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: var(--balloon-accent);
+  background: var(--balloon-chip);
+}
+
+.tag {
+  font-weight: 500;
+}
+
+.variant {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--balloon-muted);
+}
+
+.close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--balloon-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #fff;
+  background: rgb(255 255 255 / 0.08);
+}
+
+.close:focus-visible {
+  outline: 2px solid var(--balloon-focus);
+  outline-offset: 1px;
+}
+
+.summary {
+  margin-top: 10px;
+  color: var(--balloon-body);
+}
+
+.aliases {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-top: 12px;
+}
+
+.aliasesLabel {
+  font-size: 12px;
+  color: var(--balloon-muted);
+}
+
+.aliasList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aliasList li {
+  padding: 1px 9px;
+  border: 1px solid var(--balloon-line-strong);
+  border-radius: var(--radius-full);
+  font-size: 12.5px;
+}
+
+.groups {
+  display: grid;
+  gap: 16px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--balloon-line);
+}
+
+/* Balon yeterince genişse Görünüm ve Davranış yan yana */
+@container (width >= 480px) {
+  .groups {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+}
+
+.concepts {
+  display: grid;
+  gap: 12px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.concept {
+  display: grid;
+  gap: 4px;
+}
+
+.termRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+}
+
+.term {
+  font-weight: 600;
+}
+
+.value {
+  font-size: 12px;
+  color: var(--balloon-muted);
+  overflow-wrap: anywhere;
+}
+
+.plain {
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--balloon-body);
+}
+
+.hint {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--balloon-line);
+  font-size: 12px;
+  color: var(--balloon-muted);
+}
+
+.hint kbd {
+  padding: 0 5px;
+  border: 1px solid var(--balloon-line-strong);
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--balloon-text);
+}
+
+/* Sabit balondaki ipucu cihaza göre değişir */
+@media (hover: none) {
+  .forHover {
+    display: none;
+  }
+}
+
+@media (hover: hover) {
+  .forTouch {
+    display: none;
+  }
+}
+
+@keyframes balloon-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}

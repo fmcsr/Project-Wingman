@@ -1,0 +1,103 @@
+.root {
+  position: relative;
+}
+
+/* Örneğin tamamını kaplayan, görünmez inceleme düğmesi */
+.trigger {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Seçim çerçevesi (devtools'taki gibi): hover, odak ve açık durumda görünür */
+.trigger::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 2px dashed transparent;
+  border-radius: 10px;
+  transition:
+    border-color 150ms,
+    background-color 150ms,
+    box-shadow 150ms;
+}
+
+@media (hover: hover) {
+  .trigger:hover::after {
+    border-color: var(--color-inspect);
+    background-color: rgb(99 102 241 / 0.06);
+  }
+}
+
+.root[data-state='preview'] .trigger::after {
+  border-color: var(--color-inspect);
+  background-color: rgb(99 102 241 / 0.06);
+}
+
+.root[data-state='pinned'] .trigger::after {
+  border-style: solid;
+  border-color: var(--color-inspect);
+  background-color: rgb(99 102 241 / 0.08);
+}
+
+/* Varsayılan outline kaydırma alanında kırpılacağı için odak, çerçevenin içine çizilir */
+.trigger:focus-visible {
+  outline: none;
+}
+
+.trigger:focus-visible::after {
+  border-style: solid;
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 3px rgb(79 70 229 / 0.25);
+}
+
+/* İncelenebilir olduğunu dokunmatikte de belli eden işaret rozeti; ok buraya bakar */
+.beacon {
+  position: absolute;
+  bottom: -11px;
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--color-inspect);
+  box-shadow:
+    0 0 0 3px #fff,
+    0 4px 12px rgb(79 70 229 / 0.35);
+  transform: translateX(-50%);
+}
+
+.beacon::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border: 2px solid var(--color-inspect);
+  border-radius: 50%;
+  animation: beacon-pulse 2.4s var(--ease-out) infinite;
+}
+
+.root:not([data-state='closed']) .beacon::before {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes beacon-pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}

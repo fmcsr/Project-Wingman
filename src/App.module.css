@@ -1,0 +1,111 @@
+.app {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.container {
+  width: 100%;
+  max-width: 1040px;
+  margin-inline: auto;
+  padding-inline: 16px;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-inline: 24px;
+  }
+}
+
+.header {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 56px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.brandMark {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  color: var(--color-accent);
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* Altta, sahnenin dışına taşabilen açık balon için yer */
+  padding-block: 40px 120px;
+}
+
+.intro {
+  max-width: 720px;
+  margin-bottom: 4px;
+}
+
+.eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-accent);
+}
+
+.title {
+  margin-top: 8px;
+  font-size: clamp(1.75rem, 1.2rem + 2.4vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.lead {
+  max-width: 62ch;
+  margin-top: 14px;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  color: var(--color-text-muted);
+  text-wrap: pretty;
+}
+
+.tip {
+  font-size: 14px;
+  color: var(--color-text-subtle);
+}
+
+.tip code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+@media (max-width: 639px) {
+  .main {
+    padding-block: 28px 96px;
+  }
+}
