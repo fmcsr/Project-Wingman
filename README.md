@@ -2,7 +2,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/hero-dark.png">
-  <img alt="Project Wingman landing page: the headline “Every PM needs a wingman.” above converging line art, with a shooting star heading for the focus point" src="docs/screenshots/hero-light.png">
+  <img alt="Project Wingman landing page: the headline “Every PM needs a wingman.” above lines converging on a horizon, with a shooting star's lights coming in from the left" src="docs/screenshots/hero-light.png">
 </picture>
 
 **The PM's best friend for design.** Project Wingman teaches product managers and founders the real names behind
@@ -12,23 +12,33 @@ design briefs that AI coding tools such as Claude Code and Cursor understand.
 ## A look inside
 
 Hover anything in the examples to learn what it's called. Click to pin the full explanation: how it looks, how it
-behaves, and the exact CSS behind it.
+behaves, and the exact CSS behind it. The examples switch to dark mode with the page (Muse is dark by design), and the
+balloons show the values for the theme you're in.
 
-![The Acme example pinned in its scroll scene, with the frosted-glass navbar's explanation open](docs/screenshots/inspect-light.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/inspect-dark.png">
+  <img alt="The Acme example pinned in its scroll scene, with the frosted-glass navbar's explanation open" src="docs/screenshots/inspect-light.png">
+</picture>
 
-Three mobile apps side by side, here in dark mode, with a preview of Muse's Liquid Glass navbar:
+Three mobile apps side by side, with a preview of Muse's Liquid Glass navbar:
 
-![The Wave, Muse and Stride phone examples in one row on the dark theme, with a balloon describing the Liquid Glass navbar](docs/screenshots/phones-dark.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/phones-dark.png">
+  <img alt="The Wave, Muse and Stride phone examples in one row, with a balloon describing the Liquid Glass navbar" src="docs/screenshots/phones-light.png">
+</picture>
 
-## Current status: landing page and sign-in
+## Current status: landing page, sign-in and the library
 
 An English landing page with a sticky header (with a theme toggle), a hero, examples, feature cards, pricing and a
 footer. The examples section has five projects (a marketing site, an analytics dashboard and three mobile apps), and
 nearly every element shows its name on hover, a summary after a short pause and the full explanation on click.
 
-Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to a placeholder signed-in workspace (`/app`). There's no
-auth backend yet: email and password sign-in only works with the development account below, and Google sign-in and
-sign-ups show a “not connected yet” message.
+Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to the library (`/app/mobile`, `/app/web`): mobile apps and
+websites in two tabs, each a fictional product built from the patterns of well-known ones (“inspired by” Spotify,
+Airbnb, Stripe, Linear and others). Phones can be inspected right in the grid; every example also has its own page
+(`/app/<platform>/<id>`) with all of its elements written out. A search finds examples by name or by element
+(“bottom sheet”, “toast”). There's no auth backend yet: email and password sign-in only works with the development
+account below, and Google sign-in and sign-ups show a “not connected yet” message.
 
 Out of scope for now (later phases): a real auth backend, payments and subscriptions (plan prices are placeholders),
 and a real LLM integration.
@@ -73,9 +83,10 @@ setting (light or dark) and can be switched from the header. All visual decision
 src/
   landing/     Landing page sections: header, theme toggle, hero, examples, feature cards, pricing, footer
   auth/        Sign-in and sign-up pages, the session store (no backend yet) and the dev account
-  workspace/   The signed-in area at /app (a placeholder for now)
-  demos/       Inspectable example projects: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ shared StatusBar)
-  catalog/     Element descriptions (English, typed data): marketing, dashboard, mobile, assistant, commerce
+  workspace/   The signed-in area: the library's tabs, search and grids, and each example's page with its glossary
+  library/     The library: types, the registry, and one folder per example (mobile/<id>, web/<id>)
+  demos/       The landing page's five examples: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ StatusBar)
+  catalog/     Element descriptions (English, typed data) for those five, plus elements every phone shares
   inspector/   The “inspect element” layer: InspectSurface, explainer balloon, positioning
   showcase/    Frames and the interaction guide: the browser frame as a scroll scene (useScrollScene), a scalable phone
   brand/       Logo and the hero's animated line art (with the shooting star)
@@ -86,25 +97,35 @@ docs/
   screenshots/ Images used in this README
 ```
 
+## Adding a library example
+
+Create a folder; the library picks it up on its own (`import.meta.glob` in `src/library/index.ts`):
+
+```
+src/library/<mobile|web>/<id>/
+  <Name>.tsx         the demo (a named export)
+  <Name>.module.css  its styles
+  specs.ts           a UiElementSpec for every data-inspect id the demo uses
+  index.ts           export const <id>: LibraryExample = { id, platform, name, kind, category, inspiredBy, … }
+```
+
+- **The demo is a picture:** no real links, buttons or inputs (`<a>` without `href`, `<span>`), since it sits inside
+  one focusable region. Colors are `light-dark()` pairs so it follows the theme. Anything that moves on its own
+  pauses while inspected (`useInspectActivity()`).
+- **Mobile** fills a 280 × 600 phone screen and starts with the shared `<StatusBar />`; reuse the `statusBar` and
+  `homeIndicator` specs from `src/catalog`. **Web** sets `container-type: inline-size` and works from about 340 px to
+  1150 px wide; it can be taller than the window.
+- **Names are fictional;** real products go in `inspiredBy`.
+
 ## Adding a UI element
 
-1. Write the description: add a `UiElementSpec` to the matching catalog file (`src/catalog/marketing.ts`,
-   `dashboard.ts`, `mobile.ts`, `assistant.ts` or `commerce.ts`), with the demo's real CSS values in its `value`
-   fields.
+1. Write the description: add a `UiElementSpec` to the example's `specs.ts` (for the landing page's five, the
+   matching file in `src/catalog/`), with the demo's real CSS values in its `value` fields. A color that differs by
+   theme is `{ light, dark }`.
 2. Mark it in the demo: add a `data-inspect="<id>"` attribute to the element.
 
-Hover, click, touch, keyboard, outline, balloon and the element counter all work automatically. An id with no catalog
-entry logs a warning to the console during development.
-
-## Adding an example project
-
-1. Write the component under `src/demos/`. Don't use real links or buttons (use `<a>` without `href`, or `<span>`),
-   and keep its colors fixed.
-2. In `src/landing/Examples.tsx`, wrap it in a `BrowserFrame` or a `PhoneFrame` and put it inside an `InspectSurface`
-   (`fill` for phones). `BrowserFrame` is a scroll scene: the window pins and page scrolling scrolls its content.
-   Phones stay in one row and shrink together when they don't fit.
-3. If the demo animates on its own (a menu that opens and closes, a toast that comes and goes), pause it while it's
-   being inspected with `useInspectActivity()`.
+Hover, click, touch, keyboard, outline, balloon, the element counter and the glossary all work automatically. An id
+with no description logs a warning to the console during development.
 
 ## Interaction model
 
