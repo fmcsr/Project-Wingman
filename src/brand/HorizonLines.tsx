@@ -2,14 +2,33 @@ import { useEffect, useRef } from 'react';
 import { subscribeTheme } from '../theme';
 import styles from './HorizonLines.module.css';
 
-/** Time for a ray to slide into the next one's place; larger values slow the flow. */
-const FLOW_MS = 3200;
-/** Cycle of the focus point's gentle sway. */
-const BREATH_MS = 16000;
-/** The fixed moment drawn while "reduced motion" is on. */
-const STILL_MS = 0;
+/**
+ * Settings for one screen size. The values were measured from LayerZero's hero, which this line art follows, except
+ * the wide layout's opacity range and edge fade: on landscape screens their wings faded too soon, so ours stay
+ * stronger further out.
+ */
+type Layout = {
+  /** Angle between neighbouring lines (radians). */
+  step: number;
+  /** How far the horizon sits below the canvas's vertical centre (CSS pixels). */
+  horizonDrop: number;
+  /** A line's opacity grows linearly with its radius: clear at the first radius, full at the second (CSS pixels). */
+  opacityRadii: readonly [number, number];
+  /** Share of the width over which lines fade out toward each side (0: they run to the edge at full strength). */
+  edgeFade: number;
+};
 
-/** Shooting star: 2–5 lights from different left rays meet at the focus point and exit as one on a ray to the right. */
+const WIDE_LAYOUT: Layout = { step: Math.PI / 50, horizonDrop: 40, opacityRadii: [270, 2800], edgeFade: 0.12 };
+const NARROW_LAYOUT: Layout = { step: Math.PI / 30, horizonDrop: 60, opacityRadii: [141, 1889], edgeFade: 0 };
+const WIDE_MIN_WIDTH = 768;
+
+/** Upward drift in radians per second: fastest on a phone-sized canvas, slowest from 1440px, linear in between. */
+const DRIFT_SMALL = { width: 390, speed: 0.114 };
+const DRIFT_LARGE = { width: 1440, speed: 0.03 };
+/** The fixed moment drawn while "reduced motion" is on: lines lie symmetric above and below the horizon. */
+const STILL_PHASE = 0;
+
+/** Shooting star: 2–5 lights from different lines on the left meet at the centre point and exit as one to the right. */
 const STAR_IN_MS = 1100;
 const STAR_OUT_MS = 1400;
 const STAR_FIRST_MS = 3000;
@@ -17,7 +36,9 @@ const STAR_GAP_MIN_MS = 8000;
 const STAR_GAP_MAX_MS = 14000;
 const STAR_ENTRIES_MIN = 2;
 const STAR_ENTRIES_MAX = 5;
-/** Trail length in path units (one ray = 1): a short teardrop when slow, a long ray when passing the focus point. */
+/** Stars only ride lines at least this opaque, so they never run along a line you can't see. */
+const STAR_MIN_OPACITY = 0.15;
+/** Trail length in path units (half the width = 1): a short teardrop when slow, a long ray when passing the centre. */
 const STAR_TAIL_MIN = 0.04;
 const STAR_TAIL_MAX = 0.24;
 /** Width of the teardrop's head (CSS pixels). */
@@ -25,7 +46,6 @@ const STAR_WIDTH = 3;
 
 type Rgb = readonly [number, number, number];
 type Side = -1 | 1;
-type Half = -1 | 1;
 type Point = { x: number; y: number };
 
 type Frame = {
@@ -36,27 +56,31 @@ type Frame = {
   rgb: Rgb;
 };
 
-type Geometry = {
+type Field = {
   width: number;
   height: number;
-  perHalf: number;
-  focusX: number;
-  focusY: number;
-  flow: number;
+  layout: Layout;
+  centerX: number;
+  horizonY: number;
+  /** Turn of the whole family (radians); it grows over time, which moves every line upward. */
+  phase: number;
 };
 
-/** A quadratic ray curve: from the end at the edge (e) to the focus point (f), with control point c. */
-type Curve = { ex: number; ey: number; cx: number; cy: number; fx: number; fy: number };
+/** A path along one half of a line; v is 0 at the edge and 1 at the centre point. */
+type Path = (v: number) => Point;
 
-/** The part of the trail on one curve. Share: where that end falls along the trail (0 tail tip, 1 head). */
-type Band = { curve: Curve; from: number; to: number; fromShare: number; toShare: number; withHead: boolean };
+/** The part of the trail on one path. Share: where that end falls along the trail (0 tail tip, 1 head). */
+type Band = { path: Path; from: number; to: number; fromShare: number; toShare: number; withHead: boolean };
 
-type RayRef = { half: Half; k: number };
+/** Lines are numbered: a line keeps its number while the field drifts, so a star can stay on it. */
+type Star = { start: number; entries: number[]; exit: number };
 
-type Star = { start: number; entries: RayRef[]; exit: RayRef };
+function clamp01(x: number) {
+  return Math.min(Math.max(x, 0), 1);
+}
 
 function smoothstep(edge0: number, edge1: number, x: number) {
-  const t = Math.min(Math.max((x - edge0) / (edge1 - edge0), 0), 1);
+  const t = clamp01((x - edge0) / (edge1 - edge0));
   return t * t * (3 - 2 * t);
 }
 
@@ -70,84 +94,110 @@ function readColor(element: Element): Rgb {
   return [r, g, b];
 }
 
-function fieldGeometry(width: number, height: number, timeMs: number): Geometry {
-  return {
-    width,
-    height,
-    perHalf: Math.round(Math.min(40, Math.max(22, width / 36))),
-    focusX: width / 2 + Math.sin((timeMs / BREATH_MS) * Math.PI * 2) * width * 0.006,
-    focusY: height * (width < 640 ? 0.74 : 0.7),
-    flow: timeMs / FLOW_MS,
-  };
+function isBright([r, g, b]: Rgb) {
+  return (r + g + b) / 3 > 128;
+}
+
+function fieldOf(width: number, height: number, phase: number): Field {
+  const layout = width >= WIDE_MIN_WIDTH ? WIDE_LAYOUT : NARROW_LAYOUT;
+  return { width, height, layout, centerX: width / 2, horizonY: height / 2 + layout.horizonDrop, phase };
+}
+
+function driftSpeed(width: number) {
+  const t = clamp01((width - DRIFT_SMALL.width) / (DRIFT_LARGE.width - DRIFT_SMALL.width));
+  return DRIFT_SMALL.speed + (DRIFT_LARGE.speed - DRIFT_SMALL.speed) * t;
+}
+
+/** Angle of line n: 0 lies flat on the horizon, positive angles curve up, negative ones down. */
+function angleOf(field: Field, n: number) {
+  return n * field.layout.step + field.phase;
 }
 
 /**
- * A ray's current curve. `t`: 0 at the focus point, 1 at the edge. Over time it decreases on the left (inward flow)
- * and increases on the right (outward flow). Rays get denser toward the horizon (perspective).
+ * Every line is a circle that touches the horizon at the centre point. The steeper its angle, the smaller the circle:
+ * radius = half the canvas height / tan(angle). Signed: positive above the horizon, negative below.
  */
-function ray(geo: Geometry, side: Side, half: Half, k: number) {
-  const progress = ((k + geo.flow) % geo.perHalf) / geo.perHalf;
-  const t = side < 0 ? 1 - progress : progress;
-  // Rays above the horizon reach higher
-  const span = half < 0 ? geo.focusY * 1.05 : (geo.height - geo.focusY) * 2.2;
-  const reach = t ** 1.6;
-  const ex = side < 0 ? -geo.width * 0.02 : geo.width * 1.02;
-  const ey = geo.focusY + half * span * reach;
-  // Control point near the horizon: rays join the focus point almost horizontally, at a tangent
-  const curve: Curve = {
-    ex,
-    ey,
-    cx: geo.focusX + (ex - geo.focusX) * 0.42,
-    cy: geo.focusY + half * span * reach * 0.1,
-    fx: geo.focusX,
-    fy: geo.focusY,
-  };
-  return { curve, t };
+function radiusOf(field: Field, angle: number) {
+  return field.height / 2 / Math.tan(angle);
 }
 
-/** Point on the curve; v is 0 at the edge, 1 at the focus point. */
-function pointOn({ ex, ey, cx, cy, fx, fy }: Curve, v: number): Point {
-  const a = (1 - v) * (1 - v);
-  const b = 2 * (1 - v) * v;
-  const c = v * v;
-  return { x: a * ex + b * cx + c * fx, y: a * ey + b * cy + c * fy };
+function opacityOf(field: Field, radius: number) {
+  const [clear, full] = field.layout.opacityRadii;
+  return clamp01((Math.abs(radius) - clear) / (full - clear));
+}
+
+/** The circle's outline; huge, nearly flat circles become a parabola, which matches them to well under a pixel. */
+function traceLine(ctx: CanvasRenderingContext2D, { width, height, centerX, horizonY }: Field, radius: number) {
+  const size = Math.abs(radius);
+  if (size > width * 8) {
+    const bend = (centerX * centerX) / (2 * radius);
+    ctx.moveTo(0, horizonY - bend);
+    ctx.quadraticCurveTo(centerX, horizonY + bend, width, horizonY - bend);
+    return;
+  }
+  const centerY = horizonY - radius;
+  if (size < Math.hypot(width, height)) {
+    ctx.arc(centerX, centerY, size, 0, Math.PI * 2);
+    return;
+  }
+  // A large circle only reaches the canvas around the centre point, where it touches the horizon
+  const touch = radius > 0 ? Math.PI / 2 : -Math.PI / 2;
+  const reach = Math.asin(Math.min(1, (centerX + 2) / size));
+  ctx.arc(centerX, centerY, size, touch - reach, touch + reach);
 }
 
 /**
- * Symmetric ray field: hairline rays coming from the left shrink toward the focus point in the middle and grow
- * again the same way toward the right. Scattered ideas meet in one clear term and open up again from there.
+ * Field of circles that all touch the horizon at the centre point: from the sides they look like rays converging on
+ * one point, flattening into the horizon as they meet. Scattered ideas meet in one clear term.
  */
-function drawField({ ctx, width, height, dpr, rgb }: Frame, geo: Geometry) {
+function drawField({ ctx, width, height, dpr, rgb }: Frame, field: Field) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, width, height);
-  ctx.lineWidth = Math.max(0.5, 1 / dpr);
+  ctx.lineWidth = 1;
 
-  const [r, g, b] = rgb;
-  // Light lines read brighter on a dark background; they're dimmed to look equally thin in both themes
-  const intensity = (r + g + b) / 3 > 128 ? 0.7 : 1;
-
-  for (const side of [-1, 1] as const) {
-    for (const half of [-1, 1] as const) {
-      for (let k = 0; k < geo.perHalf; k++) {
-        const { curve, t } = ray(geo, side, half, k);
-        // Fades out near the focus point (so overlapping lines don't darken) and fades in or out at the edge
-        const alpha =
-          0.22 * intensity * smoothstep(0, 0.3, t) * (1 - smoothstep(0.8, 1, t)) * (k % 5 === 0 ? 1.5 : 1);
-        if (alpha < 0.004) continue;
-        ctx.strokeStyle = rgba(rgb, alpha);
-        ctx.beginPath();
-        ctx.moveTo(curve.ex, curve.ey);
-        ctx.quadraticCurveTo(curve.cx, curve.cy, curve.fx, curve.fy);
-        ctx.stroke();
-      }
-    }
+  const { edgeFade, step } = field.layout;
+  if (edgeFade > 0) {
+    const fade = ctx.createLinearGradient(0, 0, width, 0);
+    fade.addColorStop(0, rgba(rgb, 0));
+    fade.addColorStop(edgeFade, rgba(rgb, 1));
+    fade.addColorStop(1 - edgeFade, rgba(rgb, 1));
+    fade.addColorStop(1, rgba(rgb, 0));
+    ctx.strokeStyle = fade;
+  } else {
+    ctx.strokeStyle = rgba(rgb, 1);
   }
+  // Light lines read brighter on a dark background; they're dimmed a little to look as fine as in the light theme
+  const strength = isBright(rgb) ? 0.8 : 1;
+
+  // Every line between straight down and straight up
+  const first = Math.floor((-Math.PI / 2 - field.phase) / step) + 1;
+  for (let n = first; angleOf(field, n) < Math.PI / 2; n++) {
+    const radius = radiusOf(field, angleOf(field, n));
+    const alpha = opacityOf(field, radius) * strength;
+    if (alpha < 0.004) continue;
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    traceLine(ctx, field, radius);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+
+/** Path along line n's left (side −1) or right (side 1) half, from the edge (v 0) to the centre point (v 1). */
+function pathOf(field: Field, n: number, side: Side): Path {
+  const curvature = Math.tan(angleOf(field, n)) / (field.height / 2);
+  return (v) => {
+    const dx = (1 - v) * field.centerX;
+    // Height of the circle above the horizon, in a form that stays exact for nearly flat lines
+    const lift = (curvature * dx * dx) / (1 + Math.sqrt(Math.max(0, 1 - (curvature * dx) ** 2)));
+    return { x: field.centerX + side * dx, y: field.horizonY - lift };
+  };
 }
 
 /**
- * The star's position on its path: 0 left edge, 1 focus point, 2 right edge. Speeds up on entry, slows on exit;
- * the exit's easing exponent comes from the ratio of the two durations so speed doesn't jump at the focus point.
- * `pace`: ratio of the current speed to the speed at the focus point (0–1).
+ * The star's position on its path: 0 left edge, 1 centre point, 2 right edge. Speeds up on entry, slows on exit;
+ * the exit's easing exponent comes from the ratio of the two durations so speed doesn't jump at the centre point.
+ * `pace`: ratio of the current speed to the speed at the centre point (0–1).
  */
 function starMotion(elapsed: number) {
   if (elapsed < STAR_IN_MS) {
@@ -164,10 +214,10 @@ function starMotion(elapsed: number) {
  * toward the tail; at the head, a semicircle facing the direction of travel forms the teardrop's round end.
  */
 function drawBand(ctx: CanvasRenderingContext2D, band: Band, rgb: Rgb, alpha: number) {
-  const { curve, from, to, fromShare, toShare, withHead } = band;
+  const { path, from, to, fromShare, toShare, withHead } = band;
   const samples = Math.max(2, Math.ceil(20 * (toShare - fromShare)));
   const shareAt = (i: number) => fromShare + ((toShare - fromShare) * i) / samples;
-  const points = Array.from({ length: samples + 1 }, (_, i) => pointOn(curve, from + ((to - from) * i) / samples));
+  const points = Array.from({ length: samples + 1 }, (_, i) => path(from + ((to - from) * i) / samples));
   const left: Point[] = [];
   const right: Point[] = [];
 
@@ -214,16 +264,16 @@ function drawGlow(ctx: CanvasRenderingContext2D, { x, y }: Point, radius: number
 }
 
 /**
- * The shooting star's current frame. The trail is drawn separately on each ray it passes over, from tail to head:
- * as they meet, the entries' tails flow into the focus point while the merged light's head exits on the right ray.
+ * The shooting star's current frame. The trail is drawn separately on each line it passes over, from tail to head:
+ * as they meet, the entries' tails flow into the centre point while the merged light's head exits on the right.
+ * The lines keep drifting meanwhile, and the lights move with them.
  */
-function drawStar({ ctx, rgb }: Frame, geo: Geometry, star: Star, timeMs: number) {
+function drawStar({ ctx, rgb }: Frame, field: Field, star: Star, timeMs: number) {
   const elapsed = timeMs - star.start;
   const { position: head, pace } = starMotion(elapsed);
   const tail = Math.max(0, head - (STAR_TAIL_MIN + (STAR_TAIL_MAX - STAR_TAIL_MIN) * pace));
   const share = (position: number) => (position - tail) / (head - tail);
-  const [r, g, b] = rgb;
-  const bright = (r + g + b) / 3 > 128;
+  const bright = isBright(rgb);
   // A light trail reads brighter on a dark background; on a light one, the head's glow is dimmed to avoid a smudge
   const strength = bright ? 0.85 : 0.7;
   const halo = bright ? 0.3 : 0.15;
@@ -234,37 +284,40 @@ function drawStar({ ctx, rgb }: Frame, geo: Geometry, star: Star, timeMs: number
     if (tail < 1) {
       const end = Math.min(head, 1);
       for (const entry of star.entries) {
-        const { curve } = ray(geo, -1, entry.half, entry.k);
-        drawBand(ctx, { curve, from: tail, to: end, fromShare: 0, toShare: share(end), withHead: head <= 1 }, rgb, alpha);
-        if (head <= 1) drawGlow(ctx, pointOn(curve, head), STAR_WIDTH * 3, rgb, alpha * halo);
+        const path = pathOf(field, entry, -1);
+        drawBand(ctx, { path, from: tail, to: end, fromShare: 0, toShare: share(end), withHead: head <= 1 }, rgb, alpha);
+        if (head <= 1) drawGlow(ctx, path(head), STAR_WIDTH * 3, rgb, alpha * halo);
       }
     }
     if (head > 1) {
-      // On the exit ray the curve parameter is 1 at the focus point, 0 at the edge
+      // On the exit path the parameter is 1 at the centre point, 0 at the edge
       const start = Math.max(tail, 1);
-      const { curve } = ray(geo, 1, star.exit.half, star.exit.k);
-      drawBand(ctx, { curve, from: 2 - start, to: 2 - head, fromShare: share(start), toShare: 1, withHead: true }, rgb, alpha);
-      drawGlow(ctx, pointOn(curve, 2 - head), STAR_WIDTH * 3, rgb, alpha * halo);
+      const path = pathOf(field, star.exit, 1);
+      drawBand(ctx, { path, from: 2 - start, to: 2 - head, fromShare: share(start), toShare: 1, withHead: true }, rgb, alpha);
+      drawGlow(ctx, path(2 - head), STAR_WIDTH * 3, rgb, alpha * halo);
     }
   }
 
-  // A brief, soft flash at the focus point as the lights meet
+  // A brief, soft flash at the centre point as the lights meet
   const flash = (elapsed - STAR_IN_MS + 60) / 480;
   if (flash > 0 && flash < 1) {
-    drawGlow(ctx, { x: geo.focusX, y: geo.focusY }, 3 + 14 * flash, rgb, strength * 0.4 * (1 - flash));
+    drawGlow(ctx, { x: field.centerX, y: field.horizonY }, 3 + 14 * flash, rgb, strength * 0.4 * (1 - flash));
   }
 }
 
-/** Rays currently in the visible zone (neither fading out nor fading in). */
-function visibleRays(geo: Geometry, side: Side) {
-  const rays: RayRef[] = [];
-  for (const half of [-1, 1] as const) {
-    for (let k = 0; k < geo.perHalf; k++) {
-      const { t } = ray(geo, side, half, k);
-      if (t > 0.35 && t < 0.8) rays.push({ half, k });
-    }
+/**
+ * Lines a star can ride: clearly visible and reaching the edge for the whole flight, during which every angle grows
+ * by `drift`.
+ */
+function starLines(field: Field, drift: number) {
+  const [clear, full] = field.layout.opacityRadii;
+  const minRadius = Math.max(field.centerX * 1.25, clear + (full - clear) * STAR_MIN_OPACITY);
+  const limit = Math.atan(field.height / 2 / minRadius);
+  const lines: number[] = [];
+  for (let n = Math.ceil((-limit - field.phase) / field.layout.step); angleOf(field, n) + drift <= limit; n++) {
+    lines.push(n);
   }
-  return rays;
+  return lines;
 }
 
 function pickRandom<T>(items: T[]) {
@@ -280,23 +333,22 @@ function shuffle<T>(items: T[]) {
   return copy;
 }
 
-/** Two rays count as the same spot if they're in the same half and fewer than `gap` rays apart. */
-function farApart(a: RayRef, b: RayRef, gap: number) {
-  return a.half !== b.half || Math.abs(a.k - b.k) >= gap;
-}
-
 /**
- * Builds a new star that comes from different places each time and leaves somewhere other than the previous one.
- * The entry count is 2–5 each time; entries are picked from rays that are far apart.
+ * Builds a new star that comes from different places each time and leaves somewhere other than the previous one
+ * (`previousExit`: its exit line's angle when it set off). The entry count is 2–5 each time; entries are picked from
+ * lines that are far apart.
  */
-function createStar(geo: Geometry, start: number, previousExit: RayRef | null): Star | null {
+function createStar(field: Field, start: number, drift: number, previousExit: number | null): Star | null {
+  const lines = starLines(field, drift);
   const wanted = STAR_ENTRIES_MIN + Math.floor(Math.random() * (STAR_ENTRIES_MAX - STAR_ENTRIES_MIN + 1));
-  const entries: RayRef[] = [];
-  for (const candidate of shuffle(visibleRays(geo, -1))) {
-    if (entries.every((entry) => farApart(candidate, entry, 3))) entries.push(candidate);
+  const entries: number[] = [];
+  for (const candidate of shuffle(lines)) {
+    if (entries.every((entry) => Math.abs(candidate - entry) >= 2)) entries.push(candidate);
     if (entries.length === wanted) break;
   }
-  const exits = visibleRays(geo, 1).filter((candidate) => !previousExit || farApart(candidate, previousExit, 4));
+  const exits = lines.filter(
+    (candidate) => previousExit === null || Math.abs(angleOf(field, candidate) - previousExit) >= field.layout.step * 2,
+  );
   if (entries.length < STAR_ENTRIES_MIN || exits.length === 0) return null;
   return { start, entries, exit: pickRandom(exits) };
 }
@@ -310,7 +362,7 @@ type HorizonLinesProps = {
 };
 
 /**
- * The gently moving line field behind the Hero, with an occasional shooting star.
+ * The slowly drifting line field behind the Hero, with an occasional shooting star.
  * The animation stops while off-screen and while the "reduced motion" setting is on.
  */
 export function HorizonLines({ className }: HorizonLinesProps) {
@@ -325,16 +377,19 @@ export function HorizonLines({ className }: HorizonLinesProps) {
     const frame: Frame = { ctx, width: 0, height: 0, dpr: 1, rgb: readColor(canvas) };
     let raf = 0;
     let visible = false;
-    let elapsed = STILL_MS;
+    let elapsed = 0;
+    let phase = STILL_PHASE;
     let last: number | null = null;
     let star: Star | null = null;
-    let lastExit: RayRef | null = null;
+    let lastExit: number | null = null;
     let nextStarAt = STAR_FIRST_MS;
 
+    const field = () => fieldOf(frame.width, frame.height, phase);
+
     const render = () => {
-      const geo = fieldGeometry(frame.width, frame.height, elapsed);
-      drawField(frame, geo);
-      if (star) drawStar(frame, geo, star, elapsed);
+      const current = field();
+      drawField(frame, current);
+      if (star) drawStar(frame, current, star, elapsed);
     };
 
     const updateStar = () => {
@@ -343,15 +398,21 @@ export function HorizonLines({ className }: HorizonLinesProps) {
         nextStarAt = elapsed + nextGap();
       }
       if (!star && elapsed >= nextStarAt) {
-        star = createStar(fieldGeometry(frame.width, frame.height, elapsed), elapsed, lastExit);
-        if (star) lastExit = star.exit;
+        const current = field();
+        const drift = (driftSpeed(frame.width) * (STAR_IN_MS + STAR_OUT_MS)) / 1000;
+        star = createStar(current, elapsed, drift, lastExit);
+        if (star) lastExit = angleOf(current, star.exit);
         else nextStarAt = elapsed + 1000;
       }
     };
 
     const loop = (now: number) => {
       // The time step is capped so the lines don't suddenly jump when you return to the tab
-      if (last !== null) elapsed += Math.min(now - last, 64);
+      if (last !== null) {
+        const step = Math.min(now - last, 64);
+        elapsed += step;
+        phase += (driftSpeed(frame.width) * step) / 1000;
+      }
       last = now;
       updateStar();
       render();
@@ -362,7 +423,8 @@ export function HorizonLines({ className }: HorizonLinesProps) {
       cancelAnimationFrame(raf);
       last = null;
       if (reducedMotion.matches) {
-        elapsed = STILL_MS;
+        elapsed = 0;
+        phase = STILL_PHASE;
         star = null;
         nextStarAt = STAR_FIRST_MS;
       }
@@ -372,6 +434,8 @@ export function HorizonLines({ className }: HorizonLinesProps) {
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
+      // Line numbers mean other lines once the spacing changes, so a star in flight is dropped
+      if ((rect.width >= WIDE_MIN_WIDTH) !== (frame.width >= WIDE_MIN_WIDTH)) star = null;
       frame.dpr = Math.min(window.devicePixelRatio || 1, 2);
       frame.width = rect.width;
       frame.height = rect.height;

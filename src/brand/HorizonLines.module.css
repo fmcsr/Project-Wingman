@@ -1,11 +1,11 @@
+/* On very wide screens the field stays 1920px wide and centred; the lines fade out toward its sides */
 .canvas {
   position: absolute;
   inset: 0;
   width: 100%;
+  max-width: 1920px;
   height: 100%;
+  margin-inline: auto;
   color: var(--color-text);
   pointer-events: none;
-  /* Soft fade at the top and bottom; in the heading area the lines are already sparse and faint */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 86%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 86%, transparent 100%);
 }
