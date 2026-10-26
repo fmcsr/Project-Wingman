@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Link } from '../router';
 import styles from './ButtonLink.module.css';
 
 type ButtonLinkProps = {
@@ -10,7 +11,7 @@ type ButtonLinkProps = {
   children: ReactNode;
 };
 
-/** A link styled as a button. Leads to in-page sections or to pages that will come later. */
+/** A link styled as a button. Leads to in-page sections or to other pages of the app. */
 export function ButtonLink({ href, variant = 'secondary', size = 'md', block = false, children }: ButtonLinkProps) {
   const className = [
     styles.button,
@@ -22,8 +23,8 @@ export function ButtonLink({ href, variant = 'secondary', size = 'md', block = f
     .filter(Boolean)
     .join(' ');
   return (
-    <a className={className} href={href}>
+    <Link className={className} href={href}>
       {children}
-    </a>
+    </Link>
   );
 }

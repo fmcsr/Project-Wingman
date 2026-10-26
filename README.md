@@ -20,14 +20,26 @@ Three mobile apps side by side, here in dark mode, with a preview of Muse's Liqu
 
 ![The Wave, Muse and Stride phone examples in one row on the dark theme, with a balloon describing the Liquid Glass navbar](docs/screenshots/phones-dark.png)
 
-## Current status: landing page
+## Current status: landing page and sign-in
 
 An English landing page with a sticky header (with a theme toggle), a hero, examples, feature cards, pricing and a
 footer. The examples section has five projects (a marketing site, an analytics dashboard and three mobile apps), and
 nearly every element shows its name on hover, a summary after a short pause and the full explanation on click.
 
-Out of scope for now (later phases): authentication and signed-in areas (“Sign in” is a placeholder), payments and
-subscriptions (plan prices are placeholders), and a real LLM integration.
+Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to a placeholder signed-in workspace (`/app`). There's no
+auth backend yet: email and password sign-in only works with the development account below, and Google sign-in and
+sign-ups show a “not connected yet” message.
+
+Out of scope for now (later phases): a real auth backend, payments and subscriptions (plan prices are placeholders),
+and a real LLM integration.
+
+## Before going live
+
+- [ ] **Remove the dev sign-in account.** Delete `src/auth/devAccount.ts` and `src/auth/DevAccountNote.tsx`, and
+      their uses in `session.ts`, `SignInPage.tsx` and `Workspace.tsx` (search for `TODO(before launch)`). It only
+      works in development builds, but it must not ship.
+- [ ] Connect a real auth provider for email and password, Google sign-in and sign-ups (`src/auth/session.ts`).
+- [ ] Configure the host to serve `index.html` for app routes (`/sign-in`, `/sign-up`, `/app`).
 
 ## Getting started
 
@@ -45,6 +57,9 @@ npm run dev
 | `npm run preview` | Serves the production build locally |
 | `npm run typecheck` | TypeScript check only |
 
+To try the signed-in area while developing, sign in with the dev account `fatih123` / `fatih123` (the sign-in page
+has a “Fill in” shortcut). It only works with `npm run dev` and must be removed before launch.
+
 ## Stack
 
 Vite + React 19 + TypeScript, styled with CSS Modules and CSS custom properties (`src/styles/tokens.css`).
@@ -57,12 +72,15 @@ setting (light or dark) and can be switched from the header. All visual decision
 ```
 src/
   landing/     Landing page sections: header, theme toggle, hero, examples, feature cards, pricing, footer
+  auth/        Sign-in and sign-up pages, the session store (no backend yet) and the dev account
+  workspace/   The signed-in area at /app (a placeholder for now)
   demos/       Inspectable example projects: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ shared StatusBar)
   catalog/     Element descriptions (English, typed data): marketing, dashboard, mobile, assistant, commerce
   inspector/   The “inspect element” layer: InspectSurface, explainer balloon, positioning
   showcase/    Frames and the interaction guide: the browser frame as a scroll scene (useScrollScene), a scalable phone
   brand/       Logo and the hero's animated line art (with the shooting star)
   styles/      Design tokens (light-dark) and global styles
+  router.tsx   A tiny client-side router: current path, links, redirects, page titles
   theme.ts     Light/dark theme: read, set, subscribe to changes
 docs/
   screenshots/ Images used in this README

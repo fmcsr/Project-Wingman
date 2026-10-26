@@ -1,0 +1,92 @@
+.page {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+/* The hero's line art, faint behind the form. Shifted down so the rays meet below the card and its footer line */
+.backdrop {
+  position: fixed;
+  inset: 22vh 0 -22vh;
+  z-index: -1;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px 16px 72px;
+}
+
+.card {
+  width: min(100%, 400px);
+  padding: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: var(--color-surface);
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.heading {
+  margin-top: 12px;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+  outline: none;
+}
+
+.lead {
+  margin-top: 8px;
+  color: var(--color-text-muted);
+}
+
+.footer {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.footer a {
+  font-weight: 500;
+  color: var(--color-text);
+  text-underline-offset: 3px;
+}
+
+/* On a phone the card spans the width and padding tightens */
+@media (max-width: 479px) {
+  .card {
+    padding: 24px 20px;
+  }
+}

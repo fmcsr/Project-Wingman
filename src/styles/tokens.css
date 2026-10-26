@@ -35,6 +35,8 @@
   --color-accent-text: light-dark(#087a56, #0fb983);
   --color-accent-soft: light-dark(#e6f6ef, rgb(15 185 131 / 0.14));
   --color-focus: light-dark(#0a8f65, #0fb983);
+  /* Form errors; ≥6:1 against the surfaces in both themes */
+  --color-danger: light-dark(#b42318, #f97066);
 
   /* Example UIs stay light in every theme, so the inspection color is fixed */
   --color-inspect: #0a8f65;

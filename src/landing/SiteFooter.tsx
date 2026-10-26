@@ -1,8 +1,12 @@
-import { SECTION_LINKS, SIGN_IN_HREF } from './links';
+import { useUser } from '../auth/session';
+import { Link } from '../router';
+import { SECTION_LINKS, SIGN_IN_HREF, WORKSPACE_HREF } from './links';
 import styles from './SiteFooter.module.css';
 
 /** Footer: section links as plain text, not a bar. */
 export function SiteFooter() {
+  const user = useUser();
+
   return (
     <footer className={styles.footer}>
       <div className={`container ${styles.top}`}>
@@ -16,7 +20,7 @@ export function SiteFooter() {
               {link.label}
             </a>
           ))}
-          <a href={SIGN_IN_HREF}>Sign in</a>
+          {user ? <Link href={WORKSPACE_HREF}>Workspace</Link> : <Link href={SIGN_IN_HREF}>Sign in</Link>}
         </nav>
       </div>
       <div className={`container ${styles.bottom}`}>
