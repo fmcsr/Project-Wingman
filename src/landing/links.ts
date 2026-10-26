@@ -8,5 +8,7 @@ export const SECTION_LINKS = [
 /** Section ids (used by the header to track which section is in view). */
 export const SECTION_IDS = SECTION_LINKS.map((link) => link.href.slice(1));
 
-/** Sign-in and account pages come in the next phase; a placeholder for now. */
-export const SIGN_IN_HREF = '#sign-in';
+/** App pages linked from the landing page (see App.tsx). */
+export const SIGN_IN_HREF = '/sign-in';
+export const SIGN_UP_HREF = '/sign-up';
+export const WORKSPACE_HREF = '/app';

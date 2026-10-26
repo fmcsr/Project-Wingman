@@ -15,6 +15,8 @@ Last updated: 2026-10-26 · Status: Applied to the landing page
 | Signature visual | Symmetric rays in the hero (`src/brand/HorizonLines.tsx`): they come in from the left, narrow to a point in the middle and widen again toward the right. Every so often a shooting star passes: 2–5 beams come in along different rays on the left and meet at the focus point, and the merged beam leaves along another ray on the right | A motif inspired by LayerZero's hero. The metaphor: scattered ideas meet in one clear term and open up again from there. The shooting star animates that meeting. The flow runs left to right. |
 | Example interfaces | Not affected by the site theme; each keeps its own look (Muse is dark on purpose) | The examples stand for real products; they're part of the concept being taught, not of the brand. |
 | Inspection model | Like “Inspect element” in browser developer tools | Nearly every element can explain itself, and adding a new one takes a single `data-inspect` attribute. |
+| Pages and routing | `/` landing page, `/sign-in`, `/sign-up`, `/app` (signed-in workspace). A tiny router on the History API instead of a library | Four routes don't justify a dependency; links stay real `<a href>` elements, so opening in a new tab works. |
+| Auth | No backend yet. The session lives in `localStorage`; the sign-in functions already have the shape a real provider will need | The pages won't change when a provider (Supabase, Firebase, Clerk…) is connected. Until then, a development-only account opens the workspace. |
 | Scrolling in the example sites | No scrolling inside the frames. As on Apple's product pages, the window pins and page scrolling scrolls the site inside it | Nested scrolling (a window that scrolls inside the page) trapped the cursor and made the page harder to use. |
 
 ## Page structure (information architecture)
@@ -27,6 +29,8 @@ Hero          [ PROJECT WINGMAN ] · “Every PM needs a wingman.” · See exam
 [03] Pricing  Free · Pro · Team (placeholder prices)
 Footer        Text links · Back to top
 ```
+
+Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the plans' buttons lead here) and `/app`, the signed-in workspace. Once signed in, Sign in becomes Workspace in the header and the footer.
 
 - **The header isn't a bar, but it's sticky:** Fully transparent at the top of the page; as you scroll down it takes on a borderless frosted-glass background. Links go to sections, the logo goes back to the top, and the link of the section in view gets darker. Sections stop below the header thanks to `scroll-margin-top`.
 - **Footer:** Not a bar; text links sitting on the page background.
@@ -50,6 +54,15 @@ The balloon is narrow in preview (name, summary, term chips) and wide when pinne
 In the scaled-down phones and in windows settling into place, the outline and the name tag are drawn at the inverse scale: the outline stays thin and the tag stays readable.
 
 **Animated demos pause while inspected.** Muse's dropdown opens and closes on its own when idle. It holds still while the pointer is over the example, keyboard focus is inside it or a balloon is open, so the menu itself can be inspected too. Demos read this state with `useInspectActivity()`.
+
+## Sign-in and sign-up
+
+- **Layout:** A minimal header (logo and theme toggle), the hero's line art faint behind, and the form in a 400 px card. The card opens like a landing section: a mono `[ SIGN IN ]` label, a large light heading (“Welcome back.”), a muted lead.
+- **Fields:** 46 px tall with 12 px corners. On focus the field's own border turns signal green with a soft ring. An error appears under the field in `--color-danger` and is read out by screen readers. Passwords have a show/hide button.
+- **Buttons:** The main action is the primary pill. “Continue with Google” follows Google's button colors: white, a `#747775` border and `#1F1F1F` text in light mode; `#131314`, `#8E918F` and `#E3E3E3` in dark mode. It uses the four-color G, in our pill shape (Roboto 500 is Google's own button font).
+- **Messages:** A form-level message is neutral when something isn't connected yet (Google, sign-ups) and red when the input was wrong (email and password don't match).
+- **Workspace:** Unlike the landing page, the app header is a bar (hairline border, frosted glass): it frames a working area rather than a story. The avatar shows the user's initial.
+- **Dev account (development builds only):** A dashed note under the sign-in card with the credentials and a “Fill in” shortcut, and a dashed banner in the workspace. Both disappear from production builds and are removed before launch.
 
 ## Mobile demos
 
@@ -82,6 +95,7 @@ All of them live in `src/styles/tokens.css` and are defined with `light-dark(lig
 | `--color-accent` | `#0a8f65` | `#0fb983` | Non-text accent |
 | `--color-accent-text` | `#087a56` | `#0fb983` | Accent text |
 | `--color-inspect` | `#0a8f65` | `#0a8f65` | Inspection outline (fixed: the examples are always light) |
+| `--color-danger` | `#b42318` | `#f97066` | Form errors (≥6:1 against the surfaces) |
 
 The explainer balloon uses an inverted surface in light mode (`#171717`) and a surface one step up in dark mode (`#202020`).
 

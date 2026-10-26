@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useUser } from '../auth/session';
 import { BrandMark } from '../brand/BrandMark';
 import { ButtonLink } from './ButtonLink';
-import { SECTION_IDS, SECTION_LINKS, SIGN_IN_HREF } from './links';
+import { SECTION_IDS, SECTION_LINKS, SIGN_IN_HREF, WORKSPACE_HREF } from './links';
 import { ThemeToggle } from './ThemeToggle';
 import styles from './SiteHeader.module.css';
 
@@ -46,6 +47,7 @@ function useScrollState() {
  */
 export function SiteHeader() {
   const { scrolled, active } = useScrollState();
+  const user = useUser();
 
   return (
     <header className={styles.header} data-scrolled={scrolled || undefined}>
@@ -63,9 +65,15 @@ export function SiteHeader() {
         </nav>
         <div className={styles.actions}>
           <ThemeToggle />
-          <ButtonLink href={SIGN_IN_HREF} size="sm">
-            Sign in
-          </ButtonLink>
+          {user ? (
+            <ButtonLink href={WORKSPACE_HREF} size="sm">
+              Workspace
+            </ButtonLink>
+          ) : (
+            <ButtonLink href={SIGN_IN_HREF} size="sm">
+              Sign in
+            </ButtonLink>
+          )}
         </div>
       </div>
     </header>

@@ -1,22 +1,24 @@
-import { Examples } from './landing/Examples';
-import { Features } from './landing/Features';
-import { Hero } from './landing/Hero';
-import { Pricing } from './landing/Pricing';
-import { SiteFooter } from './landing/SiteFooter';
-import { SiteHeader } from './landing/SiteHeader';
+import { SignInPage } from './auth/SignInPage';
+import { SignUpPage } from './auth/SignUpPage';
+import { useUser } from './auth/session';
+import { LandingPage } from './landing/LandingPage';
+import { Redirect, usePath, useScrollOnNavigate } from './router';
+import { Workspace } from './workspace/Workspace';
 
-/** Landing page: hero, examples, feature cards and plans. Signed-in areas come in a later phase. */
+/** Pages: the landing page, sign-in and sign-up, and the signed-in workspace at /app. */
 export function App() {
-  return (
-    <div id="top">
-      <SiteHeader />
-      <main>
-        <Hero />
-        <Examples />
-        <Features />
-        <Pricing />
-      </main>
-      <SiteFooter />
-    </div>
-  );
+  const path = usePath();
+  const user = useUser();
+  useScrollOnNavigate(path);
+
+  switch (path) {
+    case '/sign-in':
+      return user ? <Redirect to="/app" /> : <SignInPage />;
+    case '/sign-up':
+      return user ? <Redirect to="/app" /> : <SignUpPage />;
+    case '/app':
+      return user ? <Workspace user={user} /> : <Redirect to="/sign-in" />;
+    default:
+      return <LandingPage />;
+  }
 }

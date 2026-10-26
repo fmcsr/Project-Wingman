@@ -1,5 +1,5 @@
 import { ButtonLink } from './ButtonLink';
-import { SIGN_IN_HREF } from './links';
+import { SIGN_UP_HREF } from './links';
 import { SectionHeader } from './SectionHeader';
 import styles from './Pricing.module.css';
 
@@ -74,7 +74,7 @@ export function Pricing() {
                   </li>
                 ))}
               </ul>
-              <ButtonLink href={SIGN_IN_HREF} variant={plan.featured ? 'primary' : 'secondary'} block>
+              <ButtonLink href={SIGN_UP_HREF} variant={plan.featured ? 'primary' : 'secondary'} block>
                 {plan.cta}
               </ButtonLink>
             </li>
