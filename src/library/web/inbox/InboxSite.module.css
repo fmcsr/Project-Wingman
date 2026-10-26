@@ -1,0 +1,839 @@
+/* The example app follows the page theme: every color is a light-dark(light, dark) pair. */
+/* Container queries apply to child elements, not the container itself; that's why the layout sits inside it */
+.root {
+  container-type: inline-size;
+}
+
+/* Fills the browser window like a real mail app: the top bar, then panes that stretch to the bottom */
+.app {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 900px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: light-dark(#1f1f1f, #e3e3e3);
+  background: light-dark(#f6f8fc, #111317);
+}
+
+.icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.iconButton,
+.toolButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  color: light-dark(#444746, #c4c7c5);
+}
+
+.iconButton {
+  width: 40px;
+  height: 40px;
+}
+
+.toolButton {
+  width: 32px;
+  height: 32px;
+}
+
+.toolButton .icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Vertical dots need a thicker stroke to read as dots */
+.dots {
+  stroke-width: 3;
+}
+
+.avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px solid light-dark(#c4c7c5, #444746);
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: light-dark(#444746, #c4c7c5);
+}
+
+/* Top bar: stays pinned while the panes scroll under it */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 64px;
+  padding: 0 16px 0 8px;
+  background: light-dark(#f6f8fc, #111317);
+}
+
+.brand {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  width: 208px;
+}
+
+.logo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  color: #fff;
+  background: linear-gradient(135deg, #1a73e8, #7b5cf5);
+}
+
+.logo .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.wordmark {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Search: a wide pill, the biggest control in the bar */
+.search {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  max-width: 720px;
+  min-width: 0;
+  height: 46px;
+  padding: 0 4px 0 14px;
+  border-radius: 23px;
+  color: light-dark(#444746, #c4c7c5);
+  background: light-dark(#e9eef6, #252a31);
+}
+
+.placeholder {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: light-dark(#5f6368, #9aa0a6);
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+/* Panes: the rail, then the message list and the reading pane side by side */
+.body {
+  display: grid;
+  grid-template-columns: 216px minmax(0, 0.9fr) minmax(0, 1fr);
+  grid-template-areas: 'rail list reading';
+  gap: 8px;
+  padding: 0 12px 12px 0;
+}
+
+.rail {
+  grid-area: rail;
+}
+
+/* Stays in view under the top bar while the panes scroll */
+.railInner {
+  position: sticky;
+  top: 64px;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0 16px 8px;
+}
+
+/* Compose: an extended floating action button, icon plus label, the strongest action on screen */
+.compose {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  align-self: flex-start;
+  height: 56px;
+  margin-bottom: 16px;
+  padding: 0 22px 0 16px;
+  border-radius: 16px;
+  font-weight: 600;
+  color: light-dark(#001d35, #c2e7ff);
+  background: light-dark(#c2e7ff, #004a77);
+  box-shadow: 0 1px 3px light-dark(rgb(60 64 67 / 0.2), rgb(0 0 0 / 0.4));
+}
+
+.folders {
+  display: grid;
+  gap: 2px;
+}
+
+.folder {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 32px;
+  margin-right: 8px;
+  padding: 0 14px 0 16px;
+  border-radius: 999px;
+}
+
+.folder .icon {
+  color: light-dark(#444746, #c4c7c5);
+}
+
+/* The open folder: a tinted pill and bold text */
+.folder[aria-current='page'] {
+  font-weight: 700;
+  color: light-dark(#001d35, #d3e3fd);
+  background: light-dark(#d3e3fd, #004a77);
+}
+
+.folder[aria-current='page'] .icon {
+  color: inherit;
+}
+
+.folderLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.unreadCount,
+.totalCount {
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A bold count means unread messages; a regular one (Drafts) is just how many there are */
+.unreadCount {
+  font-weight: 700;
+}
+
+.railHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  margin-top: 12px;
+  padding: 0 18px 0 16px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.railHeading .icon {
+  color: light-dark(#444746, #c4c7c5);
+}
+
+.tagIcon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/*
+ * Message list and reading pane: white cards on the tinted background. In the real app each pane scrolls on its
+ * own (overflow-y: auto); this picture clips instead and scrolls with the page, so it stays a single tab stop.
+ */
+.list,
+.reading {
+  min-width: 0;
+  overflow: clip;
+  border-radius: 16px;
+  background: light-dark(#ffffff, #1b1e23);
+}
+
+.list {
+  grid-area: list;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 48px;
+  padding: 0 8px 0 10px;
+}
+
+/* Select all: a checkbox plus a caret that opens All, None, Read, Unread… */
+.selectAll {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+  margin-right: 6px;
+  padding: 0 2px 0 8px;
+  border-radius: 6px;
+  color: light-dark(#444746, #c4c7c5);
+}
+
+.caret {
+  width: 14px;
+  height: 14px;
+}
+
+.checkbox {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 2px solid light-dark(#5f6368, #9aa0a6);
+  border-radius: 3px;
+}
+
+/* Checked and mixed are filled with the accent: a check means all, a dash means some */
+.checkbox[aria-checked='true'],
+.checkbox[aria-checked='mixed'] {
+  border-color: light-dark(#0b57d0, #a8c7fa);
+  color: light-dark(#ffffff, #062e6f);
+  background: light-dark(#0b57d0, #a8c7fa);
+}
+
+.checkbox .icon {
+  width: 12px;
+  height: 12px;
+  stroke-width: 3;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  font-size: 12.5px;
+  color: light-dark(#5f6368, #9aa0a6);
+}
+
+.range {
+  margin-right: 6px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* On the first page there's nothing newer, so the arrow is dimmed */
+.toolButton[aria-disabled='true'] {
+  opacity: 0.38;
+}
+
+/* Category tabs */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid light-dark(#e6e9ef, #2a2e35);
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 14px;
+  font-weight: 500;
+  color: light-dark(#444746, #c4c7c5);
+}
+
+.tab[aria-selected='true'] {
+  color: light-dark(#0b57d0, #a8c7fa);
+}
+
+/* The selected tab: a 3px bar along the bottom edge, rounded on top */
+.tab[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  left: 10px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: currentColor;
+}
+
+/* "3 new": unseen mail waiting in another tab */
+.newBadge {
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: light-dark(#ffffff, #072711);
+  background: light-dark(#188038, #6dd58c);
+}
+
+/* Message rows: two lines each, sender and time on top, subject and snippet below */
+.row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 16px 11px 18px;
+  border-bottom: 1px solid light-dark(#eef0f4, #262a31);
+}
+
+.rowControls {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  height: 20px;
+}
+
+.star {
+  display: grid;
+  place-items: center;
+  color: light-dark(#80868b, #8e949a);
+}
+
+.star .icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Starred: the outline fills in */
+.star[aria-pressed='true'] {
+  color: #f4b400;
+}
+
+.star[aria-pressed='true'] .icon {
+  fill: currentColor;
+}
+
+/* minmax(0, 1fr) lets the column shrink below its one-line text, so long lines end in "…" */
+.rowBody {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+  min-width: 0;
+}
+
+.rowTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 20px;
+}
+
+.sender {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.time {
+  flex: none;
+  font-size: 12.5px;
+  color: light-dark(#5f6368, #9aa0a6);
+  font-variant-numeric: tabular-nums;
+}
+
+.rowLine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 20px;
+  font-size: 13.5px;
+}
+
+.preview {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.snippet {
+  color: light-dark(#5f6368, #9aa0a6);
+}
+
+/* Unread: bold sender, subject and time; that's the whole difference */
+.unread .sender,
+.unread .subject,
+.unread .time {
+  font-weight: 700;
+  color: light-dark(#1f1f1f, #ffffff);
+}
+
+/* Open in the reading pane: a soft tint and an accent bar along the left edge */
+.rowOpen {
+  background: light-dark(#f1f4f9, #21262e);
+  box-shadow: inset 3px 0 0 light-dark(#0b57d0, #a8c7fa);
+}
+
+/* Checked for a bulk action */
+.rowChecked {
+  background: light-dark(#d3e3fd, #233552);
+}
+
+/* Under the pointer: the row lifts with a shadow and trades its time for quick actions */
+.rowHover {
+  z-index: 1;
+  background: light-dark(#ffffff, #252a32);
+  box-shadow:
+    0 1px 2px light-dark(rgb(60 64 67 / 0.3), rgb(0 0 0 / 0.6)),
+    0 1px 3px 1px light-dark(rgb(60 64 67 / 0.15), rgb(0 0 0 / 0.3));
+}
+
+.quickActions {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  margin: -6px -6px -6px 0;
+}
+
+.quickButton {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: light-dark(#444746, #c4c7c5);
+}
+
+.quickButton .icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Label chips: a tint of the label color with darker (light theme) or lighter (dark theme) text */
+.chip {
+  flex: none;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.chipImportant {
+  color: light-dark(#7a4b00, #fdd663);
+  background: light-dark(#fdefc3, rgb(251 188 4 / 0.18));
+}
+
+.chipProduct {
+  color: light-dark(#0842a0, #a8c7fa);
+  background: light-dark(#d3e3fd, rgb(76 141 246 / 0.22));
+}
+
+.chipFinance {
+  color: light-dark(#0d652d, #81c995);
+  background: light-dark(#cdeed6, rgb(47 166 90 / 0.22));
+}
+
+.chipHiring {
+  color: light-dark(#8a3c00, #ffb77a);
+  background: light-dark(#fde2cc, rgb(240 138 36 / 0.2));
+}
+
+/* Attachment chip: the file is visible (and openable) without opening the email */
+.rowAttachments,
+.bodyAttachments {
+  display: flex;
+  margin-top: 6px;
+}
+
+.attachment {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 12px 0 8px;
+  border: 1px solid light-dark(#dadce0, #3c4043);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.fileIcon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: #ea4335;
+}
+
+.fileFold {
+  fill: none;
+  stroke: light-dark(#ffffff, #1b1e23);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.fileSize {
+  font-weight: 400;
+  color: light-dark(#5f6368, #9aa0a6);
+}
+
+/* Reading pane */
+.reading {
+  display: flex;
+  grid-area: reading;
+  flex-direction: column;
+  padding: 20px 24px 24px;
+}
+
+.subjectRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+.subjectTitle {
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.messageHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.avatarLarge {
+  width: 40px;
+  height: 40px;
+  font-size: 15px;
+}
+
+.from {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  padding-top: 1px;
+}
+
+/* Name and address share a line when there's room; the address wraps under the name when there isn't */
+.fromLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 6px;
+}
+
+.fromName {
+  font-weight: 600;
+}
+
+.fromAddress,
+.toLine,
+.sentTime {
+  font-size: 12.5px;
+  color: light-dark(#5f6368, #9aa0a6);
+}
+
+.fromAddress {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.headerEnd {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  margin-top: -6px;
+}
+
+.sentTime {
+  margin-right: 6px;
+  white-space: nowrap;
+}
+
+/* The body starts under the sender's name, past the avatar */
+.messageBody {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+  padding-left: 52px;
+  line-height: 1.6;
+}
+
+.bodyAttachments {
+  margin-top: 4px;
+}
+
+/* Collapsed reply: one line that grows into a full editor when you click it (or press R) */
+.replyBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  margin: 28px 0 0 52px;
+  padding: 0 12px 0 16px;
+  border: 1px solid light-dark(#c4c7c5, #444746);
+  border-radius: 24px;
+  color: light-dark(#444746, #c4c7c5);
+}
+
+.replyPlaceholder {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: light-dark(#5f6368, #9aa0a6);
+}
+
+/* Medium widths: the rail shrinks to icons, Compose to its pencil, and unread counts become badges */
+@container (width < 1080px) {
+  .body {
+    grid-template-columns: 72px minmax(0, 0.9fr) minmax(0, 1fr);
+  }
+
+  .compose {
+    justify-content: center;
+    width: 56px;
+    padding: 0;
+  }
+
+  .composeLabel,
+  .folderLabel,
+  .totalCount,
+  .railHeading {
+    display: none;
+  }
+
+  .folder {
+    justify-content: center;
+    width: 56px;
+    margin-right: 0;
+    padding: 0;
+  }
+
+  .unreadCount {
+    position: absolute;
+    top: 0;
+    left: 30px;
+    padding: 0 5px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    line-height: 16px;
+    color: #fff;
+    background: light-dark(#0b57d0, #3b6fd8);
+  }
+
+  .railHeading + .folders {
+    margin-top: 16px;
+  }
+
+  .tabIcon {
+    display: none;
+  }
+}
+
+/* The reading pane moves under the message list */
+@container (width < 760px) {
+  .body {
+    grid-template-columns: 72px minmax(0, 1fr);
+    grid-template-areas:
+      'rail list'
+      'rail reading';
+  }
+}
+
+/* Phone width: no rail (the ☰ opens it), and the panes stack in one column */
+@container (width < 640px) {
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'list'
+      'reading';
+    padding: 0 8px 8px;
+  }
+
+  .rail,
+  .wordmark,
+  .settings,
+  .range,
+  .relative {
+    display: none;
+  }
+
+  .topbar {
+    gap: 6px;
+    padding: 0 12px 0 4px;
+  }
+
+  .brand {
+    width: auto;
+  }
+
+  .search {
+    gap: 8px;
+    height: 42px;
+    padding-left: 12px;
+  }
+
+  .placeholder {
+    font-size: 15px;
+  }
+
+  .tab {
+    padding: 0 12px;
+  }
+
+  .row {
+    gap: 10px;
+    padding-inline: 12px;
+  }
+
+  .reading {
+    padding: 18px 16px 20px;
+  }
+
+  .subjectTitle {
+    font-size: 19px;
+  }
+
+  .messageBody {
+    padding-left: 0;
+  }
+
+  .replyBox {
+    margin-left: 0;
+  }
+}

@@ -1,16 +1,19 @@
+/* Fills the first screen under the 64px header; the line field's horizon sits just below its middle */
 .hero {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-height: clamp(560px, 86vh, 840px);
+  height: calc(100svh - 64px);
+  min-height: 720px;
 }
 
+/* The text sits in the upper part, well clear of the horizon */
 .inner {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: clamp(64px, 14vh, 150px);
+  padding-top: clamp(56px, calc(27svh - 140px), 200px);
   text-align: center;
 }
 

@@ -38,9 +38,11 @@
   /* Form errors; ≥6:1 against the surfaces in both themes */
   --color-danger: light-dark(#b42318, #f97066);
 
-  /* Example UIs stay light in every theme, so the inspection color is fixed */
-  --color-inspect: #0a8f65;
-  --color-inspect-strong: #087a56;
+  /* Brighter in dark mode, so the outline stands out on the examples once they turn dark */
+  --color-inspect: light-dark(#0a8f65, #0fb983);
+  --color-inspect-strong: light-dark(#087a56, #34d399);
+  /* Text on the inspection color (the name tag) */
+  --color-on-inspect: light-dark(#ffffff, #04281c);
 
   /* Balloon: an inverted (dark) surface in the light theme, one step above the background in the dark theme */
   --balloon-bg: light-dark(#171717, #202020);

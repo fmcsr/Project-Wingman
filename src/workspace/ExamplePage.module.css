@@ -1,0 +1,128 @@
+.page {
+  padding-block: 32px 96px;
+}
+
+.back {
+  display: inline-flex;
+  font-size: 14px;
+  text-decoration: none;
+  color: var(--color-text-subtle);
+}
+
+.back:hover {
+  color: var(--color-text);
+}
+
+.header {
+  max-width: 760px;
+  margin-top: 24px;
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.title {
+  margin-top: 12px;
+  font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+}
+
+.muted {
+  color: var(--color-text-faint);
+}
+
+.lead {
+  max-width: 60ch;
+  margin-top: 12px;
+  color: var(--color-text-muted);
+}
+
+.inspired {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--color-text-subtle);
+}
+
+/* Balloons are drawn on a layer over the whole stage, so they're never clipped by the frame */
+.stage {
+  position: relative;
+  margin-top: 40px;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.webLayout {
+  display: grid;
+  gap: 72px;
+}
+
+/* Phone on the left stays in view while the element list scrolls by */
+.mobileLayout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+}
+
+.phoneColumn {
+  position: sticky;
+  top: 88px;
+}
+
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 72px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+}
+
+.pager a {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 16px;
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.pager a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pager .next {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.pagerLabel {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+/* Narrow screens: the phone sits on top, the element list below it */
+@media (max-width: 859px) {
+  .mobileLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .phoneColumn {
+    position: static;
+  }
+}

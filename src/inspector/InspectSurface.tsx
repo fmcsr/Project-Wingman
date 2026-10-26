@@ -1,7 +1,8 @@
-import { useEffect, useId, useLayoutEffect, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
 import type { CSSProperties, ReactNode, RefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { getSpec } from '../catalog';
+import { catalogOf, getSpec } from '../catalog';
+import type { UiElementSpec } from '../catalog';
 import { Explainer } from './Explainer';
 import { InspectActivityContext } from './InspectActivity';
 import { useInspectorLayer } from './InspectorLayer';
@@ -83,6 +84,8 @@ type InspectSurfaceProps = {
   onCount?: (count: number) => void;
   /** Whether to fill the container's full height (for fixed-height frames such as a phone screen). */
   fill?: boolean;
+  /** Descriptions of the elements this example marks with `data-inspect`. */
+  specs: readonly UiElementSpec[];
   children: ReactNode;
 };
 
@@ -91,7 +94,7 @@ type InspectSurfaceProps = {
  * inspectable: hovering shows its name, a short dwell its summary, and a click its full explanation.
  * The demo is visual only; for screen readers the example is conveyed by a single focus stop and a live region.
  */
-export function InspectSurface({ label, onCount, fill = false, children }: InspectSurfaceProps) {
+export function InspectSurface({ label, onCount, fill = false, specs, children }: InspectSurfaceProps) {
   const id = useId();
   const hintId = `${id}hint`;
   const layer = useInspectorLayer();
@@ -109,8 +112,9 @@ export function InspectSurface({ label, onCount, fill = false, children }: Inspe
     panelProps,
   } = useInspectSurface();
 
-  const spec = target ? getSpec(target.getAttribute('data-inspect') ?? undefined) : undefined;
-  const hoverSpec = hoverEl ? getSpec(hoverEl.getAttribute('data-inspect') ?? undefined) : undefined;
+  const catalog = useMemo(() => catalogOf(specs), [specs]);
+  const spec = target ? getSpec(catalog, target.getAttribute('data-inspect') ?? undefined) : undefined;
+  const hoverSpec = hoverEl ? getSpec(catalog, hoverEl.getAttribute('data-inspect') ?? undefined) : undefined;
   const position = useAnchorPosition(open && Boolean(spec), target, panelRef, layer);
   const targetBox = useRelativeBox(open || keyboardActive ? target : null, surfaceRef);
   const hoverBox = useRelativeBox(hoverEl && hoverEl !== target ? hoverEl : null, surfaceRef);

@@ -7,10 +7,11 @@
   min-height: 100svh;
 }
 
-/* The hero's line art, faint behind the form. Shifted down so the rays meet below the card and its footer line */
+/* The hero's line art, faint behind the form. Shifted down so the rays meet near the bottom of the screen, below the
+   card and its footer lines (the horizon sits just under the middle of this box) */
 .backdrop {
   position: fixed;
-  inset: 22vh 0 -22vh;
+  inset: 40vh 0 -40vh;
   z-index: -1;
   opacity: 0.6;
   pointer-events: none;

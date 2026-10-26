@@ -12,8 +12,9 @@ Last updated: 2026-10-26 · Status: Applied to the landing page
 | Visual direction | **Signal**: LayerZero's gray simplicity in light mode, Stargate's depth in dark mode | The two references share a language (neutral base, one accent, flat surfaces) that fits the light/dark pair. |
 | Accent color | One color, signal green, **only for learning moments** | Inspection outline, name tag, term chips, focus ring. Not used anywhere else. |
 | Typography | Roboto + Roboto Mono, the same as LayerZero | LayerZero's typefaces; both are open source (OFL). Self-hosted via Fontsource. Heading and label metrics are taken from LayerZero too. |
-| Signature visual | Symmetric rays in the hero (`src/brand/HorizonLines.tsx`): they come in from the left, narrow to a point in the middle and widen again toward the right. Every so often a shooting star passes: 2–5 beams come in along different rays on the left and meet at the focus point, and the merged beam leaves along another ray on the right | A motif inspired by LayerZero's hero. The metaphor: scattered ideas meet in one clear term and open up again from there. The shooting star animates that meeting. The flow runs left to right. |
-| Example interfaces | Not affected by the site theme; each keeps its own look (Muse is dark on purpose) | The examples stand for real products; they're part of the concept being taught, not of the brand. |
+| Signature visual | LayerZero's hero line art (`src/brand/HorizonLines.tsx`): every line is a circle that touches the horizon at the centre point, so from the sides they look like rays converging and flattening into one line; the whole field drifts slowly upward. Every so often a shooting star passes: 2–5 beams come in along different lines on the left and meet at the centre point, and the merged beam leaves along another line on the right | The geometry, spacing, opacity and speed were measured from LayerZero's canvas. One deliberate change: on wide screens their outer lines (the wings) faded too soon and the hero looked bland on landscape screens, so ours stay stronger further out. The metaphor: scattered ideas meet in one clear term and open up again from there. The shooting star (our own addition) animates that meeting. |
+| Logo | Two square brackets facing each other, empty inside, next to the name (`src/brand/BrandMark.tsx`); the favicon is the same mark | The site's `[ ]` label motif (as in `[ PROJECT WINGMAN ]`) made into a mark. Square ends and corners like the bracket glyphs, drawn on whole pixels so it stays crisp. |
+| Example interfaces | The examples follow the site theme; only Muse stays dark in both (dark by design) | Bright examples on a dark page felt off, and real products ship a dark mode too. Every example color is a `light-dark()` pair (Wave uses iOS's own light and dark system colors), and the balloons show color values for the theme in use, so what they explain always matches what's on screen. |
 | Inspection model | Like “Inspect element” in browser developer tools | Nearly every element can explain itself, and adding a new one takes a single `data-inspect` attribute. |
 | Pages and routing | `/` landing page, `/sign-in`, `/sign-up`, `/app` (signed-in workspace). A tiny router on the History API instead of a library | Four routes don't justify a dependency; links stay real `<a href>` elements, so opening in a new tab works. |
 | Auth | No backend yet. The session lives in `localStorage`; the sign-in functions already have the shape a real provider will need | The pages won't change when a provider (Supabase, Firebase, Clerk…) is connected. Until then, a development-only account opens the workspace. |
@@ -30,7 +31,7 @@ Hero          [ PROJECT WINGMAN ] · “Every PM needs a wingman.” · See exam
 Footer        Text links · Back to top
 ```
 
-Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the plans' buttons lead here) and `/app`, the signed-in workspace. Once signed in, Sign in becomes Workspace in the header and the footer.
+Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the plans' buttons lead here) and the signed-in library: `/app/mobile`, `/app/web` and one page per example at `/app/<platform>/<id>`. Once signed in, Sign in becomes Workspace in the header and the footer. Under the landing page's examples, “Explore the library” leads in.
 
 - **The header isn't a bar, but it's sticky:** Fully transparent at the top of the page; as you scroll down it takes on a borderless frosted-glass background. Links go to sections, the logo goes back to the top, and the link of the section in view gets darker. Sections stop below the header thanks to `scroll-margin-top`.
 - **Footer:** Not a bar; text links sitting on the page background.
@@ -55,6 +56,15 @@ In the scaled-down phones and in windows settling into place, the outline and th
 
 **Animated demos pause while inspected.** Muse's dropdown opens and closes on its own when idle. It holds still while the pointer is over the example, keyboard focus is inside it or a balloon is open, so the menu itself can be inspected too. Demos read this state with `useInspectActivity()`.
 
+## Library
+
+- **Two tabs, Mobile and Web,** in a pill-shaped segmented control with the count of examples. Like a pattern gallery (Mobbin): category chips, and a search that matches names, inspirations and every element's name, aliases and terms (“bottom sheet” finds the apps that have one).
+- **Examples are fictional products** built from the patterns of well-known ones; real names only appear as “Inspired by”. No real logos or brands inside the demos.
+- **Mobile grid:** phones scale to their column and can be inspected right there, like on the landing page. Each card's heading stays on one line so phones in a row line up.
+- **Web grid:** a still, scaled-down picture of each site at desktop width (1280 px); the whole card opens the site's page. Previews can't be focused or inspected.
+- **Example page:** the example at full size and all of its elements written out as a glossary: name, tag, variant, summary, “also called”, and each concept with its term and value (for the theme in use). Phones stay in view on the left while the list scrolls; sites use the scroll scene, with the glossary below. Previous/next links walk through the tab.
+- The library loads separately from the landing page, so the public page stays light.
+
 ## Sign-in and sign-up
 
 - **Layout:** A minimal header (logo and theme toggle), the hero's line art faint behind, and the form in a 400 px card. The card opens like a landing section: a mono `[ SIGN IN ]` label, a large light heading (“Welcome back.”), a muted lead.
@@ -66,7 +76,7 @@ In the scaled-down phones and in windows settling into place, the outline and th
 
 ## Mobile demos
 
-- **Wave:** The classic iOS language. Light background, list rows, toggle switches, a FAB and a bottom tab bar.
+- **Wave:** The classic iOS language. Grouped background, list rows, toggle switches, a FAB and a bottom tab bar. In dark mode it uses iOS's dark system colors: black background, `#1c1c1e` cells, darker separators and the brighter `#30d158` switch.
 - **Muse:** A newer kind of app: an AI assistant in the Liquid Glass style. A glass navbar floating over a dark, colorful background, a glass dropdown that opens and closes on its own, chat bubbles, a typing indicator, glass suggestion chips, a glass composer and a voice button with a color ring.
   - Liquid Glass recipe: `backdrop-filter: blur() saturate(180%)`, a translucent white background, a thin white border and a highlight along the top edge made with an inset shadow.
 - **Stride:** A shopping product page. A must-have in the collection, because it gathers the elements PMs most often look up by name on a single screen:
@@ -75,6 +85,7 @@ In the scaled-down phones and in windows settling into place, the outline and th
   - Star rating, color and size pickers (including a sold-out size).
   - Quantity stepper and a sticky buy bar.
   - A toast that comes and goes on its own (stays visible while inspected).
+  - In dark mode: a warm dark gallery behind the coral shoe, a dark details panel, and the selections (size, color ring, Add to bag) flip to light.
 
 ## Color tokens
 
@@ -94,7 +105,8 @@ All of them live in `src/styles/tokens.css` and are defined with `light-dark(lig
 | `--color-fill-secondary` | black 6% | white 8% | Secondary button (LayerZero's gray button) |
 | `--color-accent` | `#0a8f65` | `#0fb983` | Non-text accent |
 | `--color-accent-text` | `#087a56` | `#0fb983` | Accent text |
-| `--color-inspect` | `#0a8f65` | `#0a8f65` | Inspection outline (fixed: the examples are always light) |
+| `--color-inspect` | `#0a8f65` | `#0fb983` | Inspection outline and name tag; brighter in dark mode to stand out on dark examples |
+| `--color-on-inspect` | `#ffffff` | `#04281c` | Text on the name tag |
 | `--color-danger` | `#b42318` | `#f97066` | Form errors (≥6:1 against the surfaces) |
 
 The explainer balloon uses an inverted surface in light mode (`#171717`) and a surface one step up in dark mode (`#202020`).
@@ -114,10 +126,13 @@ Typefaces and metrics are taken one to one from LayerZero.
 - **Corners:** Buttons are fully rounded (pills); the theme toggle and the pause button are circles. Cards 8–12 px; chips and badges fully rounded.
 - **Flat surfaces:** No shadows; hairlines separate things. Only floating elements (balloon, phone, browser window) get a shadow.
 - **Motion:**
-  - The rays drift left to right by one ray spacing every ~3.2 seconds; the focus point sways gently on a 16-second cycle.
+  - Hero lines, as measured on LayerZero:
+    - A line at angle φ is a circle of radius (hero height ÷ 2) ÷ tan φ, touching the horizon at the centre point. The horizon sits 40 px below the hero's middle (60 px under 768 px wide).
+    - Lines are 3.6° apart (6° under 768 px) and 1 px wide. Every angle grows at the same rate, so lines rise from below, flatten into the horizon and curl away above: 1.7°/s from 1440 px wide, faster on narrower screens (6.5°/s at 390 px).
+    - Opacity grows linearly with a line's radius: clear at 141 px, full at 1889 px under 768 px, as on LayerZero. On wide screens it's clear at 270 px and full at 2800 px, and lines fade out over the outer 12% of the width on each side (LayerZero: 440–5480 px and the outer quarter, which left the wings faint). The field is at most 1920 px wide.
   - The shooting star is rare: the first one after ~3 seconds, then at random 8–14 second intervals.
-    - Path: 2–5 beams (random each time) speed in from rays far apart on the left and meet at the focus point at the same moment (a short, soft flash). The merged beam slows down as it leaves along a different ray on the right than the last one, and fades as it nears the edge. Each beam follows its ray, recomputed every frame, so it never leaves the moving line.
-    - Shape: A teardrop. A full, round head with a single tapering, fading tail; no dotted trail. A short drop when slow, a long beam as it passes the focus point. Same color as the lines, so it follows the theme; the glow around the head is dimmed in light mode.
+    - Path: 2–5 beams (random each time) speed in from lines far apart on the left and meet at the centre point at the same moment (a short, soft flash). The merged beam slows down as it leaves along a line on the right, at a different angle than the last one, and fades as it nears the edge. Beams only ride clearly visible lines and move with them as the field drifts, so they never leave their line.
+    - Shape: A teardrop. A full, round head with a single tapering, fading tail; no dotted trail. A short drop when slow, a long beam as it passes the centre point. Same color as the lines, so it follows the theme; the glow around the head is dimmed in light mode.
   - Site scenes: The window grows from 92% to 100% as it reaches its pinned position. Once pinned, there's a short hold before the content starts scrolling and before the window is released (~12% of the viewport height, at most 120 px). While scrolling, a thin macOS-style scrollbar appears on the right.
   - Features marquee: Two identical groups sit end to end and drift left by one group's width every 80 seconds (~25–30 px/s); the edges fade out softly. It stops under the pointer or with the button.
   - The inspection outline slides between elements in 120 ms.

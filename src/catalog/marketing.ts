@@ -21,8 +21,8 @@ export const marketing: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Translucent background',
-        value: 'rgb(255 255 255 / 0.6)',
-        plain: 'White at 60% opacity, so the colors behind it softly show through.',
+        value: { light: 'rgb(255 255 255 / 0.6)', dark: 'rgb(15 23 42 / 0.6)' },
+        plain: 'A 60% opaque background, so the colors behind it softly show through.',
       },
       {
         kind: 'behavior',
@@ -146,7 +146,7 @@ export const marketing: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Hairline border',
-        value: '1px solid rgb(15 23 42 / 0.08)',
+        value: { light: '1px solid rgb(15 23 42 / 0.08)', dark: '1px solid rgb(255 255 255 / 0.12)' },
         plain: 'A barely visible outline separates it from the background without shouting.',
       },
     ],
@@ -189,8 +189,8 @@ export const marketing: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Solid fill',
-        value: 'background: #0f172a',
-        plain: 'A dark, solid color with white text — the highest contrast in the section.',
+        value: { light: 'background: #0f172a', dark: 'background: #f8fafc' },
+        plain: 'A solid fill in the strongest contrast to the page (dark in light mode, light in dark mode).',
       },
       {
         kind: 'behavior',
@@ -210,8 +210,8 @@ export const marketing: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Outline',
-        value: '1px solid rgb(15 23 42 / 0.12)',
-        plain: 'A thin border on a white background instead of a solid fill.',
+        value: { light: '1px solid rgb(15 23 42 / 0.12)', dark: '1px solid rgb(255 255 255 / 0.16)' },
+        plain: 'A thin border on the page color instead of a solid fill.',
       },
       {
         kind: 'behavior',
@@ -231,7 +231,7 @@ export const marketing: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Muted logos',
-        value: 'color: #94a3b8',
+        value: { light: 'color: #94a3b8', dark: 'color: #64748b' },
         plain: 'The logos are grayed out so they support the page instead of pulling attention.',
       },
       {

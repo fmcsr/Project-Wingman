@@ -1,0 +1,381 @@
+import { homeIndicator, statusBar } from '../../../catalog';
+import type { UiElementSpec } from '../../../catalog';
+
+/** Elements in the Hail ride-hailing app, in the order they appear. `value` fields are the actual values from HailApp. */
+export const hailSpecs: UiElementSpec[] = [
+  statusBar,
+  {
+    id: 'map-view',
+    name: 'Map view',
+    variant: 'Light and dark map style',
+    summary: 'The map that fills the top of the screen. Its colors stay quiet, so the route, pins and cars are what you notice.',
+    aliases: ['the map', 'map background', 'map screen'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'Muted base map',
+        value: { light: '#eceef1', dark: '#1b1e24' },
+        plain: 'City blocks are soft gray by day and near-black at night, so nothing on the map fights with the trip.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Layer order',
+        value: 'blocks → route → pins → callouts',
+        plain: 'Each layer is drawn on top of the one before, so the trip always sits above the streets.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Full-bleed',
+        value: 'top: 0',
+        plain: 'The map runs all the way up under the clock and battery, so no space is wasted on a header.',
+      },
+    ],
+  },
+  {
+    id: 'route-line',
+    name: 'Route line',
+    htmlTag: '<path>',
+    variant: 'Polyline with a casing',
+    summary: 'The colored line that traces the trip along the streets, from the pickup to the drop-off.',
+    aliases: ['the route', 'the path on the map', 'the purple line'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'Polyline',
+        value: { light: 'stroke: #4f46e5', dark: 'stroke: #8b8cff' },
+        plain: 'A line made of connected points that follows the roads, drawn in the brand color.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Casing',
+        value: { light: '8px #fff under 4px', dark: '8px #0e1014 under 4px' },
+        plain: 'A wider line underneath outlines the route, so its edges stay crisp over any part of the map.',
+      },
+      {
+        kind: 'appearance',
+        term: 'stroke-linejoin',
+        value: 'round',
+        plain: 'Turns get rounded corners, so the route reads as one smooth path.',
+      },
+    ],
+  },
+  {
+    id: 'vehicle-marker',
+    name: 'Vehicle marker',
+    variant: 'Nearby cars, seen from above',
+    summary: 'Little cars on the map that show drivers nearby. Each one faces the way it is driving.',
+    aliases: ['the little cars', 'car icons', 'drivers on the map'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'Top-down icon',
+        value: '9 × 16px',
+        plain: 'Drawn from above, so a car can point in any direction and still look like a car.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Heading',
+        value: 'rotate(var(--heading))',
+        plain: 'Each car is turned to match its direction of travel: 0°, 90° or 270° here.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Drop shadow',
+        value: 'box-shadow: 0 1px 2px rgb(0 0 0 / 0.3)',
+        plain: 'A tiny shadow lifts each car off the street, so it reads as something moving on the map.',
+      },
+    ],
+  },
+  {
+    id: 'map-pin',
+    name: 'Map pin',
+    variant: 'Pickup ● and drop-off ■',
+    summary: 'Markers placed exactly on a spot on the map. The circle is where you get in; the square is where you get out.',
+    aliases: ['marker', 'location pin', 'the dot and the square'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'Shape coding',
+        value: 'border-radius: 50% vs 3px',
+        plain: 'Start and end differ in shape, not only in color, so anyone can tell them apart at a glance.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Maximum contrast',
+        value: { light: 'background: #111', dark: 'background: #fff' },
+        plain: 'Pins use the strongest color on the map: black on the light map, white on the dark one.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Anchor point',
+        value: 'translate(-50%, -50%)',
+        plain: 'The pin is centered on its coordinates, so the middle of the marker is the exact spot.',
+      },
+    ],
+  },
+  {
+    id: 'map-callout',
+    name: 'Map callout',
+    variant: 'Pickup ETA and destination',
+    summary: 'Small labels attached to the pins: the ETA (estimated time of arrival) of the car at the pickup, and where you are going.',
+    aliases: ['ETA bubble', 'map label', 'info window'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'Pointer tail',
+        value: 'clip-path: polygon(0 0, 100% 0, 50% 100%)',
+        plain: 'A small triangle under each label points at the pin it belongs to.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Inverted ETA',
+        value: { light: 'background: #111', dark: 'background: #fff' },
+        plain: 'The arrival time is dark on the light map and light on the dark one, so it is the first thing you read.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Anchored above the pin',
+        value: 'translate(-50%, calc(-100% - 14px))',
+        plain: 'Each label is centered over its pin and lifted just clear of it, so it never covers the spot.',
+      },
+      {
+        kind: 'appearance',
+        term: 'font-variant-numeric',
+        value: 'tabular-nums',
+        plain: "Every digit has the same width, so the bubble doesn't wobble when the minutes change.",
+      },
+    ],
+  },
+  {
+    id: 'back-button',
+    name: 'Back button',
+    htmlTag: '<button aria-label="Back">',
+    variant: 'Floating, over the map',
+    summary: 'A round button floating over the map that takes you back a step, here to editing the destination.',
+    aliases: ['back arrow', 'the round button in the corner'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'Floating button',
+        value: {
+          light: 'box-shadow: 0 2px 10px rgb(0 0 0 / 0.16)',
+          dark: 'box-shadow: 0 2px 10px rgb(0 0 0 / 0.5)',
+        },
+        plain: 'A solid circle with a soft shadow stays readable on top of any part of the map.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Touch target',
+        value: '38 × 38px',
+        plain: 'The whole circle can be tapped, not just the arrow inside it.',
+      },
+      {
+        kind: 'behavior',
+        term: 'aria-label',
+        value: '"Back"',
+        plain: "Gives the icon a name that screen readers can say, since there's no visible text.",
+      },
+    ],
+  },
+  {
+    id: 'bottom-sheet',
+    name: 'Bottom sheet',
+    variant: 'Non-modal, at its middle height',
+    summary: 'A panel anchored to the bottom of the screen that holds the ride choices, while the map stays visible above it.',
+    aliases: ['the panel at the bottom', 'drawer', 'the card that slides up'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'Detent',
+        value: 'height: 360px',
+        plain: 'Sheets rest at set heights called detents. This one leaves the top of the map in view.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Top corners only',
+        value: 'border-radius: 20px 20px 0 0',
+        plain: 'Rounded on top and square at the bottom, because the panel continues past the screen edge.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Upward shadow',
+        value: {
+          light: 'box-shadow: 0 -6px 24px rgb(0 0 0 / 0.12)',
+          dark: 'box-shadow: 0 -6px 24px rgb(0 0 0 / 0.5)',
+        },
+        plain: 'The shadow falls onto the map above, so the sheet looks like it sits on top of it.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Non-modal',
+        value: 'no backdrop',
+        plain: 'There is no dark overlay behind it, so the map stays visible and usable while you choose.',
+      },
+    ],
+  },
+  {
+    id: 'recenter-button',
+    name: 'Recenter button',
+    htmlTag: '<button aria-label="Recenter map">',
+    variant: 'Map control',
+    summary: "Brings the map back to your trip after you've dragged it somewhere else.",
+    aliases: ['locate me', 'my location button', 'the target button'],
+    concepts: [
+      {
+        kind: 'behavior',
+        term: 'Anchored to the sheet',
+        value: 'bottom: calc(100% + 12px)',
+        plain: "It sits 12px above the sheet's top edge, so it moves up and down together with the sheet.",
+      },
+      {
+        kind: 'appearance',
+        term: 'Crosshair icon',
+        value: '20 × 20px',
+        plain: 'A target with a dot in the middle is the familiar sign for “show where I am”.',
+      },
+      {
+        kind: 'behavior',
+        term: 'aria-label',
+        value: '"Recenter map"',
+        plain: 'Screen readers say what the icon does, since the button has no visible text.',
+      },
+    ],
+  },
+  {
+    id: 'drag-handle',
+    name: 'Drag handle',
+    variant: 'Grabber',
+    summary: 'The short gray bar at the top of the sheet. It hints that you can drag the sheet taller or shorter.',
+    aliases: ['grabber', 'the little line at the top', 'pull tab'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'Grabber',
+        value: '36 × 5px',
+        plain: 'Small, centered and gray: a hint, not a button.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Hit area',
+        value: '64 × 20px',
+        plain: 'The area you can grab is much bigger than the bar itself, so it is easy to catch with a thumb.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Quiet color',
+        value: { light: '#d1d1d6', dark: '#48484a' },
+        plain: "A soft gray that doesn't compete with the content below it.",
+      },
+    ],
+  },
+  {
+    id: 'ride-option',
+    name: 'Selectable card',
+    variant: 'Ride option · one selected',
+    summary: 'One choice in a list where only one can be picked. Each card shows the car, the seats, the pickup time and the price.',
+    aliases: ['ride option', 'radio card', 'choice row'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'Selected state',
+        value: { light: 'border-color: #4f46e5', dark: 'border-color: #8b8cff' },
+        plain: 'The chosen card gets an outline in the brand color and a soft tint.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Reserved border',
+        value: 'border: 2px solid transparent',
+        plain: 'The other cards keep an invisible border of the same width, so nothing shifts when the choice changes.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Radio group',
+        value: 'role="radiogroup"',
+        plain: 'Only one ride can be picked at a time, like radio buttons, and screen readers say which one is selected.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Product image',
+        value: '48 × 28px',
+        plain: 'A small picture of the car tells the options apart before you read a word.',
+      },
+    ],
+  },
+  {
+    id: 'fare',
+    name: 'Upfront price',
+    variant: 'Fare per ride',
+    summary: 'The price of the trip for each option, shown before you book so there are no surprises at the end.',
+    aliases: ['price', 'fare', 'cost'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'font-variant-numeric',
+        value: 'tabular-nums',
+        plain: 'Every digit has the same width, so the prices line up neatly down the right edge.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Visual weight',
+        value: '15px · 700',
+        plain: 'The price is the boldest text on each card, because it is what most people compare.',
+      },
+    ],
+  },
+  {
+    id: 'payment-row',
+    name: 'Payment method row',
+    variant: 'With a disclosure chevron',
+    summary: 'Shows which card will be charged. The arrow at the end means tapping it opens a screen to choose another one.',
+    aliases: ['payment selector', 'card on file', 'the card row'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'Masked card number',
+        value: '•••• 4242',
+        plain: 'Only the last four digits are shown: enough to recognize the card without exposing it.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Disclosure indicator',
+        value: '16 × 16px chevron',
+        plain: 'The small arrow on the right is the usual sign for “this opens another screen”.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Hairline divider',
+        value: { light: 'border-top: 1px solid #e5e5ea', dark: 'border-top: 1px solid #38383a' },
+        plain: 'A thin line separates the payment row from the ride choices above it.',
+      },
+    ],
+  },
+  {
+    id: 'primary-button',
+    name: 'Primary button',
+    htmlTag: '<button>',
+    variant: 'Full width, names the choice',
+    summary: "The screen's one main action. Its label names the selected ride, so you know exactly what you're confirming.",
+    aliases: ['CTA', 'call to action', 'the big button', 'confirm button'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'Full-width button',
+        value: 'height: 48px',
+        plain: 'It spans the whole sheet and stands 48px tall: the easiest thing on the screen to hit.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Brand fill',
+        value: { light: '#4f46e5', dark: '#5a52e6' },
+        plain: 'It is the only solid colored button on the screen, so the eye lands on it first.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Specific label',
+        value: '"Choose Hail Comfort"',
+        plain: 'Naming the ride in the button, instead of a plain “Confirm”, helps prevent booking the wrong one.',
+      },
+    ],
+  },
+  homeIndicator,
+];

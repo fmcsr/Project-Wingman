@@ -55,7 +55,7 @@
   font-size: 11px;
   line-height: 1.4;
   white-space: nowrap;
-  color: #fff;
+  color: var(--color-on-inspect);
   background: var(--color-inspect);
   transform: scale(calc(1 / var(--inspect-scale, 1)));
   transform-origin: bottom left;

@@ -115,7 +115,7 @@ export function StrideApp() {
             <defs>
               <linearGradient id="stride-star-partial">
                 <stop offset="80%" stopColor="#f59e0b" />
-                <stop offset="80%" stopColor="#e5e7eb" />
+                <stop className={styles.starEmpty} offset="80%" />
               </linearGradient>
             </defs>
           </svg>

@@ -54,8 +54,7 @@
   height: 100%;
   overflow: hidden;
   border-radius: 42px;
-  background: #fff;
-  color-scheme: light;
+  background: light-dark(#fff, #000);
 }
 
 /* Dynamic Island in iPhone 18 Pro proportions: about 24% narrower than the 17 Pro's (≈126 → ≈96 of 402 pt) */

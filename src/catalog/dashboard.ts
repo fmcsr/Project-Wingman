@@ -22,6 +22,12 @@ export const dashboard: UiElementSpec[] = [
         value: '@container (width < 640px)',
         plain: 'On narrow screens the labels hide and only the icons remain, saving space.',
       },
+      {
+        kind: 'behavior',
+        term: 'Dark mode',
+        value: 'light-dark()',
+        plain: 'Every color in the app is defined twice, once for light and once for dark, and it follows the theme you pick.',
+      },
     ],
   },
   {
@@ -83,7 +89,7 @@ export const dashboard: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Selected segment',
-        value: 'background: #fff + box-shadow',
+        value: { light: 'background: #fff + box-shadow', dark: 'background: #334155 + box-shadow' },
         plain: 'The active option looks raised, like a key pressed into place.',
       },
       {
@@ -197,8 +203,8 @@ export const dashboard: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Tinted background',
-        value: 'pale fill + dark text',
-        plain: 'A pale background with darker text from the same color family stays readable.',
+        value: { light: 'pale fill + dark text', dark: 'tinted fill + light text' },
+        plain: 'A soft tint of the status color behind text in a stronger shade of the same color stays readable.',
       },
       {
         kind: 'behavior',

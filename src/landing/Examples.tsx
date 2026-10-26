@@ -5,11 +5,14 @@ import { MuseApp } from '../demos/MuseApp';
 import { OrbitDashboard } from '../demos/OrbitDashboard';
 import { StrideApp } from '../demos/StrideApp';
 import { WaveApp } from '../demos/WaveApp';
+import { showcaseSpecs } from '../catalog';
 import { InspectSurface } from '../inspector/InspectSurface';
 import { InspectorLayerHost } from '../inspector/InspectorLayer';
 import { BrowserFrame } from '../showcase/BrowserFrame';
 import { InteractionGuide } from '../showcase/InteractionGuide';
 import { PhoneFrame } from '../showcase/PhoneFrame';
+import { ButtonLink } from './ButtonLink';
+import { WORKSPACE_HREF } from './links';
 import { SectionHeader } from './SectionHeader';
 import styles from './Examples.module.css';
 
@@ -98,7 +101,7 @@ export function Examples() {
               url="acme.app"
               header={<ProjectMeta index="[01]" name="Acme" kind="Marketing site" count={counts.acme} />}
             >
-              <InspectSurface label="Acme marketing site" onCount={onCount.acme}>
+              <InspectSurface specs={showcaseSpecs} label="Acme marketing site" onCount={onCount.acme}>
                 <AcmeSite />
               </InspectSurface>
             </BrowserFrame>
@@ -107,7 +110,7 @@ export function Examples() {
               url="app.orbit.io"
               header={<ProjectMeta index="[02]" name="Orbit" kind="Analytics dashboard" count={counts.orbit} />}
             >
-              <InspectSurface label="Orbit analytics dashboard" onCount={onCount.orbit}>
+              <InspectSurface specs={showcaseSpecs} label="Orbit analytics dashboard" onCount={onCount.orbit}>
                 <OrbitDashboard />
               </InspectSurface>
             </BrowserFrame>
@@ -116,7 +119,7 @@ export function Examples() {
               <div className={styles.phoneProject}>
                 <ProjectMeta index="[03]" name="Wave" kind="Habit tracker" count={counts.wave} />
                 <PhoneFrame>
-                  <InspectSurface label="Wave habit tracker" onCount={onCount.wave} fill>
+                  <InspectSurface specs={showcaseSpecs} label="Wave habit tracker" onCount={onCount.wave} fill>
                     <WaveApp />
                   </InspectSurface>
                 </PhoneFrame>
@@ -125,7 +128,7 @@ export function Examples() {
               <div className={styles.phoneProject}>
                 <ProjectMeta index="[04]" name="Muse" kind="AI assistant" count={counts.muse} />
                 <PhoneFrame>
-                  <InspectSurface label="Muse AI assistant" onCount={onCount.muse} fill>
+                  <InspectSurface specs={showcaseSpecs} label="Muse AI assistant" onCount={onCount.muse} fill>
                     <MuseApp />
                   </InspectSurface>
                 </PhoneFrame>
@@ -134,7 +137,7 @@ export function Examples() {
               <div className={styles.phoneProject}>
                 <ProjectMeta index="[05]" name="Stride" kind="Shopping" count={counts.stride} />
                 <PhoneFrame>
-                  <InspectSurface label="Stride shopping app" onCount={onCount.stride} fill>
+                  <InspectSurface specs={showcaseSpecs} label="Stride shopping app" onCount={onCount.stride} fill>
                     <StrideApp />
                   </InspectSurface>
                 </PhoneFrame>
@@ -142,6 +145,15 @@ export function Examples() {
             </div>
           </div>
         </InspectorLayerHost>
+      </div>
+
+      <div className={`container ${styles.more}`}>
+        <p className={styles.moreText}>
+          There's a lot more inside: a library of mobile apps and websites, every element explained.
+        </p>
+        <ButtonLink href={WORKSPACE_HREF} variant="primary" size="lg">
+          Explore the library
+        </ButtonLink>
       </div>
     </section>
   );
