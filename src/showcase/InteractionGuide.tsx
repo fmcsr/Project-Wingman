@@ -29,23 +29,23 @@ function KeyboardIcon() {
 }
 
 const ITEMS: { label: string; icon: () => ReactNode; text: ReactNode }[] = [
-  { label: 'Fare', icon: MouseIcon, text: 'Üzerine gel: önizle · Tıkla: sabitle' },
-  { label: 'Dokunmatik', icon: TouchIcon, text: 'Dokun: aç · Dışarıya dokun: kapat' },
+  { label: 'Mouse', icon: MouseIcon, text: 'Hover to name it · Click for details' },
+  { label: 'Touch', icon: TouchIcon, text: 'Tap for details · Tap outside to close' },
   {
-    label: 'Klavye',
+    label: 'Keyboard',
     icon: KeyboardIcon,
     text: (
       <>
-        <kbd>Tab</kbd> odaklan · <kbd>Enter</kbd> sabitle · <kbd>Esc</kbd> kapat
+        <kbd>Tab</kbd> into an example · Arrows to move · <kbd>Enter</kbd> details · <kbd>Esc</kbd> close
       </>
     ),
   },
 ];
 
-/** Balonun hangi girdilerle açılıp kapandığını anlatan kısa rehber. */
+/** Short guide to the inputs the examples can be inspected with. */
 export function InteractionGuide() {
   return (
-    <ul className={styles.guide} aria-label="Etkileşim yolları">
+    <ul className={styles.guide} aria-label="Ways to explore">
       {ITEMS.map(({ label, icon: Icon, text }) => (
         <li key={label} className={styles.item}>
           <Icon />

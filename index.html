@@ -1,12 +1,23 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="UI/UX terimlerini gerçek arayüz örnekleri üzerinde öğren." />
-    <meta name="theme-color" content="#f6f7fb" />
+    <meta
+      name="description"
+      content="Learn the real names behind every interface, and brief your AI coding tools like a designer would."
+    />
+    <meta name="theme-color" content="#fcfcfc" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>PM Wingman · UI Vitrini</title>
+    <title>Project Wingman · The PM's best friend for design</title>
+    <script>
+      // Apply the chosen theme before the first paint; otherwise the page flashes in the wrong theme
+      try {
+        var theme = localStorage.getItem('pw-theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (error) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

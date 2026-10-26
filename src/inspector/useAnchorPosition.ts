@@ -1,29 +1,30 @@
 import { useLayoutEffect, useState } from 'react';
 import type { RefObject } from 'react';
 
-/** Balonun katman kenarlarına bırakacağı en az boşluk (Explainer.module.css genişliğiyle uyumlu). */
+/** Minimum gap the balloon keeps from the layer edges (matches the width in Explainer.module.css). */
 const EDGE_GAP = 8;
-/** Hedefin alt kenarı ile balon arasındaki mesafe (işaret rozeti dahil). */
-const OFFSET_Y = 20;
-/** Okun balon köşelerine en fazla ne kadar yaklaşabileceği. */
+/** Distance between the target element and the balloon. */
+const OFFSET_Y = 12;
+/** The closest the arrow may get to the balloon's corners. */
 const ARROW_INSET = 18;
 
-export type AnchorPosition = { top: number; left: number; arrowX: number };
+export type Placement = 'top' | 'bottom';
+
+export type AnchorPosition = { top: number; left: number; arrowX: number; placement: Placement };
 
 /**
- * Balonu katman içinde hedefin altına ortalar; yatayda katmandan taşırmaz.
- * Katman ya da hedef boyut değiştirdiğinde veya herhangi bir alan kaydırıldığında yeniden hesaplar.
+ * Positions the balloon in the layer relative to the target element: below by default, above if no room below.
+ * Centers horizontally on the target without overflowing the layer. Recomputes when size or scroll changes.
  */
 export function useAnchorPosition(
   open: boolean,
-  anchorRef: RefObject<HTMLElement | null>,
+  anchor: Element | null,
   panelRef: RefObject<HTMLElement | null>,
   layer: HTMLElement | null,
 ): AnchorPosition | null {
   const [position, setPosition] = useState<AnchorPosition | null>(null);
 
   useLayoutEffect(() => {
-    const anchor = anchorRef.current;
     const panel = panelRef.current;
     if (!open || !layer || !anchor || !panel) return;
 
@@ -31,15 +32,30 @@ export function useAnchorPosition(
       const anchorRect = anchor.getBoundingClientRect();
       const layerRect = layer.getBoundingClientRect();
       const width = panel.offsetWidth;
+      const height = panel.offsetHeight;
       const anchorX = anchorRect.left + anchorRect.width / 2 - layerRect.left;
       const left = clamp(anchorX - width / 2, EDGE_GAP, layerRect.width - EDGE_GAP - width);
+      const spaceBelow = window.innerHeight - anchorRect.bottom;
+      const placement: Placement =
+        spaceBelow < height + OFFSET_Y && anchorRect.top > spaceBelow ? 'top' : 'bottom';
+      const top =
+        placement === 'bottom'
+          ? anchorRect.bottom - layerRect.top + OFFSET_Y
+          : anchorRect.top - layerRect.top - OFFSET_Y - height;
       const next = {
-        top: Math.round(anchorRect.bottom - layerRect.top + OFFSET_Y),
+        top: Math.round(top),
         left: Math.round(left),
         arrowX: Math.round(clamp(anchorX - left, ARROW_INSET, width - ARROW_INSET)),
+        placement,
       };
       setPosition((prev) =>
-        prev && prev.top === next.top && prev.left === next.left && prev.arrowX === next.arrowX ? prev : next,
+        prev &&
+        prev.top === next.top &&
+        prev.left === next.left &&
+        prev.arrowX === next.arrowX &&
+        prev.placement === next.placement
+          ? prev
+          : next,
       );
     };
 
@@ -47,17 +63,20 @@ export function useAnchorPosition(
     const observer = new ResizeObserver(update);
     observer.observe(layer);
     observer.observe(anchor);
+    observer.observe(panel);
     document.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
     return () => {
       observer.disconnect();
       document.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
     };
-  }, [open, layer, anchorRef, panelRef]);
+  }, [open, anchor, layer, panelRef]);
 
   return position;
 }
 
-/** Alt sınır üst sınırdan büyükse alt sınır kazanır (dar katmanda balon sola yaslanır). */
+/** If the lower bound exceeds the upper, the lower bound wins (in a narrow layer the balloon hugs the left). */
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(value, max));
 }

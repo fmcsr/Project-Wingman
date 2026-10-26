@@ -4,14 +4,14 @@ import type { ReactNode } from 'react';
 const InspectorLayerContext = createContext<HTMLElement | null>(null);
 
 type InspectorLayerHostProps = {
-  /** Katmanı sahnenin üstüne yerleştiren sınıf. */
+  /** Class that places the layer over the scene. */
   className?: string;
   children: ReactNode;
 };
 
 /**
- * Açıklama balonlarının çizildiği, kırpılmayan katmanı sağlar.
- * Katman içerikten sonra geldiği için balon, DOM ve sekme sırasında hedefin ardından gelir.
+ * Provides the unclipped layer that explainer balloons are drawn in.
+ * Because the layer comes after the content, a balloon follows its target in DOM and tab order.
  */
 export function InspectorLayerHost({ className, children }: InspectorLayerHostProps) {
   const [layer, setLayer] = useState<HTMLDivElement | null>(null);

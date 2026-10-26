@@ -1,0 +1,81 @@
+.section {
+  padding-block: 96px 64px;
+}
+
+/* The balloon layer covers all frames, so a balloon can overflow outside its frame */
+.stage {
+  position: relative;
+  margin-top: 28px;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* First the two sites (each in its own scroll scene), then the three phones in one row */
+.scenes {
+  display: grid;
+  /* Keep the column from growing with its content: phones and sites fit the container width */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 72px;
+}
+
+/* Phones stay in one row at any width; if they don't fit, they shrink together (--phone-scale, Examples.tsx) */
+.phones {
+  display: flex;
+  justify-content: center;
+  gap: clamp(12px, 3vw, 40px);
+}
+
+.phoneProject {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: calc(300px * var(--phone-scale, 1));
+  container-type: inline-size;
+}
+
+/* When the phone gets very small, only the index and name remain in its heading */
+@container (width < 200px) {
+  .phoneProject .kind,
+  .phoneProject .count {
+    display: none;
+  }
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.index {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-subtle);
+}
+
+.name {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.kind {
+  font-size: 14px;
+  color: var(--color-text-subtle);
+}
+
+.count {
+  margin-left: auto;
+  padding: 2px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}

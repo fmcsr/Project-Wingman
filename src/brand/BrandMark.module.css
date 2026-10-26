@@ -1,0 +1,17 @@
+.mark {
+  flex: none;
+  width: 24px;
+  height: 24px;
+}
+
+.mark rect {
+  fill: var(--color-text);
+}
+
+.mark path {
+  fill: none;
+  stroke: var(--color-bg);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

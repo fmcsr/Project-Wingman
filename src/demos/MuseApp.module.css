@@ -1,0 +1,319 @@
+/* The example app stays the same in every theme: Liquid Glass elements on a dark, colorful background. */
+.app {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  font-size: 14px;
+  color: #fff;
+  background:
+    radial-gradient(60% 40% at 18% 22%, rgb(124 58 237 / 0.85), transparent 70%),
+    radial-gradient(50% 35% at 86% 36%, rgb(37 99 235 / 0.8), transparent 70%),
+    radial-gradient(55% 40% at 28% 74%, rgb(219 39 119 / 0.7), transparent 70%),
+    radial-gradient(45% 30% at 82% 86%, rgb(20 184 166 / 0.6), transparent 70%),
+    #0b0b14;
+}
+
+.app svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.statusBar {
+  position: relative;
+  z-index: 7;
+}
+
+/* Liquid Glass: blur + saturation + a highlight line along the top edge */
+.navbar {
+  position: absolute;
+  top: 50px;
+  inset-inline: 12px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 4px;
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: 22px;
+  background: rgb(255 255 255 / 0.12);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    0 8px 24px rgb(0 0 0 / 0.25);
+}
+
+.iconButton {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.picker {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background-color 220ms;
+}
+
+.picker svg {
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.picker[data-open] {
+  background: rgb(255 255 255 / 0.14);
+}
+
+.picker[data-open] svg {
+  transform: rotate(180deg);
+}
+
+/* Dropdown menu: grows in from the point nearest the button (top center), shrinks on the way out */
+.menu {
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  z-index: 6;
+  width: 210px;
+  padding: 6px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 18px;
+  background: rgb(28 28 40 / 0.55);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    0 18px 40px rgb(0 0 0 / 0.4);
+  transform-origin: top center;
+  transform: translateX(-50%) scale(0.92) translateY(-6px);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 220ms ease,
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    visibility 0s linear 220ms;
+}
+
+.menu[data-open] {
+  transform: translateX(-50%) scale(1);
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.menuItem,
+.menuItemSelected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+}
+
+.menuItemSelected {
+  background: rgb(255 255 255 / 0.1);
+}
+
+.menuName {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.menuDetail {
+  display: block;
+  font-size: 12px;
+  color: rgb(255 255 255 / 0.65);
+}
+
+.check {
+  flex: none;
+  color: #c4b5fd;
+}
+
+/* Chat */
+.chat {
+  position: absolute;
+  top: 112px;
+  inset-inline: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.received,
+.sent {
+  max-width: 78%;
+  padding: 9px 13px;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.received {
+  align-self: flex-start;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: 18px 18px 18px 4px;
+  background: rgb(255 255 255 / 0.12);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.sent {
+  align-self: flex-end;
+  border-radius: 18px 18px 4px 18px;
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+}
+
+.typing {
+  display: flex;
+  align-self: flex-start;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.1);
+}
+
+.typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  animation: bounce 1.2s ease-in-out infinite;
+}
+
+.typing span:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.typing span:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes bounce {
+  0%,
+  60%,
+  100% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+/* Suggestion chips */
+.suggestions {
+  position: absolute;
+  right: 0;
+  bottom: 92px;
+  left: 0;
+  display: flex;
+  gap: 8px;
+  padding: 0 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.suggestion {
+  flex: none;
+  padding: 7px 12px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  background: rgb(255 255 255 / 0.14);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* Message composer: a floating glass capsule above the home indicator */
+.composer {
+  position: absolute;
+  bottom: 32px;
+  inset-inline: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 6px 0 8px;
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: 24px;
+  background: rgb(255 255 255 / 0.12);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+
+.plus {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.14);
+}
+
+.placeholder {
+  flex: 1;
+  font-size: 14px;
+  color: rgb(255 255 255 / 0.6);
+}
+
+/* Voice button: color wheel + a pulsing ring */
+.voice {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: conic-gradient(#a78bfa, #60a5fa, #f472b6, #a78bfa);
+}
+
+.voice::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgb(167 139 250 / 0.7);
+  border-radius: 50%;
+  animation: pulse 2s ease-out infinite;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+.homeIndicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 112px;
+  height: 5px;
+  border-radius: 999px;
+  background: #fff;
+  transform: translateX(-50%);
+}

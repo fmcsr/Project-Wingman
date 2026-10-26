@@ -1,41 +1,73 @@
-/* Tasarım token'ları: renk, tipografi, köşe ve gölge değerleri tek yerden yönetilir. */
+/*
+ * Signal design system tokens.
+ * The light theme draws on LayerZero's gray simplicity, the dark theme on Stargate's depth.
+ * The single accent color (signal green) is used only in learning moments: the inspection outline,
+ * term tags, the focus ring.
+ *
+ * Each color is defined once with light-dark(light, dark); color-scheme decides which one applies:
+ * the default is the system setting, and the theme toggle overrides it with <html data-theme="light|dark">.
+ */
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  /* LayerZero's typefaces: Roboto and Roboto Mono (both openly licensed) */
+  --font-sans: 'Roboto Variable', Roboto, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Roboto Mono Variable', 'Roboto Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  --color-bg: #f6f7fb;
-  --color-surface: #ffffff;
-  --color-text: #0f172a;
-  --color-text-muted: #475569;
-  --color-text-subtle: #64748b;
-  --color-border: #e2e8f0;
-  --color-accent: #4f46e5;
-  --color-accent-soft: #eef2ff;
-  --color-focus: #4f46e5;
-  --color-inspect: #6366f1;
+  --color-bg: light-dark(#fcfcfc, #141414);
+  --color-surface: light-dark(#ffffff, #1a1a1a);
+  --color-surface-2: light-dark(#f5f5f5, #1c1c1c);
+  --color-text: light-dark(#171717, #fafafa);
+  --color-text-muted: light-dark(#5c5c5c, #a3a3a3);
+  --color-text-subtle: light-dark(#6b6b6b, #8f8f8f);
+  /* Only for large text (the second half of two-tone headings); ≥3:1 against the background */
+  --color-text-faint: light-dark(#7a7a7a, #6b6b6b);
+  --color-border: light-dark(#e5e5e5, #262626);
+  --color-border-strong: light-dark(#d4d4d4, #333333);
+  --color-primary: light-dark(#171717, #fafafa);
+  --color-primary-hover: light-dark(#333333, #e5e5e5);
+  --color-on-primary: light-dark(#fcfcfc, #141414);
+  /* Secondary button background (like LayerZero's gray buttons) */
+  --color-fill-secondary: light-dark(rgb(0 0 0 / 0.06), rgb(255 255 255 / 0.08));
+  --color-fill-secondary-hover: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.13));
 
-  /* Açıklama balonu (koyu yüzey) */
-  --balloon-bg: #0f172a;
-  --balloon-text: #e2e8f0;
-  --balloon-body: #cbd5e1;
-  --balloon-muted: #94a3b8;
-  --balloon-line: rgb(148 163 184 / 0.18);
-  --balloon-line-strong: rgb(148 163 184 / 0.35);
-  --balloon-chip: rgb(129 140 248 / 0.16);
-  --balloon-accent: #c7d2fe;
-  --balloon-focus: #a5b4fc;
+  --color-accent: light-dark(#0a8f65, #0fb983);
+  --color-accent-text: light-dark(#087a56, #0fb983);
+  --color-accent-soft: light-dark(#e6f6ef, rgb(15 185 131 / 0.14));
+  --color-focus: light-dark(#0a8f65, #0fb983);
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  /* Example UIs stay light in every theme, so the inspection color is fixed */
+  --color-inspect: #0a8f65;
+  --color-inspect-strong: #087a56;
+
+  /* Balloon: an inverted (dark) surface in the light theme, one step above the background in the dark theme */
+  --balloon-bg: light-dark(#171717, #202020);
+  --balloon-text: #fafafa;
+  --balloon-body: #d4d4d4;
+  --balloon-muted: light-dark(#a3a3a3, #9a9a9a);
+  --balloon-line: light-dark(rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.1));
+  --balloon-line-strong: light-dark(rgb(255 255 255 / 0.24), rgb(255 255 255 / 0.22));
+  --balloon-chip: rgb(15 185 131 / 0.16);
+  --balloon-accent: #34d399;
+  --balloon-focus: #34d399;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --radius-full: 999px;
 
-  --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.06);
-  --shadow-lg: 0 1px 2px rgb(15 23 42 / 0.04), 0 24px 48px -24px rgb(15 23 42 / 0.25);
-  --shadow-pop: 0 24px 48px -16px rgb(15 23 42 / 0.45);
+  --shadow-sm: 0 1px 2px light-dark(rgb(0 0 0 / 0.04), transparent);
+  --shadow-lg: 0 1px 2px light-dark(rgb(0 0 0 / 0.04), transparent);
+  --shadow-pop: 0 24px 48px -16px light-dark(rgb(0 0 0 / 0.35), rgb(0 0 0 / 0.6));
 
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
 }

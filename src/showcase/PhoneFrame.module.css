@@ -1,0 +1,72 @@
+/* Space the phone takes up on the page: design size × scale. The phone itself shrinks to fit this box. */
+.slot {
+  flex: none;
+  width: calc(300px * var(--phone-scale, 1));
+  height: calc(620px * var(--phone-scale, 1));
+  border-radius: calc(52px * var(--phone-scale, 1));
+}
+
+/* Keyboard focus is drawn on the unscaled box; same thickness however small the phone gets */
+.slot:has(:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+.phone {
+  position: relative;
+  width: 300px;
+  height: 620px;
+  transform: scale(var(--phone-scale, 1));
+  transform-origin: top left;
+  padding: 10px;
+  border-radius: 52px;
+  background: #0b0b0c;
+  box-shadow:
+    inset 0 0 0 1.5px #2c2c30,
+    0 0 0 1px var(--color-border),
+    0 30px 60px -30px rgb(0 0 0 / 0.45);
+}
+
+/* Side buttons */
+.phone::before,
+.phone::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  border-radius: 2px;
+  background: #1c1c1f;
+}
+
+.phone::before {
+  top: 120px;
+  left: -3px;
+  height: 64px;
+}
+
+.phone::after {
+  top: 150px;
+  right: -3px;
+  height: 92px;
+}
+
+.screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 42px;
+  background: #fff;
+  color-scheme: light;
+}
+
+.island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  z-index: 40;
+  width: 90px;
+  height: 26px;
+  border-radius: 20px;
+  background: #000;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
