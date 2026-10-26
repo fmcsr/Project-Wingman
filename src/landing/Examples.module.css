@@ -38,6 +38,23 @@
   container-type: inline-size;
 }
 
+/* Phone headings stay on one line so all three phones start at the same height; a long kind is cut short */
+.phoneProject .meta {
+  flex-wrap: nowrap;
+}
+
+.phoneProject .name,
+.phoneProject .count {
+  flex: none;
+}
+
+.phoneProject .kind {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* When the phone gets very small, only the index and name remain in its heading */
 @container (width < 200px) {
   .phoneProject .kind,
@@ -78,4 +95,21 @@
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--color-text-muted);
+}
+
+/* After the examples: the way into the full library (sign-in comes first if needed) */
+.more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  margin-top: 72px;
+  text-align: center;
+}
+
+.moreText {
+  max-width: 40ch;
+  font-size: 18px;
+  color: var(--color-text-muted);
+  text-wrap: balance;
 }

@@ -1,4 +1,4 @@
-/* The example app stays light in every theme; the colors are hardcoded on purpose. */
+/* The example app follows the page theme: every color is a light-dark(light, dark) pair. */
 /* Container queries apply to child elements, not the container itself; that's why the grid sits inside it */
 .root {
   container-type: inline-size;
@@ -9,8 +9,8 @@
   grid-template-columns: 196px minmax(0, 1fr);
   min-height: 100%;
   font-size: 14px;
-  color: #0f172a;
-  background: #f8fafc;
+  color: light-dark(#0f172a, #e2e8f0);
+  background: light-dark(#f8fafc, #0b1120);
 }
 
 .icon {
@@ -30,8 +30,8 @@
   flex-direction: column;
   gap: 18px;
   padding: 16px 12px;
-  border-right: 1px solid #e2e8f0;
-  background: #fff;
+  border-right: 1px solid light-dark(#e2e8f0, #1e293b);
+  background: light-dark(#fff, #0f172a);
 }
 
 .brand {
@@ -47,7 +47,7 @@
   flex: none;
   width: 22px;
   height: 22px;
-  border: 5px solid #4f46e5;
+  border: 5px solid light-dark(#4f46e5, #818cf8);
   border-radius: 50%;
 }
 
@@ -63,12 +63,12 @@
   padding: 8px 10px;
   border-radius: 8px;
   font-weight: 500;
-  color: #475569;
+  color: light-dark(#475569, #94a3b8);
 }
 
 .navItem[aria-current='page'] {
-  color: #4338ca;
-  background: #eef2ff;
+  color: light-dark(#4338ca, #c7d2fe);
+  background: light-dark(#eef2ff, rgb(99 102 241 / 0.16));
 }
 
 /* Top bar */
@@ -83,8 +83,8 @@
   gap: 12px;
   height: 56px;
   padding: 0 20px;
-  border-bottom: 1px solid #e2e8f0;
-  background: #fff;
+  border-bottom: 1px solid light-dark(#e2e8f0, #1e293b);
+  background: light-dark(#fff, #0f172a);
 }
 
 .search {
@@ -94,10 +94,10 @@
   width: min(300px, 100%);
   height: 34px;
   padding: 0 8px 0 10px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid light-dark(#e2e8f0, #1e293b);
   border-radius: 8px;
-  color: #94a3b8;
-  background: #f8fafc;
+  color: light-dark(#94a3b8, #64748b);
+  background: light-dark(#f8fafc, #0b1120);
 }
 
 .placeholder {
@@ -109,11 +109,11 @@
 
 .kbd {
   padding: 1px 6px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid light-dark(#e2e8f0, #334155);
   border-radius: 6px;
   font-size: 11px;
-  color: #64748b;
-  background: #fff;
+  color: light-dark(#64748b, #94a3b8);
+  background: light-dark(#fff, #1e293b);
 }
 
 .avatar {
@@ -125,8 +125,8 @@
   border-radius: 50%;
   font-size: 12px;
   font-weight: 700;
-  color: #4338ca;
-  background: #e0e7ff;
+  color: light-dark(#4338ca, #c7d2fe);
+  background: light-dark(#e0e7ff, rgb(99 102 241 / 0.24));
 }
 
 /* Content */
@@ -156,8 +156,8 @@
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
-  color: #64748b;
-  background: #f1f5f9;
+  color: light-dark(#64748b, #94a3b8);
+  background: light-dark(#f1f5f9, #1e293b);
 }
 
 .segmented span {
@@ -166,9 +166,9 @@
 }
 
 .segmented .segmentActive {
-  color: #0f172a;
-  background: #fff;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.12);
+  color: light-dark(#0f172a, #f1f5f9);
+  background: light-dark(#fff, #334155);
+  box-shadow: 0 1px 2px light-dark(rgb(15 23 42 / 0.12), rgb(0 0 0 / 0.4));
 }
 
 .stats {
@@ -179,9 +179,9 @@
 
 .stat,
 .card {
-  border: 1px solid #e2e8f0;
+  border: 1px solid light-dark(#e2e8f0, #1e293b);
   border-radius: 12px;
-  background: #fff;
+  background: light-dark(#fff, #0f172a);
 }
 
 .stat {
@@ -193,7 +193,7 @@
 
 .statLabel {
   font-size: 12px;
-  color: #64748b;
+  color: light-dark(#64748b, #94a3b8);
 }
 
 .statValue {
@@ -212,13 +212,13 @@
 }
 
 .deltaUp {
-  color: #15803d;
-  background: #dcfce7;
+  color: light-dark(#15803d, #4ade80);
+  background: light-dark(#dcfce7, rgb(34 197 94 / 0.14));
 }
 
 .deltaDown {
-  color: #b91c1c;
-  background: #fee2e2;
+  color: light-dark(#b91c1c, #f87171);
+  background: light-dark(#fee2e2, rgb(239 68 68 / 0.14));
 }
 
 .card {
@@ -237,7 +237,7 @@
 .muted {
   font-size: 12px;
   font-weight: 400;
-  color: #64748b;
+  color: light-dark(#64748b, #94a3b8);
 }
 
 .chart {
@@ -247,16 +247,21 @@
 }
 
 .gridline {
-  stroke: #e2e8f0;
+  stroke: light-dark(#e2e8f0, #1e293b);
   stroke-dasharray: 4 4;
   vector-effect: non-scaling-stroke;
 }
 
 .line {
   fill: none;
-  stroke: #6366f1;
+  stroke: light-dark(#6366f1, #818cf8);
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
+}
+
+/* The fill under the line fades from the line color to transparent */
+.stop {
+  stop-color: light-dark(#6366f1, #818cf8);
 }
 
 /* Table */
@@ -268,18 +273,18 @@
 
 .table th {
   padding: 0 0 8px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid light-dark(#e2e8f0, #1e293b);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-align: left;
   text-transform: uppercase;
-  color: #64748b;
+  color: light-dark(#64748b, #94a3b8);
 }
 
 .table td {
   padding: 10px 0;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid light-dark(#f1f5f9, rgb(148 163 184 / 0.08));
 }
 
 .table tr:last-child td {
@@ -302,18 +307,18 @@
 }
 
 .pillPaid {
-  color: #15803d;
-  background: #dcfce7;
+  color: light-dark(#15803d, #4ade80);
+  background: light-dark(#dcfce7, rgb(34 197 94 / 0.14));
 }
 
 .pillPending {
-  color: #b45309;
-  background: #fef3c7;
+  color: light-dark(#b45309, #fbbf24);
+  background: light-dark(#fef3c7, rgb(245 158 11 / 0.14));
 }
 
 .pillOverdue {
-  color: #b91c1c;
-  background: #fee2e2;
+  color: light-dark(#b91c1c, #f87171);
+  background: light-dark(#fee2e2, rgb(239 68 68 / 0.14));
 }
 
 /* On narrow screens the sidebar collapses to icons */

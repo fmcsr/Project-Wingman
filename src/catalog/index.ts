@@ -3,18 +3,32 @@ import { commerce } from './commerce';
 import { dashboard } from './dashboard';
 import { marketing } from './marketing';
 import { mobile } from './mobile';
-import type { UiElementSpec } from './types';
+import type { ThemedValue, UiElementSpec } from './types';
 
-/** All UI elements in the showcase, keyed by `data-inspect` id. New elements go in the matching list. */
-export const catalog: Record<string, UiElementSpec> = Object.fromEntries(
-  [...marketing, ...dashboard, ...mobile, ...assistant, ...commerce].map((spec) => [spec.id, spec]),
-);
+/** An example's element descriptions, keyed by `data-inspect` id. */
+export type Catalog = Record<string, UiElementSpec>;
 
-/** Returns the explanation for a demo's `data-inspect` id; warns in development if it isn't registered. */
-export function getSpec(id: string | undefined): UiElementSpec | undefined {
+export function catalogOf(specs: readonly UiElementSpec[]): Catalog {
+  return Object.fromEntries(specs.map((spec) => [spec.id, spec]));
+}
+
+/**
+ * Elements of the five original examples (Acme, Orbit, Wave, Muse, Stride). They share one list because they
+ * reuse each other's elements (avatar, nav link, icon button). Newer examples bring their own list.
+ */
+export const showcaseSpecs: UiElementSpec[] = [...marketing, ...dashboard, ...mobile, ...assistant, ...commerce];
+
+/** Returns the explanation for a `data-inspect` id; warns in development if the example's catalog lacks it. */
+export function getSpec(catalog: Catalog, id: string | undefined): UiElementSpec | undefined {
   const spec = id ? catalog[id] : undefined;
   if (!spec && import.meta.env.DEV) console.warn(`[catalog] no description for "${id}"`);
   return spec;
 }
 
-export type { Concept, ConceptKind, UiElementSpec } from './types';
+/** A concept's value as shown for the theme in use (colors differ between light and dark). */
+export function valueFor(value: string | ThemedValue, theme: 'light' | 'dark') {
+  return typeof value === 'string' ? value : value[theme];
+}
+
+export { homeIndicator, statusBar } from './shared';
+export type { Concept, ConceptKind, ThemedValue, UiElementSpec } from './types';

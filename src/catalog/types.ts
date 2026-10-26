@@ -1,5 +1,8 @@
 export type ConceptKind = 'appearance' | 'behavior';
 
+/** A value that differs between the light and dark theme, such as a background color. */
+export type ThemedValue = { light: string; dark: string };
+
 /** A single technical concept behind a UI element. */
 export type Concept = {
   kind: ConceptKind;
@@ -7,8 +10,8 @@ export type Concept = {
   term: string;
   /** A plain explanation for someone with no technical background. */
   plain: string;
-  /** The actual value used in the example; shown next to the term, e.g. "blur(16px)". */
-  value?: string;
+  /** The actual value used in the example; shown next to the term, e.g. "blur(16px)". Colors give one per theme. */
+  value?: string | ThemedValue;
 };
 
 /** The explanation content for a UI element in the showcase. */

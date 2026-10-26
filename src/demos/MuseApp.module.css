@@ -224,8 +224,9 @@
   display: flex;
   gap: 8px;
   padding: 0 14px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  /* A still picture: it clips the row. A real app scrolls it (overflow-x: auto, as the balloon says); a scrollable
+     row would also become keyboard-focusable inside the example. clip, unlike hidden, isn't a scroll container */
+  overflow: clip;
 }
 
 .suggestion {

@@ -1,0 +1,989 @@
+/*
+ * Ledger follows the page theme: every color is a light-dark(light, dark) pair. The brand violet (#5a4bff) stays
+ * single where it fills a button, since white text reads on it in both themes. The code card and the stats band
+ * are dark in both themes, like an editor; their text colors are single values tuned for that dark surface.
+ */
+.page {
+  --gutter: 32px;
+  --nav-h: 64px;
+  --brand: #5a4bff;
+  --brand-text: light-dark(#4b3df0, #b9b2ff);
+  --muted: light-dark(#475569, #a3b0c6);
+  --subtle: light-dark(#64748b, #8191ab);
+  --line: light-dark(#e3e8ef, #1f2a40);
+  container-type: inline-size;
+  position: relative;
+  font-size: 15px;
+  line-height: 1.5;
+  color: light-dark(#0b1f3a, #e6ebf5);
+  background: light-dark(#ffffff, #0a1224);
+}
+
+/* Resets sit in :where() (zero specificity), so any class below can override them */
+:where(.page svg) {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+}
+
+:where(.page ul) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.page h4) {
+  margin: 0;
+}
+
+/* Announcement bar: one line above everything, cut off with an ellipsis when space runs out */
+.announcement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 var(--gutter);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: light-dark(#ffffff, #e6ebf5);
+  background: light-dark(#0b1f3a, #141f38);
+  border-bottom: 1px solid light-dark(#0b1f3a, #22304d);
+}
+
+.announcementText {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.announcementTag {
+  font-weight: 700;
+  color: #b9b2ff;
+}
+
+.announcementArrow {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.2;
+}
+
+/* Hero: the navbar sits on the same mesh gradient as the headline */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 64px;
+}
+
+/*
+ * Mesh gradient: four soft radial blobs over a base color. skewY tilts the band so its lower edge rises to the
+ * right; the hero's overflow: hidden trims what sticks out.
+ */
+.mesh {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 82%;
+  transform: skewY(-7deg);
+  transform-origin: 0 100%;
+  background:
+    radial-gradient(38% 60% at 90% 22%, light-dark(#ffb35c, #c2410c) 0%, transparent 70%),
+    radial-gradient(44% 64% at 66% 0%, light-dark(#ff5fa2, #be185d) 0%, transparent 72%),
+    radial-gradient(52% 76% at 100% 72%, light-dark(#8a7dff, #4338ca) 0%, transparent 70%),
+    radial-gradient(46% 70% at 34% 0%, light-dark(#8fe3ff, #0e7490) 0%, transparent 70%),
+    light-dark(#f4f2ff, #0d1631);
+}
+
+/* Navbar: no background of its own, so the gradient shows through */
+.navbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: var(--nav-h);
+  padding: 0 var(--gutter);
+  background: transparent;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 22px;
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.logoMark {
+  display: grid;
+  gap: 2.5px;
+  width: 22px;
+}
+
+.logoMark span {
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #5a4bff, #e0367a);
+}
+
+.logoMark span:nth-child(2) {
+  width: 72%;
+}
+
+.logoMark span:nth-child(3) {
+  width: 44%;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+
+/* The mega menu is positioned against its trigger's list item */
+.linkSlot {
+  position: relative;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.chevron {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.2;
+  opacity: 0.7;
+}
+
+/* The open trigger: a soft pill behind it and the chevron flipped up */
+.link[aria-expanded='true'] {
+  background: light-dark(rgb(255 255 255 / 0.65), rgb(255 255 255 / 0.12));
+}
+
+.link[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.signIn {
+  padding: 7px 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.navCta {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 7px 12px 7px 16px;
+  border-radius: 999px;
+  font-size: 14.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: light-dark(#ffffff, #0b1f3a);
+  background: light-dark(#0b1f3a, #ffffff);
+}
+
+.ctaChevron {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.4;
+}
+
+.menuButton {
+  display: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: light-dark(rgb(255 255 255 / 0.65), rgb(255 255 255 / 0.12));
+}
+
+/* Mega menu: a wide floating panel with a deep, soft shadow */
+.megaMenu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: -16px;
+  width: 720px;
+  padding: 18px 20px 0;
+  border: 1px solid light-dark(rgb(11 31 58 / 0.06), rgb(255 255 255 / 0.08));
+  border-radius: 14px;
+  background: light-dark(#ffffff, #111b31);
+  box-shadow:
+    0 50px 100px -20px light-dark(rgb(50 50 93 / 0.25), rgb(0 0 0 / 0.55)),
+    0 30px 60px -30px light-dark(rgb(0 0 0 / 0.3), rgb(0 0 0 / 0.6));
+}
+
+/* Notch: a rotated square that points up at the Products link */
+.megaMenu::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 62px;
+  width: 12px;
+  height: 12px;
+  border-top: inherit;
+  border-left: inherit;
+  border-radius: 3px 0 0;
+  background: inherit;
+  transform: rotate(45deg);
+}
+
+.menuColumns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.menuColumn {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+}
+
+.menuHeading {
+  padding: 0 10px 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--subtle);
+}
+
+.menuItem,
+.menuItemHover {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  padding: 7px 10px;
+  border-radius: 10px;
+}
+
+/* Shown in its hover state, the way the row lights up under the pointer */
+.menuItemHover {
+  background: light-dark(#f4f5fb, rgb(255 255 255 / 0.06));
+}
+
+.menuIcon {
+  display: grid;
+  grid-row: span 2;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--tone);
+  background: var(--tone-soft);
+}
+
+.toneViolet {
+  --tone: light-dark(#5a4bff, #a49cff);
+  --tone-soft: light-dark(#efedff, rgb(90 75 255 / 0.2));
+}
+
+.tonePink {
+  --tone: light-dark(#d6336c, #f783ac);
+  --tone-soft: light-dark(#ffeef4, rgb(214 51 108 / 0.2));
+}
+
+.toneTeal {
+  --tone: light-dark(#0c8599, #66d9e8);
+  --tone-soft: light-dark(#e3f7fa, rgb(12 133 153 / 0.22));
+}
+
+.menuName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* One-line description: anything longer ends in an ellipsis instead of wrapping */
+.menuText {
+  overflow: hidden;
+  font-size: 12.5px;
+  line-height: 1.35;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--muted);
+}
+
+.newPill {
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #ffffff;
+  background: var(--brand);
+}
+
+.menuFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px -20px 0;
+  padding: 11px 30px;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 13px 13px;
+  background: light-dark(#f6f8fb, rgb(255 255 255 / 0.03));
+}
+
+.menuFooterNote {
+  font-size: 13px;
+  color: var(--subtle);
+}
+
+/* Hero copy: a narrow column, so the headline stays clear of the open menu */
+.heroBody {
+  position: relative;
+  padding: 72px var(--gutter) 0;
+}
+
+.heroTitle {
+  max-width: 11ch;
+  font-size: clamp(36px, 4.8cqi, 60px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+/* Gradient text: the gradient is painted only inside the letters */
+.gradientText {
+  background: linear-gradient(
+    90deg,
+    light-dark(#5a4bff, #a49cff),
+    light-dark(#e0367a, #f472b6) 55%,
+    light-dark(#f08a24, #fdba74)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.lead {
+  max-width: 38ch;
+  margin-top: 22px;
+  font-size: 18px;
+  line-height: 1.55;
+  color: light-dark(#334155, #b4c0d4);
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 28px;
+  margin-top: 32px;
+}
+
+/* Email capture: field and button share one pill-shaped border, so they read as one control */
+.capture {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(420px, 100%);
+  padding: 5px;
+  border: 1px solid light-dark(rgb(11 31 58 / 0.12), rgb(255 255 255 / 0.14));
+  border-radius: 999px;
+  background: light-dark(#ffffff, rgb(10 18 36 / 0.72));
+  box-shadow: 0 10px 30px -12px light-dark(rgb(50 50 93 / 0.3), rgb(0 0 0 / 0.6));
+}
+
+.captureField {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding-left: 14px;
+  color: var(--subtle);
+}
+
+.captureIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.placeholder {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.captureButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 14px 10px 20px;
+  border-radius: 999px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #ffffff;
+  background: var(--brand);
+}
+
+/* Text link: no box, just colored text and an arrow that says "this goes somewhere" */
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--brand-text);
+}
+
+.linkArrow {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.2;
+}
+
+/* Logo wall: same-size cells and one muted color, so no customer outshines another */
+.logoWall {
+  padding: 0 var(--gutter) 56px;
+  text-align: center;
+}
+
+.logoLabel {
+  font-size: 13.5px;
+  color: var(--subtle);
+}
+
+.logoGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: center;
+  gap: 20px 24px;
+  margin-top: 22px;
+  color: light-dark(#8792a2, #5f6f8a);
+}
+
+.customer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 19px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.customerMark {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  stroke: none;
+}
+
+.logoKestrel {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.logoFieldnote {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.logoHalcyon {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+}
+
+.logoBrightwave {
+  font-weight: 300;
+}
+
+.logoQuanta {
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.logoNorthbeam {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Developer section: copy on the left, code on the right */
+.devSection {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 56px;
+  padding: 60px var(--gutter);
+  border-block: 1px solid var(--line);
+  background: light-dark(#f6f8fb, #0d162b);
+}
+
+.eyebrow {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand-text);
+}
+
+.sectionTitle {
+  margin-top: 10px;
+  font-size: clamp(24px, 3cqi, 34px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.sectionText {
+  max-width: 44ch;
+  margin: 14px 0 20px;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+/* Code card: dark in both themes, like a code editor */
+.codeCard {
+  min-width: 0;
+  border: 1px solid light-dark(#0b1f3a, #24324f);
+  border-radius: 14px;
+  color: #c9d4e5;
+  background: light-dark(#0b1f3a, #0f1a30);
+  box-shadow: 0 30px 60px -30px light-dark(rgb(11 31 58 / 0.55), rgb(0 0 0 / 0.7));
+}
+
+.codeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 46px;
+  padding: 0 10px 0 6px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.tabs {
+  display: flex;
+  align-self: stretch;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #8796ae;
+}
+
+/* Selected tab: brighter label and an underline drawn with an inset shadow */
+.tab[aria-selected='true'] {
+  color: #ffffff;
+  box-shadow: inset 0 -2px 0 #8b80ff;
+}
+
+.copyButton {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  color: #4ade80;
+  background: rgb(255 255 255 / 0.08);
+}
+
+.copyButton .icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.4;
+}
+
+/* Tooltip: placed to the left of its button so it stays inside the card; the arrow points back at it */
+.tooltip {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 10px);
+  padding: 4px 10px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  color: #0b1f3a;
+  background: #ffffff;
+  box-shadow: 0 8px 20px -6px rgb(0 0 0 / 0.45);
+  transform: translateY(-50%);
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 1px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+
+/*
+ * Long lines don't wrap. The real product scrolls them sideways (overflow-x: auto); this picture clips them
+ * instead, because a scrolling box would become keyboard-focusable. Line numbers come from a CSS counter.
+ */
+.code {
+  margin: 0;
+  padding: 16px 0 18px;
+  overflow: hidden;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 13.5px;
+  line-height: 22px;
+  counter-reset: line;
+}
+
+.code code {
+  font-family: inherit;
+}
+
+.line {
+  display: block;
+  min-height: 22px;
+  padding-right: 20px;
+  counter-increment: line;
+}
+
+/* user-select: none keeps the numbers out of whatever gets copied */
+.line::before {
+  content: counter(line);
+  display: inline-block;
+  width: 2ch;
+  margin: 0 18px 0 16px;
+  text-align: right;
+  color: #4f6081;
+  user-select: none;
+}
+
+.tokKeyword {
+  color: #c792ea;
+}
+
+.tokString {
+  color: #c3e88d;
+}
+
+.tokFunction {
+  color: #82aaff;
+}
+
+.tokProperty {
+  color: #89ddff;
+}
+
+.tokNumber {
+  color: #f78c6c;
+}
+
+.tokComment {
+  font-style: italic;
+  color: #6b7d99;
+}
+
+/* Feature grid */
+.features {
+  padding: 60px var(--gutter) 56px;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px;
+  margin-top: 28px;
+}
+
+.feature {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 8px;
+}
+
+.featureIcon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  color: var(--brand-text);
+  background: light-dark(#efedff, rgb(90 75 255 / 0.2));
+}
+
+/* Accent bar: the title hangs a brand-colored line into the gutter, a detail borrowed from print */
+.featureTitle {
+  margin: 6px 0 0 -16px;
+  padding-left: 14px;
+  border-left: 2px solid var(--brand);
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.featureText {
+  font-size: 14.5px;
+  color: var(--muted);
+}
+
+/* Stats band: big numbers in one dark strip, split by hairlines */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  row-gap: 28px;
+  padding: 36px var(--gutter);
+  border-block: 1px solid light-dark(#0b1f3a, #22304d);
+  color: #ffffff;
+  background: light-dark(#0b1f3a, #121d36);
+}
+
+.stat {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 0 28px;
+  border-left: 1px solid rgb(255 255 255 / 0.14);
+}
+
+.stat:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.statValue {
+  font-size: clamp(28px, 3.4cqi, 40px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-size: 14px;
+  color: rgb(255 255 255 / 0.7);
+}
+
+/* Footer: the brand on the left, then a column of links per topic */
+.footer {
+  padding: 48px var(--gutter) 24px;
+  font-size: 14px;
+}
+
+.footerGrid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(4, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.footerBrand {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 18px;
+}
+
+.locale {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.localeIcon {
+  width: 15px;
+  height: 15px;
+}
+
+.footerHeading {
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.footerLinks {
+  display: grid;
+  gap: 9px;
+  color: var(--muted);
+}
+
+.footerBar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-top: 36px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--subtle);
+}
+
+/* Below 1120px the links (and their open menu) fold into a ☰ button */
+@container (width < 1120px) {
+  .links {
+    display: none;
+  }
+
+  .actions {
+    margin-left: auto;
+  }
+
+  .menuButton {
+    display: grid;
+  }
+}
+
+@container (width < 900px) {
+  .logoGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .devSection {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  .featureGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footerGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .footerBrand {
+    grid-column: 1 / -1;
+    grid-auto-flow: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+@container (width < 760px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+@container (width < 640px) {
+  .page > * {
+    --gutter: 16px;
+  }
+
+  .signIn {
+    display: none;
+  }
+
+  .navbar {
+    gap: 12px;
+  }
+
+  .heroBody {
+    padding-top: 40px;
+  }
+
+  .lead {
+    font-size: 16px;
+  }
+
+  .devSection,
+  .features {
+    padding-block: 48px;
+  }
+
+  .stat {
+    padding: 0 16px;
+  }
+
+  /* A shorter hang, so the accent bar stays clear of the edge */
+  .featureTitle {
+    margin-left: -12px;
+    padding-left: 10px;
+  }
+
+  .footerGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 16px;
+  }
+
+  .footerBrand {
+    grid-auto-flow: row;
+  }
+}
+
+@container (width < 560px) {
+  .featureGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+
+@container (width < 480px) {
+  .logoGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .customer {
+    font-size: 17px;
+  }
+
+  /* On phones the button drops under the field, full width */
+  .capture {
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: 16px;
+  }
+
+  .captureField {
+    padding: 10px 0 10px 12px;
+  }
+
+  .captureButton {
+    border-radius: 12px;
+  }
+}

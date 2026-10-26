@@ -1,12 +1,12 @@
-/* The example app stays the same in every theme; it uses the system font to look like iOS. */
+/* The example app follows the page theme (light-dark pairs), in the iOS system font. */
 .app {
   position: relative;
   height: 100%;
   overflow: hidden;
   font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
   font-size: 14px;
-  color: #111;
-  background: #fff;
+  color: light-dark(#111, #f5f5f7);
+  background: light-dark(#fff, #1c1c1e);
 }
 
 .icon {
@@ -24,7 +24,7 @@
   place-items: center;
   height: 272px;
   padding-top: 30px;
-  background: radial-gradient(120% 90% at 50% 30%, #ffe9dc, #ffd1bd);
+  background: radial-gradient(120% 90% at 50% 30%, light-dark(#ffe9dc, #3d2a24), light-dark(#ffd1bd, #241814));
 }
 
 .shoe {
@@ -41,7 +41,7 @@
   border-radius: 999px;
   font-size: 11px;
   font-weight: 600;
-  background: rgb(255 255 255 / 0.7);
+  background: light-dark(rgb(255 255 255 / 0.7), rgb(0 0 0 / 0.45));
 }
 
 /* Pagination dots: the active one stretches into a small pill */
@@ -62,12 +62,12 @@
 
 .dot {
   width: 6px;
-  background: rgb(0 0 0 / 0.25);
+  background: light-dark(rgb(0 0 0 / 0.25), rgb(255 255 255 / 0.3));
 }
 
 .dotActive {
   width: 16px;
-  background: #111;
+  background: light-dark(#111, #fff);
 }
 
 .statusBar {
@@ -101,8 +101,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgb(255 255 255 / 0.85);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 0.08);
+  background: light-dark(rgb(255 255 255 / 0.85), rgb(44 44 46 / 0.85));
+  box-shadow: 0 2px 8px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.3));
 }
 
 .heart {
@@ -120,7 +120,7 @@
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
-  border: 2px solid #fff;
+  border: 2px solid light-dark(#fff, #2c2c2e);
   border-radius: 999px;
   font-size: 10px;
   font-weight: 700;
@@ -135,7 +135,7 @@
   margin-top: -20px;
   padding: 18px 18px 0;
   border-radius: 24px 24px 0 0;
-  background: #fff;
+  background: light-dark(#fff, #1c1c1e);
 }
 
 .titleRow {
@@ -163,7 +163,7 @@
 .subtitle {
   margin-top: 2px;
   font-size: 13px;
-  color: #6b7280;
+  color: light-dark(#6b7280, #a1a1aa);
 }
 
 .rating {
@@ -182,6 +182,11 @@
   height: 14px;
 }
 
+/* The unfilled part of the partial star */
+.starEmpty {
+  stop-color: light-dark(#e5e7eb, #3f3f46);
+}
+
 .score {
   margin-left: 6px;
   font-size: 13px;
@@ -191,7 +196,7 @@
 .reviews {
   margin-left: 4px;
   font-size: 12px;
-  color: #6b7280;
+  color: light-dark(#6b7280, #a1a1aa);
 }
 
 .price {
@@ -208,7 +213,7 @@
 
 .was {
   font-size: 14px;
-  color: #9ca3af;
+  color: light-dark(#9ca3af, #71717a);
   text-decoration: line-through;
 }
 
@@ -216,7 +221,7 @@
   margin-top: 10px;
   font-size: 12px;
   font-weight: 600;
-  color: #6b7280;
+  color: light-dark(#6b7280, #a1a1aa);
 }
 
 .swatches {
@@ -229,12 +234,14 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
+  /* A faint rim keeps dark swatches (Black) visible on the dark panel */
+  box-shadow: inset 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.2));
 }
 
 .swatchSelected {
   box-shadow:
-    0 0 0 2px #fff,
-    0 0 0 4px #111;
+    0 0 0 2px light-dark(#fff, #1c1c1e),
+    0 0 0 4px light-dark(#111, #fff);
 }
 
 .sizes {
@@ -250,24 +257,24 @@
   place-items: center;
   width: 42px;
   height: 34px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid light-dark(#e5e7eb, #3f3f46);
   border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
 }
 
 .sizeSelected {
-  border-color: #111;
-  color: #fff;
-  background: #111;
+  border-color: light-dark(#111, #fff);
+  color: light-dark(#fff, #111);
+  background: light-dark(#111, #fff);
 }
 
 /* Sold-out size: visible but struck through */
 .sizeSoldOut {
   border-style: dashed;
-  color: #c4c4c4;
+  color: light-dark(#c4c4c4, #52525b);
   text-decoration: line-through;
-  background: #fafafa;
+  background: light-dark(#fafafa, #232326);
 }
 
 /* Toast: slides in from below and disappears the same way */
@@ -285,7 +292,7 @@
   font-size: 13px;
   font-weight: 500;
   color: #fff;
-  background: #111;
+  background: light-dark(#111, #3a3a3c);
   box-shadow: 0 10px 24px rgb(0 0 0 / 0.2);
   transform: translateY(16px);
   opacity: 0;
@@ -326,8 +333,8 @@
   gap: 10px;
   height: 84px;
   padding: 10px 14px 26px;
-  border-top: 1px solid #f0f0f0;
-  background: rgb(255 255 255 / 0.9);
+  border-top: 1px solid light-dark(#f0f0f0, #2c2c2e);
+  background: light-dark(rgb(255 255 255 / 0.9), rgb(28 28 30 / 0.9));
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
 }
@@ -338,7 +345,7 @@
   align-items: center;
   gap: 2px;
   padding: 3px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid light-dark(#e5e7eb, #3f3f46);
   border-radius: 999px;
 }
 
@@ -349,7 +356,7 @@
   height: 32px;
   border-radius: 50%;
   font-size: 18px;
-  background: #f5f5f5;
+  background: light-dark(#f5f5f5, #2c2c2e);
 }
 
 .qty {
@@ -367,8 +374,8 @@
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
-  color: #fff;
-  background: #111;
+  color: light-dark(#fff, #111);
+  background: light-dark(#111, #fff);
 }
 
 .homeIndicator {
@@ -379,6 +386,6 @@
   width: 112px;
   height: 5px;
   border-radius: 999px;
-  background: #111;
+  background: light-dark(#111, #fff);
   transform: translateX(-50%);
 }

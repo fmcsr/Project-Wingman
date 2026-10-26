@@ -1,0 +1,978 @@
+/* The example store follows the page theme: every color is a light-dark(light, dark) pair; the brand yellow stays single. */
+.page {
+  /* Colors that repeat across the page */
+  --shelf-accent: light-dark(#1d4ed8, #60a5fa);
+  --shelf-accent-soft: light-dark(#eff6ff, rgb(96 165 250 / 0.14));
+  --shelf-border: light-dark(#e5e7eb, #2a2a30);
+  --shelf-control: light-dark(#d1d5db, #3f3f46);
+  --shelf-text: light-dark(#111827, #f4f4f5);
+  --shelf-body: light-dark(#374151, #d4d4d8);
+  --shelf-muted: light-dark(#4b5563, #a1a1aa);
+  --shelf-subtle: light-dark(#6b7280, #8b8b94);
+  --shelf-surface: light-dark(#fff, #18181b);
+  --shelf-yellow: #facc15;
+  container-type: inline-size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--shelf-text);
+  background: light-dark(#f6f7f9, #0c0c0f);
+}
+
+.icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Promo strip: one short line about the offer, above everything else */
+.promo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 8px;
+  min-height: 34px;
+  padding: 6px 16px;
+  font-size: 13px;
+  text-align: center;
+  color: light-dark(#1c1917, #fde68a);
+  background: light-dark(#facc15, #422006);
+}
+
+.promoIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.promoLink {
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Header: the promo strip scrolls away, the header sticks, so search and cart stay in reach */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 64px;
+  padding: 0 24px;
+  color: #fff;
+  background: light-dark(#1e3a8a, #111827);
+  box-shadow: 0 1px 0 light-dark(transparent, #27272a);
+}
+
+.brand {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: #1c1917;
+  background: var(--shelf-yellow);
+}
+
+/* Search bar: scope selector, text field and search button joined into one rounded bar */
+.search {
+  display: flex;
+  flex: 1;
+  max-width: 640px;
+  height: 42px;
+  overflow: hidden;
+  border-radius: 8px;
+  color: var(--shelf-text);
+  background: light-dark(#fff, #27272a);
+}
+
+.scope {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px 0 12px;
+  border-right: 1px solid var(--shelf-control);
+  font-size: 13px;
+  color: var(--shelf-body);
+  background: light-dark(#f3f4f6, #3f3f46);
+}
+
+.scopeChevron {
+  width: 14px;
+  height: 14px;
+}
+
+.searchText {
+  flex: 1;
+  min-width: 0;
+  padding: 0 12px;
+  overflow: hidden;
+  line-height: 42px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: light-dark(#6b7280, #a1a1aa);
+}
+
+.searchButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  color: #1c1917;
+  background: var(--shelf-yellow);
+}
+
+.account,
+.cart {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.headerIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.accountText {
+  display: grid;
+  line-height: 1.2;
+}
+
+.accountHello {
+  font-size: 12px;
+  font-weight: 400;
+  color: light-dark(#dbeafe, #a1a1aa);
+}
+
+.cartIcon {
+  position: relative;
+  display: grid;
+}
+
+/* Count badge: pinned to the icon's corner, with a ring in the header color that cuts it out of the icon */
+.cartBadge {
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border: 2px solid light-dark(#1e3a8a, #111827);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  color: #1c1917;
+  background: var(--shelf-yellow);
+}
+
+/* Page body */
+.body {
+  padding: 14px 24px 8px;
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--shelf-subtle);
+}
+
+.crumbSeparator {
+  color: light-dark(#9ca3af, #52525b);
+}
+
+.crumbCurrent {
+  font-weight: 600;
+  color: var(--shelf-body);
+}
+
+.title {
+  margin-top: 4px;
+  font-size: 26px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: 28px;
+  margin-top: 14px;
+}
+
+/* Filter panel (faceted navigation) */
+.filters {
+  align-self: start;
+}
+
+.filtersHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--shelf-border);
+}
+
+.filtersTitle {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.clearAll {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--shelf-accent);
+}
+
+.facet {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--shelf-border);
+}
+
+.facetTitle {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.options {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  font-size: 13.5px;
+}
+
+.checkbox {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid light-dark(#9ca3af, #52525b);
+  border-radius: 4px;
+  background: var(--shelf-surface);
+}
+
+.checkbox[aria-checked='true'] {
+  border-color: var(--shelf-accent);
+  color: light-dark(#fff, #0c0c0f);
+  background: var(--shelf-accent);
+}
+
+.checkbox .icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 3;
+}
+
+.optionLabel {
+  flex: 1;
+}
+
+/* Result counts line up on the right, so they compare at a glance */
+.optionCount {
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--shelf-subtle);
+}
+
+.showMore {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--shelf-accent);
+}
+
+.showMore .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Range slider: one track, two thumbs; the stretch between them is the chosen range ($0–$500 scale) */
+.slider {
+  position: relative;
+  height: 18px;
+  margin: 6px 9px 0;
+}
+
+.slider::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  right: 0;
+  left: 0;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--shelf-control);
+}
+
+.sliderRange {
+  position: absolute;
+  top: 7px;
+  left: 10%;
+  width: 40%;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--shelf-accent);
+}
+
+.thumb {
+  position: absolute;
+  top: 0;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  border: 2px solid var(--shelf-accent);
+  border-radius: 50%;
+  background: light-dark(#fff, #f4f4f5);
+  box-shadow: 0 1px 3px light-dark(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.5));
+}
+
+.priceFields {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.priceField {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--shelf-control);
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+  background: var(--shelf-surface);
+}
+
+.fieldPrefix,
+.priceDash {
+  color: var(--shelf-subtle);
+}
+
+/* Rating filter: each row means "this many stars or more"; only one can be picked */
+.ratingOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 -8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  color: var(--shelf-body);
+}
+
+.ratingOption[aria-checked='true'] {
+  font-weight: 700;
+  color: var(--shelf-text);
+  background: var(--shelf-accent-soft);
+}
+
+/* Stars: a gold row on top of a gray one, cut to the rating's width */
+.stars {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 80px;
+  height: 16px;
+}
+
+.stars svg {
+  display: block;
+  width: 80px;
+  height: 16px;
+}
+
+.starsEmpty {
+  fill: light-dark(#d1d5db, #3f3f46);
+}
+
+.starsGold {
+  fill: #f59e0b;
+}
+
+.starsFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Color swatches: several can be picked; a ring with a gap marks each chosen color */
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 2px 4px;
+}
+
+.swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px light-dark(rgb(0 0 0 / 0.15), rgb(255 255 255 / 0.2));
+}
+
+.swatch[aria-checked='true'] {
+  box-shadow:
+    inset 0 0 0 1px light-dark(rgb(0 0 0 / 0.15), rgb(255 255 255 / 0.2)),
+    0 0 0 2px light-dark(#f6f7f9, #0c0c0f),
+    0 0 0 4px var(--shelf-accent);
+}
+
+/* Results toolbar */
+.results {
+  min-width: 0;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.filtersButton,
+.sort {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  border: 1px solid var(--shelf-control);
+  border-radius: 8px;
+  font-size: 13.5px;
+  background: var(--shelf-surface);
+}
+
+/* Only shown once the filter panel is hidden */
+.filtersButton {
+  display: none;
+  padding: 0 12px;
+  font-weight: 600;
+}
+
+.filtersCount {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: light-dark(#fff, #0c0c0f);
+  background: var(--shelf-accent);
+}
+
+.count {
+  margin-right: auto;
+  color: var(--shelf-muted);
+}
+
+.count strong {
+  color: var(--shelf-text);
+}
+
+.sort {
+  padding: 0 10px 0 12px;
+}
+
+.sortLabel {
+  color: var(--shelf-muted);
+}
+
+.sortChevron {
+  width: 16px;
+  height: 16px;
+  color: var(--shelf-subtle);
+}
+
+.viewToggle {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--shelf-control);
+  border-radius: 8px;
+  background: var(--shelf-surface);
+}
+
+.viewOption {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 28px;
+  border-radius: 5px;
+  color: var(--shelf-subtle);
+}
+
+.viewOption[aria-pressed='true'] {
+  color: light-dark(#fff, #0c0c0f);
+  background: var(--shelf-text);
+}
+
+.viewOption .icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Applied filters as removable chips */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 8px 0 12px;
+  border: 1px solid light-dark(#bfdbfe, rgb(96 165 250 / 0.35));
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: light-dark(#1e40af, #bfdbfe);
+  background: var(--shelf-accent-soft);
+}
+
+.chipRemove {
+  width: 14px;
+  height: 14px;
+}
+
+/* Product grid and cards */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 10px 12px;
+  border: 1px solid var(--shelf-border);
+  border-radius: 12px;
+  background: var(--shelf-surface);
+}
+
+.media {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  background: light-dark(#f3f4f6, #232329);
+}
+
+.headphones {
+  width: 72%;
+  height: auto;
+}
+
+.shadow {
+  fill: light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.35));
+}
+
+.band,
+.pad {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.band {
+  stroke-width: 7;
+}
+
+.pad {
+  stroke-width: 5;
+}
+
+.black .band {
+  stroke: light-dark(#27272a, #4b4b53);
+}
+
+.black .pad {
+  stroke: light-dark(#3f3f46, #63636c);
+}
+
+.black .cup {
+  fill: light-dark(#18181b, #3f3f46);
+}
+
+.black .cushion {
+  fill: light-dark(#3f3f46, #5b5b64);
+}
+
+.black .detail {
+  fill: light-dark(#71717a, #8b8b94);
+}
+
+.white .band {
+  stroke: light-dark(#d4d4d8, #c4c4cc);
+}
+
+.white .pad {
+  stroke: #e4e4e7;
+}
+
+.white .cup {
+  fill: light-dark(#fff, #f4f4f5);
+  stroke: light-dark(#d4d4d8, transparent);
+  stroke-width: 1.5;
+}
+
+.white .cushion {
+  fill: #a1a1aa;
+}
+
+.white .detail {
+  fill: light-dark(#d4d4d8, #a1a1aa);
+}
+
+/* Badges sit on the photo's top-left corner, the wishlist heart on the top-right */
+.badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fff;
+  background: #c2410c;
+}
+
+.badgeSale {
+  background: #dc2626;
+}
+
+.wishlist {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--shelf-body);
+  background: light-dark(#fff, #3f3f46);
+  box-shadow: 0 1px 3px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.4));
+}
+
+.wishlist svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+/* Saved: the outline heart fills in */
+.wishlist[aria-pressed='true'] {
+  color: #e11d48;
+}
+
+.wishlist[aria-pressed='true'] svg {
+  fill: currentColor;
+}
+
+/* Long titles stop after two lines with an ellipsis, so every card keeps the same rhythm */
+.productTitle {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.rating {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+}
+
+.rating .stars,
+.rating .stars svg {
+  width: 70px;
+  height: 14px;
+}
+
+.ratingValue {
+  font-weight: 600;
+}
+
+.reviews {
+  color: var(--shelf-accent);
+}
+
+.priceRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.price {
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Raised dollar sign and cents, so the whole dollars read first */
+.priceSmall {
+  font-size: 12px;
+  vertical-align: 7px;
+}
+
+.was {
+  font-size: 13px;
+  color: var(--shelf-subtle);
+  text-decoration: line-through;
+}
+
+.delivery {
+  margin-bottom: 4px;
+  font-size: 12.5px;
+  color: var(--shelf-muted);
+}
+
+.delivery strong {
+  color: var(--shelf-text);
+}
+
+/* margin-top: auto pushes the button to the card's bottom, so the buttons in a row line up */
+.addToCart {
+  display: grid;
+  place-items: center;
+  height: 34px;
+  margin-top: auto;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1c1917;
+  background: var(--shelf-yellow);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 28px 0 8px;
+}
+
+.pageNumber,
+.pageStep {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--shelf-control);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  background: var(--shelf-surface);
+}
+
+.pageNumber[aria-current='page'] {
+  border-color: var(--shelf-text);
+  font-weight: 700;
+  color: light-dark(#fff, #0c0c0f);
+  background: var(--shelf-text);
+}
+
+/* On the first page there's nothing before it: Previous stays visible but grayed out */
+.pageStep[aria-disabled='true'] {
+  border-color: var(--shelf-border);
+  color: light-dark(#9ca3af, #52525b);
+  background: transparent;
+}
+
+.pageStep .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.pageGap {
+  min-width: 24px;
+  text-align: center;
+  color: var(--shelf-subtle);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin-top: 24px;
+  padding: 18px 24px 22px;
+  border-top: 1px solid var(--shelf-border);
+  font-size: 12.5px;
+  color: var(--shelf-subtle);
+  background: var(--shelf-surface);
+}
+
+/* Fewer columns as the window narrows */
+@container (width < 1000px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Tablets: the filter panel folds into a Filters button above the results */
+@container (width < 860px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .filters,
+  .sortLabel {
+    display: none;
+  }
+
+  .filtersButton {
+    display: flex;
+  }
+}
+
+/* Phones: the search bar gets its own row, and the cards go two across */
+@container (width < 560px) {
+  .header {
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    height: auto;
+    padding: 10px 14px;
+  }
+
+  .search {
+    flex-basis: 100%;
+    order: 1;
+    max-width: none;
+    height: 40px;
+  }
+
+  .searchText {
+    line-height: 40px;
+  }
+
+  .scope,
+  .accountText,
+  .promoExtra,
+  .ratingValue,
+  .pageStepLabel {
+    display: none;
+  }
+
+  .account {
+    margin-left: auto;
+  }
+
+  .body {
+    padding: 12px 14px 4px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  /* Two toolbar rows: the count with the view toggle, then Filters and Sort as equal halves */
+  .count {
+    order: -2;
+  }
+
+  .viewToggle {
+    order: -1;
+  }
+
+  .filtersButton,
+  .sort {
+    flex: 1 1 calc(50% - 6px);
+    justify-content: center;
+  }
+
+  .rating .stars,
+  .rating .stars svg {
+    width: 64px;
+    height: 13px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .card {
+    padding: 8px 8px 10px;
+  }
+
+  .price {
+    font-size: 18px;
+  }
+
+  .footer {
+    padding-inline: 14px;
+  }
+}

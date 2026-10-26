@@ -1,0 +1,856 @@
+/* The example site follows the page theme: every color is a light-dark(light, dark) pair. */
+.page {
+  /* Colors that repeat across the page */
+  --docs-accent: light-dark(#6d28d9, #a78bfa);
+  --docs-accent-soft: light-dark(#f5f3ff, rgb(167 139 250 / 0.12));
+  --docs-border: light-dark(#e4e4e7, #27272a);
+  --docs-body: light-dark(#3f3f46, #d4d4d8);
+  --docs-muted: light-dark(#52525b, #a1a1aa);
+  --docs-subtle: light-dark(#71717a, #8b8b94);
+  --docs-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  container-type: inline-size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: light-dark(#18181b, #fafafa);
+  background: light-dark(#fff, #09090b);
+}
+
+.icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Top bar: pinned, slightly see-through and blurred, so the article scrolls under it */
+.topBar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 56px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--docs-border);
+  background: light-dark(rgb(255 255 255 / 0.85), rgb(9 9 11 / 0.8));
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.menuButton {
+  display: none;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-left: -6px;
+  border-radius: 8px;
+  color: var(--docs-muted);
+}
+
+.menuButton .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.brand {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  color: #fff;
+  background: linear-gradient(135deg, #7c3aed, #f97316);
+}
+
+.docsLabel {
+  padding-left: 8px;
+  border-left: 1px solid var(--docs-border);
+  font-weight: 500;
+  color: var(--docs-muted);
+}
+
+/* Looks like a text field, but opens a search dialog; the shortcut hint sits at the end */
+.search {
+  display: flex;
+  flex: 0 1 280px;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  height: 36px;
+  margin-left: 20px;
+  padding: 0 6px 0 10px;
+  border: 1px solid var(--docs-border);
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: var(--docs-subtle);
+  background: light-dark(#f4f4f5, #18181b);
+}
+
+.searchText {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.kbd {
+  padding: 1px 6px;
+  border: 1px solid var(--docs-border);
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--docs-muted);
+  background: light-dark(#fff, #27272a);
+}
+
+.barEnd {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.version {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 8px 0 10px;
+  border: 1px solid var(--docs-border);
+  border-radius: 6px;
+  font-family: var(--docs-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--docs-body);
+}
+
+.versionChevron {
+  width: 14px;
+  height: 14px;
+  color: var(--docs-subtle);
+}
+
+.dashboard {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: light-dark(#fff, #09090b);
+  background: light-dark(#18181b, #fafafa);
+}
+
+/* Three columns: docs tree, article, table of contents */
+.layout {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr) 196px;
+}
+
+/* Sidebar: the column keeps its background and divider, the link list inside it sticks */
+.sidebar {
+  border-right: 1px solid var(--docs-border);
+  background: light-dark(#fafafa, #0c0c0e);
+}
+
+.sidebarNav {
+  position: sticky;
+  top: 56px;
+  display: grid;
+  gap: 18px;
+  padding: 20px 14px 24px;
+}
+
+.sectionHeading {
+  margin-bottom: 6px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--docs-subtle);
+}
+
+.navList,
+.groupPages {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navItem,
+.groupHeader {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.navItem {
+  color: var(--docs-muted);
+}
+
+.groupHeader {
+  justify-content: space-between;
+  font-weight: 500;
+  color: light-dark(#27272a, #e4e4e7);
+}
+
+.chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--docs-subtle);
+}
+
+/* An open group's chevron points down */
+.groupHeader[aria-expanded='true'] .chevron {
+  transform: rotate(90deg);
+}
+
+/* A guide line ties the open group's pages to their parent */
+.groupPages {
+  margin: 2px 0 4px 14px;
+  border-left: 1px solid var(--docs-border);
+}
+
+.groupPages .navItem {
+  padding-left: 12px;
+  border-radius: 0 6px 6px 0;
+}
+
+/* Current page: an accent bar on the guide line, accent text on a tint */
+.navItem[aria-current='page'] {
+  margin-left: -1px;
+  padding-left: 11px;
+  border-left: 2px solid var(--docs-accent);
+  font-weight: 600;
+  color: var(--docs-accent);
+  background: var(--docs-accent-soft);
+}
+
+/* Article: its own container, so the table and the code react to the column's width, not the window's */
+.main {
+  container: docs-article / inline-size;
+  min-width: 0;
+  padding: 28px 48px 40px;
+}
+
+.main article {
+  max-width: 720px;
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--docs-subtle);
+}
+
+.crumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.crumbSeparator {
+  width: 14px;
+  height: 14px;
+  color: light-dark(#a1a1aa, #52525b);
+}
+
+.crumbCurrent {
+  font-weight: 500;
+  color: light-dark(#27272a, #e4e4e7);
+}
+
+.title {
+  margin-top: 14px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.lead {
+  max-width: 60ch;
+  margin-top: 10px;
+  font-size: 16.5px;
+  line-height: 1.55;
+  color: var(--docs-muted);
+}
+
+.sectionTitle {
+  margin-top: 36px;
+  font-size: 21px;
+  font-weight: 650;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+.text {
+  margin-top: 10px;
+  color: var(--docs-body);
+}
+
+.inlineCode {
+  padding: 1px 5px;
+  border: 1px solid var(--docs-border);
+  border-radius: 5px;
+  font-family: var(--docs-mono);
+  font-size: 0.86em;
+  background: light-dark(#f4f4f5, #18181b);
+}
+
+/* Callouts: a colored edge, a tint and an icon; the bold first line carries the meaning too */
+.callout {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 14px 16px;
+  border-left: 3px solid;
+  border-radius: 0 8px 8px 0;
+}
+
+.calloutInfo {
+  border-color: light-dark(#2563eb, #60a5fa);
+  background: light-dark(#eff6ff, rgb(59 130 246 / 0.1));
+}
+
+.calloutWarning {
+  border-color: light-dark(#d97706, #fbbf24);
+  background: light-dark(#fffbeb, rgb(245 158 11 / 0.1));
+}
+
+.calloutIcon {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.calloutInfo .calloutIcon {
+  color: light-dark(#2563eb, #60a5fa);
+}
+
+.calloutWarning .calloutIcon {
+  color: light-dark(#d97706, #fbbf24);
+}
+
+.calloutTitle {
+  font-weight: 600;
+}
+
+.calloutText {
+  margin-top: 2px;
+  color: var(--docs-body);
+}
+
+/* Package manager tabs over the install command */
+/* Real code boxes often scroll sideways (overflow-x: auto); a scrolling box would be a tab stop, so the picture clips */
+.install,
+.codeBlock {
+  margin-top: 14px;
+  overflow: hidden;
+  border: 1px solid var(--docs-border);
+  border-radius: 10px;
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--docs-border);
+  background: light-dark(#fafafa, #111113);
+}
+
+.tab {
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--docs-subtle);
+}
+
+.tab[aria-selected='true'] {
+  color: light-dark(#18181b, #fafafa);
+  box-shadow: inset 0 -2px 0 var(--docs-accent);
+}
+
+.command {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 16px;
+  font-family: var(--docs-mono);
+  font-size: 13px;
+  background: light-dark(#fff, #0c0c0e);
+}
+
+/* The prompt sign isn't part of the command, so it can't be selected */
+.prompt {
+  color: var(--docs-subtle);
+  user-select: none;
+}
+
+.commandText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-family: inherit;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.copy {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--docs-border);
+  border-radius: 6px;
+  color: var(--docs-muted);
+  background: light-dark(#fff, #18181b);
+}
+
+.copy .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Code block: a filename tab, a gutter of line numbers and highlighted syntax */
+.codeBlock {
+  background: light-dark(#fafafa, #0f0f12);
+}
+
+.codeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 40px;
+  padding-right: 6px;
+  border-bottom: 1px solid var(--docs-border);
+  background: light-dark(#f4f4f5, #18181b);
+}
+
+/* The tab covers the header's bottom border, so it reads as part of the code below */
+.fileTab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: stretch;
+  min-width: 0;
+  margin-bottom: -1px;
+  padding: 0 14px;
+  border-right: 1px solid var(--docs-border);
+  font-family: var(--docs-mono);
+  font-size: 12.5px;
+  white-space: nowrap;
+  color: light-dark(#18181b, #e4e4e7);
+  background: light-dark(#fafafa, #0f0f12);
+}
+
+.fileIcon {
+  width: 14px;
+  height: 14px;
+  color: var(--docs-subtle);
+}
+
+.code {
+  margin: 0;
+  padding: 12px 0;
+  font-family: var(--docs-mono);
+  font-size: 13px;
+  line-height: 1.65;
+  color: light-dark(#1f2328, #e6edf3);
+}
+
+.codeLines {
+  display: block;
+  font-family: inherit;
+}
+
+.line {
+  display: flex;
+  padding-right: 16px;
+}
+
+/* Line numbers can't be selected, so copying the code never copies them */
+.lineNumber {
+  flex: none;
+  width: 44px;
+  padding-right: 16px;
+  text-align: right;
+  color: light-dark(#a1a1aa, #52525b);
+  user-select: none;
+}
+
+.lineCode {
+  white-space: pre;
+}
+
+.lineHighlighted {
+  background: light-dark(rgb(109 40 217 / 0.07), rgb(167 139 250 / 0.12));
+  box-shadow: inset 2px 0 0 var(--docs-accent);
+}
+
+.lineHighlighted .lineNumber {
+  color: var(--docs-accent);
+}
+
+/* Syntax colors: keywords, strings, names and props */
+.kw {
+  color: light-dark(#cf222e, #ff7b72);
+}
+
+.str {
+  color: light-dark(#0a3069, #a5d6ff);
+}
+
+.fn {
+  color: light-dark(#8250df, #d2a8ff);
+}
+
+.attr {
+  color: light-dark(#0550ae, #79c0ff);
+}
+
+/* Props table: separate borders, so the table's corners can round off */
+.table {
+  width: 100%;
+  margin-top: 14px;
+  border: 1px solid var(--docs-border);
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  font-size: 13.5px;
+}
+
+.table th {
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--docs-muted);
+  background: light-dark(#fafafa, #111113);
+}
+
+.table th:first-child {
+  border-top-left-radius: 9px;
+}
+
+.table th:last-child {
+  border-top-right-radius: 9px;
+}
+
+.table td {
+  padding: 10px 14px;
+  border-top: 1px solid var(--docs-border);
+  vertical-align: top;
+}
+
+.propName,
+.propType,
+.propDefault {
+  font-family: var(--docs-mono);
+  font-size: 12.5px;
+}
+
+.propName {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.propType {
+  color: light-dark(#0550ae, #79c0ff);
+}
+
+.propDefault {
+  color: var(--docs-body);
+}
+
+.required {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  vertical-align: 1px;
+  color: light-dark(#be123c, #fda4af);
+  background: light-dark(#fff1f2, rgb(244 63 94 / 0.14));
+}
+
+.none {
+  color: var(--docs-subtle);
+}
+
+.propDescription {
+  color: var(--docs-body);
+}
+
+/* Feedback, previous/next and footer */
+.pageMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--docs-border);
+}
+
+.feedback {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.feedback > span:first-child {
+  margin-right: 4px;
+}
+
+.vote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--docs-border);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--docs-body);
+}
+
+.vote .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.updated {
+  font-size: 13px;
+  color: var(--docs-subtle);
+}
+
+.pager {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.pagerCard {
+  display: grid;
+  gap: 2px;
+  padding: 12px 16px;
+  border: 1px solid var(--docs-border);
+  border-radius: 10px;
+}
+
+.pagerNext {
+  justify-items: end;
+}
+
+.pagerLabel {
+  font-size: 12.5px;
+  color: var(--docs-subtle);
+}
+
+.pagerTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--docs-accent);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-top: 32px;
+  font-size: 12.5px;
+  color: var(--docs-subtle);
+}
+
+/* Table of contents: a thin rail; the section being read gets an accent segment on it */
+.toc {
+  padding: 28px 20px 0 0;
+}
+
+.tocNav {
+  position: sticky;
+  top: 84px;
+}
+
+.tocTitle {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.tocList {
+  display: grid;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  border-left: 1px solid var(--docs-border);
+}
+
+.tocLink {
+  display: block;
+  margin-left: -1px;
+  padding: 4px 0 4px 13px;
+  border-left: 2px solid transparent;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--docs-subtle);
+}
+
+.tocLink[aria-current='true'] {
+  border-left-color: var(--docs-accent);
+  font-weight: 500;
+  color: var(--docs-accent);
+}
+
+/* The table of contents goes first, so the article keeps a comfortable width */
+@container (width < 1100px) {
+  .layout {
+    grid-template-columns: 232px minmax(0, 1fr);
+  }
+
+  .toc {
+    display: none;
+  }
+}
+
+/* Phones and narrow windows: the sidebar folds into the ☰ button and the search box shrinks to an icon */
+@container (width < 720px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar,
+  .dashboard,
+  .searchText,
+  .kbd {
+    display: none;
+  }
+
+  .topBar {
+    gap: 8px;
+    padding: 0 14px;
+  }
+
+  .menuButton {
+    display: grid;
+  }
+
+  .search {
+    flex: none;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    margin-left: auto;
+    padding: 0;
+  }
+
+  .barEnd {
+    margin-left: 0;
+  }
+
+  .main {
+    padding: 20px 16px 32px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .lead {
+    font-size: 15.5px;
+  }
+}
+
+/* A narrow article: each prop stacks into its own block, and long code lines wrap instead of running off */
+@container docs-article (width < 520px) {
+  .table,
+  .table tbody {
+    display: block;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    gap: 4px 10px;
+    padding: 12px 14px;
+  }
+
+  .table tr + tr {
+    border-top: 1px solid var(--docs-border);
+  }
+
+  .table td {
+    padding: 0;
+    border-top: 0;
+  }
+
+  .table td:nth-child(n + 3) {
+    grid-column: 1 / -1;
+  }
+
+  .table td[data-label]::before {
+    content: attr(data-label);
+    margin-right: 8px;
+    font-size: 12.5px;
+    color: var(--docs-subtle);
+  }
+
+  .code {
+    font-size: 12px;
+  }
+
+  .lineNumber {
+    width: 34px;
+    padding-right: 12px;
+  }
+
+  .lineCode {
+    white-space: pre-wrap;
+  }
+}

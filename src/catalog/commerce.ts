@@ -81,8 +81,8 @@ export const commerce: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Cut-out ring',
-        value: 'border: 2px solid #fff',
-        plain: 'A white ring separates it from the icon underneath, so it stays legible.',
+        value: { light: 'border: 2px solid #fff', dark: 'border: 2px solid #2c2c2e' },
+        plain: "A ring in the button's color separates it from the icon underneath, so it stays legible.",
       },
       {
         kind: 'behavior',
@@ -159,8 +159,11 @@ export const commerce: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Selected ring',
-        value: 'box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111',
-        plain: 'A thin gap and a dark outline circle the chosen color without covering it.',
+        value: {
+          light: 'box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111',
+          dark: 'box-shadow: 0 0 0 2px #1c1c1e, 0 0 0 4px #fff',
+        },
+        plain: 'A thin gap and an outline in the text color circle the chosen color without covering it.',
       },
       {
         kind: 'behavior',
@@ -180,8 +183,8 @@ export const commerce: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Selected size',
-        value: 'background: #111',
-        plain: 'The chosen size flips to a dark fill.',
+        value: { light: 'background: #111', dark: 'background: #fff' },
+        plain: 'The chosen size flips to a solid fill in the text color.',
       },
       {
         kind: 'appearance',

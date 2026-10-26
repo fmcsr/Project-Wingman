@@ -1,0 +1,784 @@
+/* The example app follows the page theme: every color is a light-dark(light, dark) pair. */
+/* Container queries apply to child elements, not the container itself; that's why the grid sits inside it */
+.root {
+  container-type: inline-size;
+}
+
+/* An app screen, not a page: at least as tall as the browser window, so the sidebar runs to the bottom */
+.app {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  min-height: 900px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: light-dark(#1b1c20, #e4e5e9);
+  background: light-dark(#ffffff, #16171a);
+}
+
+.icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Disclosure chevron: points down while its section is open, turns to point right when collapsed */
+.chevron {
+  width: 12px;
+  height: 12px;
+  color: light-dark(#6b6f78, #8f939c);
+}
+
+[aria-expanded='false'] > .chevron {
+  transform: rotate(-90deg);
+}
+
+/* Key caps: the visible hint for a keyboard shortcut */
+.keys {
+  display: flex;
+  flex: none;
+  gap: 3px;
+  margin-left: auto;
+}
+
+.kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 1px solid light-dark(#dcdce2, #34353c);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  color: light-dark(#5f636c, #a1a4ad);
+  background: light-dark(#f7f7f9, #222327);
+}
+
+/* Sidebar */
+.sidebar {
+  border-right: 1px solid light-dark(#e8e8ec, #25262b);
+  background: light-dark(#f7f7f9, #111214);
+}
+
+/* Stays in view while the issue list scrolls, like an app's fixed navigation */
+.sidebarInner {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px 10px 16px;
+}
+
+.workspace {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 8px 0 6px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.workspaceLogo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #5e6ad2, #9b5de5);
+}
+
+/* The main action looks like a real button (surface, hairline, small shadow), with its shortcut on the right */
+.newIssue {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 6px 0 10px;
+  border: 1px solid light-dark(#e1e1e6, #2c2d33);
+  border-radius: 6px;
+  font-weight: 500;
+  background: light-dark(#ffffff, #1c1d21);
+  box-shadow: 0 1px 2px light-dark(rgb(16 17 20 / 0.06), rgb(0 0 0 / 0.4));
+}
+
+.nav,
+.section,
+.teamPages {
+  display: grid;
+  gap: 1px;
+}
+
+.navItem,
+.team {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-weight: 500;
+  color: light-dark(#3d4047, #c6c8ce);
+}
+
+.navItem .icon {
+  color: light-dark(#6b6f78, #8f939c);
+}
+
+.navItem[aria-current='page'] {
+  color: light-dark(#1b1c20, #f2f2f4);
+  background: light-dark(#e9e9ee, #25262c);
+}
+
+.navItem[aria-current='page'] .icon {
+  color: inherit;
+}
+
+/* Unread count: a filled pill that asks for attention */
+.badge {
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: auto;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: #5e6ad2;
+}
+
+/* A plain total: just the number, no pill */
+.count {
+  margin-left: auto;
+  font-size: 12px;
+  color: light-dark(#6b6f78, #8f939c);
+  font-variant-numeric: tabular-nums;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  margin-top: 4px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: light-dark(#6b6f78, #8f939c);
+}
+
+.team {
+  gap: 8px;
+}
+
+.teamIcon,
+.crumbIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* The open team's pages are indented under it: their icons line up with the team icon, like a tree */
+.teamPages .navItem {
+  padding-left: 28px;
+}
+
+/* Main column */
+.main {
+  /* Height of the pinned toolbar; the group headers stick right below it */
+  --top-h: 92px;
+  min-width: 0;
+}
+
+/* Header and filter bar stay pinned while the list scrolls under them */
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: light-dark(#ffffff, #16171a);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 48px;
+  padding: 0 16px 0 24px;
+  border-bottom: 1px solid light-dark(#e8e8ec, #25262b);
+}
+
+.menuButton {
+  display: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: light-dark(#5f636c, #a1a4ad);
+}
+
+.breadcrumbs {
+  min-width: 0;
+}
+
+.breadcrumbs ol,
+.breadcrumbs li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: light-dark(#6b6f78, #8f939c);
+}
+
+/* The last crumb is the page you're on: full-strength text, not a link */
+.crumb[aria-current='page'] {
+  color: light-dark(#1b1c20, #f2f2f4);
+}
+
+.crumbIcon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  font-size: 9px;
+}
+
+.crumbSeparator {
+  width: 12px;
+  height: 12px;
+  color: light-dark(#9a9ea6, #5f636c);
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: light-dark(#6b6f78, #8f939c);
+}
+
+/* The selected view gets a filled background and a hairline; the others stay flat */
+.tab[aria-selected='true'] {
+  color: light-dark(#1b1c20, #f2f2f4);
+  border-color: light-dark(#e1e1e6, #2e2f35);
+  background: light-dark(#f2f2f5, #222327);
+}
+
+.headerEnd {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+}
+
+/* Avatar stack: each face overlaps the one before; a ring in the background color keeps the edges apart */
+.avatarStack {
+  display: flex;
+}
+
+.stackAvatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 0 0 2px light-dark(#ffffff, #16171a);
+}
+
+.stackAvatar + .stackAvatar {
+  margin-left: -6px;
+}
+
+.stackMore {
+  color: light-dark(#5f636c, #a1a4ad);
+  background: light-dark(#ececf0, #2a2b31);
+}
+
+/* List/Board: a segmented control where exactly one option is on */
+.switcher {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 7px;
+  background: light-dark(#f0f0f3, #222327);
+}
+
+.switcherOption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 5px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: light-dark(#6b6f78, #8f939c);
+}
+
+.switcherOption .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.switcherOption[aria-checked='true'] {
+  color: light-dark(#1b1c20, #f2f2f4);
+  background: light-dark(#ffffff, #34353b);
+  box-shadow: 0 1px 2px light-dark(rgb(16 17 20 / 0.12), rgb(0 0 0 / 0.5));
+}
+
+/* Filter bar */
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px 0 24px;
+  border-bottom: 1px solid light-dark(#e8e8ec, #25262b);
+}
+
+/* Filter chip: the field and its value, plus a × of its own that removes just this filter */
+.chip {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 26px;
+  border: 1px solid light-dark(#dedfe5, #303137);
+  border-radius: 6px;
+  font-size: 12.5px;
+  background: light-dark(#fafafb, #1c1d21);
+}
+
+.chipBody {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+}
+
+.chipField {
+  color: light-dark(#6b6f78, #8f939c);
+}
+
+.chipValue {
+  font-weight: 500;
+}
+
+.chipRemove {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  width: 24px;
+  border-left: 1px solid light-dark(#dedfe5, #303137);
+  color: light-dark(#6b6f78, #8f939c);
+}
+
+.chipRemove .icon {
+  width: 12px;
+  height: 12px;
+}
+
+.miniAvatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-size: 7px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.addFilter,
+.display {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: light-dark(#6b6f78, #8f939c);
+}
+
+.addFilter .icon,
+.display .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.display {
+  margin-left: auto;
+  padding: 0 10px;
+  border: 1px solid light-dark(#e1e1e6, #2c2d33);
+  color: inherit;
+  background: light-dark(#ffffff, #1c1d21);
+}
+
+/* Group header: sticks right under the toolbar while you scroll through its group */
+.groupHeader {
+  position: sticky;
+  top: var(--top-h);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px 0 4px;
+  border-bottom: 1px solid light-dark(#ededf1, #222328);
+  background: light-dark(#f7f7f9, #1b1c20);
+}
+
+.groupToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.groupCount {
+  color: light-dark(#6b6f78, #8f939c);
+  font-variant-numeric: tabular-nums;
+}
+
+.groupAdd {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-left: auto;
+  border-radius: 6px;
+  color: light-dark(#6b6f78, #8f939c);
+}
+
+.groupAdd .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Issue row: dense (40px) and one line per issue, so a long list still fits on screen */
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 16px 0 24px;
+  border-bottom: 1px solid light-dark(#f0f0f3, #1f2024);
+}
+
+/* The right-clicked row stays highlighted while its menu is open */
+.rowSelected {
+  background: light-dark(#f2f3fb, #1d1f2d);
+}
+
+.status {
+  display: grid;
+  flex: none;
+  place-items: center;
+}
+
+.status svg {
+  width: 14px;
+  height: 14px;
+}
+
+.todo {
+  color: light-dark(#9a9ea6, #6f737c);
+}
+
+.progress {
+  color: light-dark(#c98a0b, #f2c94c);
+}
+
+.review {
+  color: light-dark(#2e9e65, #4cc38a);
+}
+
+.done {
+  color: #5e6ad2;
+}
+
+.issueId {
+  flex: none;
+  width: 58px;
+  font-size: 12.5px;
+  color: light-dark(#6b6f78, #8f939c);
+  font-variant-numeric: tabular-nums;
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.labels {
+  display: flex;
+  flex: none;
+  gap: 6px;
+}
+
+/* Label pill: the colored dot does the color coding, so the text stays readable in both themes */
+.label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid light-dark(#e3e3e8, #2c2d33);
+  border-radius: 999px;
+  font-size: 12px;
+  color: light-dark(#3d4047, #c6c8ce);
+}
+
+.labelDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.priority {
+  display: grid;
+  flex: none;
+  place-items: center;
+  color: light-dark(#5f636c, #a1a4ad);
+}
+
+.bars {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.chipBars {
+  width: 12px;
+  height: 12px;
+  color: light-dark(#5f636c, #a1a4ad);
+}
+
+.assignee {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 8px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.due {
+  flex: none;
+  width: 46px;
+  font-size: 12px;
+  text-align: right;
+  color: light-dark(#6b6f78, #8f939c);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Past its due date: the date turns red */
+.overdue {
+  color: light-dark(#d1293d, #ff6b7a);
+}
+
+/* Context menu: floats over the list at the spot that was right-clicked */
+.menu {
+  position: absolute;
+  top: 30px;
+  left: min(340px, calc(100% - 250px));
+  z-index: 2;
+  width: 232px;
+  padding: 4px;
+  border: 1px solid light-dark(#e3e3e8, #2e2f35);
+  border-radius: 8px;
+  background: light-dark(#ffffff, #1f2024);
+  box-shadow:
+    0 2px 6px light-dark(rgb(16 17 20 / 0.06), rgb(0 0 0 / 0.3)),
+    0 12px 32px -8px light-dark(rgb(16 17 20 / 0.22), rgb(0 0 0 / 0.6));
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 30px;
+  padding: 0 6px 0 8px;
+  border-radius: 5px;
+}
+
+/* The item under the pointer is highlighted; the arrow keys move the same highlight */
+.menuItemActive {
+  background: light-dark(#f0f0f4, #2a2b31);
+}
+
+.menuIcon,
+.menuBars {
+  width: 15px;
+  height: 15px;
+  color: light-dark(#6b6f78, #8f939c);
+}
+
+.menuBars {
+  padding: 1px;
+}
+
+.menuSeparator {
+  display: block;
+  height: 1px;
+  margin: 4px -4px;
+  background: light-dark(#ededf1, #2a2b30);
+}
+
+.hint {
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px;
+  font-size: 12.5px;
+  color: light-dark(#6b6f78, #8f939c);
+}
+
+.hintText {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Medium widths: secondary details give way, so issue titles keep their room */
+@container (width < 960px) {
+  .avatarStack,
+  .labels,
+  .switcherLabel {
+    display: none;
+  }
+}
+
+/* The view tabs move to their own row under the breadcrumbs, which makes the pinned toolbar taller */
+@container (width < 760px) {
+  .main {
+    --top-h: 132px;
+  }
+
+  .header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 48px 39px;
+    grid-template-areas:
+      'crumbs end'
+      'tabs tabs';
+    gap: 0 12px;
+    height: auto;
+  }
+
+  .breadcrumbs {
+    grid-area: crumbs;
+  }
+
+  .tabs {
+    grid-area: tabs;
+    align-self: center;
+  }
+
+  .headerEnd {
+    grid-area: end;
+  }
+}
+
+/* Phone width: the sidebar hides behind a ☰ button and each row keeps only what fits */
+@container (width < 640px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar,
+  .due,
+  .addFilter,
+  .displayLabel,
+  .chipBars,
+  .miniAvatar {
+    display: none;
+  }
+
+  .header {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'menu crumbs end'
+      'tabs tabs tabs';
+    padding: 0 12px;
+  }
+
+  .menuButton {
+    display: grid;
+    grid-area: menu;
+  }
+
+  .filterBar {
+    padding: 0 12px;
+  }
+
+  .display {
+    padding: 0 6px;
+  }
+
+  .groupHeader {
+    padding: 0 12px 0 0;
+  }
+
+  .row {
+    padding: 0 12px 0 20px;
+  }
+
+  .menu {
+    right: 12px;
+    left: auto;
+    width: 216px;
+  }
+}

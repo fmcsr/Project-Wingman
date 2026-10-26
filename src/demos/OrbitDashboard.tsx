@@ -116,8 +116,8 @@ export function OrbitDashboard() {
               <svg className={styles.chart} viewBox="0 0 600 160" preserveAspectRatio="none" data-inspect="area-chart">
                 <defs>
                   <linearGradient id="orbit-area-fill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#6366f1" stopOpacity="0.28" />
-                    <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+                    <stop className={styles.stop} offset="0%" stopOpacity="0.28" />
+                    <stop className={styles.stop} offset="100%" stopOpacity="0" />
                   </linearGradient>
                 </defs>
                 {[40, 80, 120].map((y) => (

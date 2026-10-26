@@ -1,0 +1,893 @@
+/*
+ * Stream is dark by design, like most streaming services: it stays dark in both themes, so its colors are single
+ * values instead of light-dark() pairs. color-scheme: dark keeps anything the browser draws dark as well.
+ */
+.page {
+  container-type: inline-size;
+  color-scheme: dark;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #ffffff;
+  background: #0d0f14;
+}
+
+/* Row geometry: the container queries at the end change these, and every tile size is derived from them */
+.screen {
+  --pad: 48px;
+  --gap: 8px;
+  --per-row: 5;
+  --tile-w: calc((100cqi - 2 * var(--pad) - (var(--per-row) - 1) * var(--gap)) / var(--per-row));
+  --art-h: calc(var(--tile-w) * 9 / 16);
+  --brand: #ff3d57;
+  position: relative;
+}
+
+/* Resets sit in :where() (zero specificity), so any class below can override them */
+:where(.page svg) {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+:where(.page ul) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+}
+
+/* Navbar: no fill of its own, just a dark gradient that fades out, so the billboard shows through */
+.navbar {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: 68px;
+  padding: 0 var(--pad);
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.7) 10%, transparent);
+}
+
+.logo {
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.links {
+  display: flex;
+  gap: 20px;
+}
+
+.navLink {
+  font-size: 14px;
+  white-space: nowrap;
+  color: #e5e5e5;
+}
+
+/* The current section is set in bold white; the others stay regular and slightly dimmer */
+.navLink[aria-current='page'] {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.browse {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-left: auto;
+}
+
+.toolIcon,
+.bell {
+  display: grid;
+  place-items: center;
+}
+
+.bell {
+  position: relative;
+}
+
+/* Count badge: pinned to the bell's corner, with a ring in the page color that cuts it out of the icon */
+.count {
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  background: var(--brand);
+  box-shadow: 0 0 0 2px #0d0f14;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #2f80ed, #56ccf2);
+}
+
+.face {
+  width: 26px;
+  height: 26px;
+  stroke: #ffffff;
+  stroke-width: 2.2;
+}
+
+.face circle {
+  fill: #ffffff;
+  stroke: none;
+}
+
+/* Caret: a CSS triangle, one colored border on a box with no size */
+.caret {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 5px 0;
+  border-color: #ffffff transparent transparent;
+}
+
+/* Billboard: gradients stand in for the trailer still; the decorative layers sit behind the copy */
+.billboard {
+  position: relative;
+  height: clamp(460px, 50cqi, 640px);
+  overflow: hidden;
+  background:
+    radial-gradient(42% 60% at 82% 30%, rgb(56 140 255 / 0.32), transparent 70%),
+    radial-gradient(36% 50% at 58% 78%, rgb(255 61 87 / 0.22), transparent 70%),
+    linear-gradient(180deg, #071226, #04060c 70%);
+}
+
+.stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.4px 1.4px at 22px 30px, rgb(255 255 255 / 0.85), transparent),
+    radial-gradient(1px 1px at 96px 88px, rgb(255 255 255 / 0.6), transparent),
+    radial-gradient(1.2px 1.2px at 160px 18px, rgb(255 255 255 / 0.7), transparent),
+    radial-gradient(1px 1px at 58px 140px, rgb(255 255 255 / 0.5), transparent),
+    radial-gradient(1.6px 1.6px at 190px 120px, rgb(170 210 255 / 0.8), transparent);
+  background-size: 210px 170px;
+}
+
+.planet {
+  position: absolute;
+  top: 12%;
+  right: 7%;
+  width: min(44cqi, 540px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #3b78b8, #0d2a4d 45%, #050b16 75%);
+  box-shadow:
+    inset 18px 14px 40px rgb(140 200 255 / 0.25),
+    0 0 90px rgb(86 170 255 / 0.3);
+}
+
+/* A thin ring, tilted like an orbit */
+.planet::after {
+  content: '';
+  position: absolute;
+  inset: 41% -12%;
+  border: 2px solid rgb(180 220 255 / 0.3);
+  border-radius: 50%;
+  transform: rotate(-14deg);
+}
+
+/*
+ * Two vignettes keep the copy readable: a fade into the page at the bottom (listed first, so it's on top and
+ * ends exactly in the page color) and a darker left side.
+ */
+.vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 58%, rgb(13 15 20 / 0.75) 80%, #0d0f14),
+    linear-gradient(77deg, rgb(0 0 0 / 0.6), transparent 85%);
+}
+
+.billboardContent {
+  position: absolute;
+  bottom: 112px;
+  left: var(--pad);
+  z-index: 1;
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  width: min(40cqi, 520px);
+}
+
+.titleBlock {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+
+.original {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #d1d5db;
+}
+
+.originalMark {
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--brand);
+}
+
+/* Title treatment: the show's name set like a logo; the gradient is clipped to the letters */
+.titleTreatment {
+  display: grid;
+  font-weight: 900;
+  line-height: 0.88;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #ffffff 35%, #8fc8ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* drop-shadow follows the letter shapes; a text-shadow would paint over the clipped gradient */
+  filter: drop-shadow(0 4px 18px rgb(0 0 0 / 0.55));
+}
+
+.titleTop {
+  padding-left: 0.08em;
+  font-size: clamp(16px, 2.2cqi, 26px);
+  letter-spacing: 0.72em;
+}
+
+.titleMain {
+  font-size: clamp(44px, 8cqi, 96px);
+  letter-spacing: 0.04em;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #e5e5e5;
+}
+
+/* Maturity rating: an outlined box, so it reads as a label rather than a button */
+.rating {
+  display: inline-grid;
+  place-items: center;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px solid rgb(255 255 255 / 0.4);
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+/* Clamped to three lines; the rest is cut off with an ellipsis */
+.description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  max-width: 46ch;
+  font-size: clamp(15px, 1.45cqi, 18px);
+  line-height: 1.45;
+  color: #e5e5e5;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.6);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.play,
+.moreInfo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 22px 0 18px;
+  border-radius: 6px;
+  font-size: 17px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Play: solid white, the one action that matters most */
+.play {
+  color: #000000;
+  background: #ffffff;
+}
+
+/* More info: translucent gray, so the backdrop still shows through */
+.moreInfo {
+  color: #ffffff;
+  background: rgb(109 109 110 / 0.7);
+}
+
+.playIcon {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+  stroke: none;
+}
+
+.infoIcon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Mute toggle: an outlined circle on the right, lined up with the buttons */
+.mute {
+  position: absolute;
+  right: var(--pad);
+  bottom: 113px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgb(255 255 255 / 0.7);
+  border-radius: 50%;
+  color: #ffffff;
+  background: rgb(0 0 0 / 0.25);
+}
+
+.mute .icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* The rows start inside the billboard's faded bottom edge */
+.rows {
+  position: relative;
+  z-index: 1;
+  margin-top: -64px;
+}
+
+/*
+ * Genre chips stay on one line. The real product scrolls the extra ones sideways (overflow-x: auto); this picture
+ * clips them instead, because a scrolling box would become keyboard-focusable.
+ */
+.chips {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+  padding: 0 var(--pad);
+  overflow: hidden;
+}
+
+.chip {
+  flex: none;
+  padding: 7px 16px;
+  border: 1px solid rgb(255 255 255 / 0.28);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: #e5e5e5;
+  background: rgb(255 255 255 / 0.06);
+}
+
+.chip[aria-pressed='true'] {
+  border-color: #ffffff;
+  font-weight: 600;
+  color: #0d0f14;
+  background: #ffffff;
+}
+
+/* Rows of tiles */
+.row {
+  margin-bottom: 40px;
+}
+
+.rowTitle {
+  margin: 0 0 10px;
+  padding: 0 var(--pad);
+  font-size: clamp(16px, 1.7cqi, 20px);
+  font-weight: 700;
+  color: #e5e5e5;
+}
+
+.trackWrap {
+  position: relative;
+}
+
+/* Tiles run past the right edge; the row clips them, so the next one peeks in under the arrow */
+.track {
+  display: flex;
+  gap: var(--gap);
+  padding: 0 var(--pad);
+  overflow: hidden;
+}
+
+.tile {
+  flex: none;
+  width: var(--tile-w);
+}
+
+.art {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 6px;
+  background-color: #1f2330;
+}
+
+/* A soft shade at the bottom of every tile keeps its title readable */
+.art::before {
+  content: '';
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(transparent, rgb(0 0 0 / 0.55));
+}
+
+.artTitle {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  font-size: clamp(13px, 1.3cqi, 16px);
+  font-weight: 800;
+  line-height: 1.1;
+  text-shadow: 0 1px 6px rgb(0 0 0 / 0.7);
+}
+
+/* In resume tiles the title moves up to make room for the progress bar */
+.artTitleRaised {
+  bottom: 22px;
+}
+
+/* Progress bar: a thin track with a brand-colored fill as wide as the share already watched */
+.progress {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 8px 10px;
+}
+
+.progressTrack {
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.3);
+}
+
+.progressFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--brand);
+}
+
+.episode {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #a3a7b3;
+}
+
+/* Top 10: a big outlined numeral, with the poster overlapping its right edge */
+.rankWrap {
+  --art-h: calc(var(--tile-w) * 0.75);
+}
+
+.rankTile {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  width: var(--tile-w);
+  height: var(--art-h);
+}
+
+.rank {
+  flex: 1;
+  margin-right: -8%;
+  font-size: calc(var(--tile-w) * 0.92);
+  font-weight: 900;
+  line-height: 0.7;
+  letter-spacing: -0.08em;
+  text-align: right;
+  color: #0d0f14;
+  -webkit-text-stroke: 3px #5c616e;
+}
+
+.poster {
+  position: relative;
+  flex: none;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.poster::before {
+  content: '';
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(transparent, rgb(0 0 0 / 0.6));
+}
+
+.posterTitle {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  left: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-shadow: 0 1px 6px rgb(0 0 0 / 0.7);
+}
+
+/* Scroll arrow: a translucent strip over the row's right edge, as tall as the tiles */
+.rowArrow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: max(var(--pad), 28px);
+  height: var(--art-h);
+  border-radius: 6px 0 0 6px;
+  color: #ffffff;
+  background: rgb(13 15 20 / 0.55);
+}
+
+.rowChevron {
+  width: 30px;
+  height: 30px;
+  stroke-width: 2.4;
+}
+
+/* New-episode badge: a small solid label in the tile's corner */
+.newBadge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  background: var(--brand);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.4);
+}
+
+/*
+ * Hover card: drawn outside the clipped track (a sibling, position: absolute), so the row's overflow can't cut
+ * it off. It's 1.5× the tile's width and centered on the tile it grows out of.
+ */
+.hoverCard {
+  position: absolute;
+  top: calc(var(--art-h) * -0.25);
+  left: calc(var(--pad) + var(--tile-w) * 0.75 + var(--gap));
+  z-index: 2;
+  width: calc(var(--tile-w) * 1.5);
+  overflow: hidden;
+  border-radius: 8px;
+  background: #181a21;
+  box-shadow: 0 8px 28px rgb(0 0 0 / 0.75);
+}
+
+.cardArt {
+  border-radius: 0;
+}
+
+.cardInfo {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px 16px;
+}
+
+.cardActions {
+  display: flex;
+  gap: 8px;
+}
+
+.circle {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgb(255 255 255 / 0.5);
+  border-radius: 50%;
+  color: #ffffff;
+  background: rgb(42 42 42 / 0.6);
+}
+
+.circle .icon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.2;
+}
+
+.circlePlay {
+  border-color: #ffffff;
+  color: #000000;
+  background: #ffffff;
+}
+
+.circlePlayIcon {
+  width: 18px;
+  height: 18px;
+  margin-left: 2px;
+  fill: currentColor;
+  stroke: none;
+}
+
+.cardExpand {
+  margin-left: auto;
+}
+
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #bcbcbc;
+}
+
+.match {
+  font-weight: 700;
+  color: #46d369;
+}
+
+.hd {
+  padding: 0 4px;
+  border: 1px solid rgb(255 255 255 / 0.4);
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 16px;
+  color: #e5e5e5;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.tags li + li::before {
+  content: '•';
+  margin: 0 7px;
+  color: #646464;
+}
+
+/* Room under the last row for the open hover card */
+.lastRow {
+  margin-bottom: 0;
+  padding-bottom: calc(var(--art-h) * 0.25 + 150px);
+}
+
+/* Tile art: gradients standing in for key art */
+.artSignal {
+  background:
+    radial-gradient(circle at 72% 40%, #3b78b8 0 16%, transparent 17%),
+    radial-gradient(60% 80% at 75% 35%, rgb(56 140 255 / 0.45), transparent 70%),
+    linear-gradient(160deg, #0a1a33, #03060d);
+}
+
+.artOrchard {
+  background:
+    radial-gradient(70% 90% at 20% 100%, #2dd4bf, transparent 70%),
+    linear-gradient(135deg, #064e3b, #0f172a);
+}
+
+.artTide {
+  background: linear-gradient(180deg, #f97316, #fb7185 38%, #1e3a8a 62%, #0b1220);
+}
+
+.artLanterns {
+  background:
+    radial-gradient(circle at 30% 40%, #fbbf24 0 6%, transparent 7%),
+    radial-gradient(circle at 62% 28%, #f59e0b 0 5%, transparent 6%),
+    radial-gradient(circle at 82% 52%, #fb923c 0 4%, transparent 5%),
+    linear-gradient(160deg, #7f1d1d, #1c0a0a);
+}
+
+.artNorth {
+  background:
+    linear-gradient(160deg, transparent 58%, #0f172a 58.5%),
+    linear-gradient(180deg, #cbd5e1, #64748b 55%, #1e293b);
+}
+
+.artBloom {
+  background:
+    radial-gradient(60% 70% at 70% 30%, #e879f9, transparent 70%),
+    linear-gradient(135deg, #581c87, #1e1b4b);
+}
+
+.artIronbark {
+  background:
+    radial-gradient(50% 60% at 80% 20%, rgb(234 179 8 / 0.5), transparent 70%),
+    linear-gradient(135deg, #365314, #1c1917 70%);
+}
+
+.artQuiet {
+  background:
+    radial-gradient(circle at 70% 26%, #f8fafc 0 9%, transparent 10%),
+    linear-gradient(180deg, #475569, #0f172a);
+}
+
+.artVerdict {
+  background:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.06) 0 2px, transparent 2px 14px),
+    linear-gradient(135deg, #111827 40%, #b45309);
+}
+
+.artSalt {
+  background:
+    radial-gradient(80% 50% at 50% 100%, #0c4a6e, transparent 70%),
+    linear-gradient(200deg, #0ea5e9, #0c4a6e 60%, #082f49);
+}
+
+.artAfterglow {
+  background: linear-gradient(160deg, #f472b6, #fb923c 45%, #7c2d12);
+}
+
+.artHalflight {
+  background:
+    radial-gradient(50% 70% at 30% 30%, rgb(251 191 36 / 0.7), transparent 70%),
+    linear-gradient(135deg, #312e81, #0b0a1f);
+}
+
+.artCold {
+  background: linear-gradient(180deg, #a5f3fc, #0891b2 50%, #083344);
+}
+
+.artNinefold {
+  background:
+    radial-gradient(40% 60% at 75% 40%, rgb(244 114 182 / 0.6), transparent 70%),
+    linear-gradient(135deg, #4c1d95, #be185d);
+}
+
+.artSundial {
+  background:
+    radial-gradient(circle at 50% 115%, #fde047 0 34%, transparent 35%),
+    linear-gradient(180deg, #ea580c, #7c2d12);
+}
+
+.artWild {
+  background:
+    radial-gradient(50% 70% at 20% 30%, rgb(74 222 128 / 0.45), transparent 70%),
+    linear-gradient(135deg, #166534, #0f172a 70%);
+}
+
+/* Fewer tiles per row as the window narrows */
+@container (width < 1000px) {
+  .screen {
+    --per-row: 4;
+  }
+
+  .billboardContent {
+    width: min(52cqi, 520px);
+  }
+}
+
+/* The links fold into a Browse menu; the copy spans the billboard */
+@container (width < 760px) {
+  .screen {
+    --pad: 32px;
+    --per-row: 3;
+  }
+
+  .navbar {
+    gap: 20px;
+  }
+
+  .links {
+    display: none;
+  }
+
+  .browse {
+    display: flex;
+  }
+
+  .billboardContent {
+    right: var(--pad);
+    width: auto;
+  }
+
+  /* The chip row fades out at the edge, a hint that there's more to the right */
+  .chips {
+    -webkit-mask-image: linear-gradient(90deg, #000 80%, transparent);
+    mask-image: linear-gradient(90deg, #000 80%, transparent);
+  }
+}
+
+/* Small screens are mostly touch screens, where nothing hovers: no hover card */
+@container (width < 640px) {
+  .hoverCard {
+    display: none;
+  }
+
+  .lastRow {
+    padding-bottom: 8px;
+  }
+}
+
+@container (width < 520px) {
+  .screen {
+    --pad: 16px;
+    --per-row: 2;
+  }
+
+  .tools {
+    gap: 16px;
+  }
+
+  .profile .caret {
+    display: none;
+  }
+
+  .rowChevron {
+    width: 22px;
+    height: 22px;
+  }
+
+  .play,
+  .moreInfo {
+    height: 40px;
+    padding: 0 16px 0 14px;
+    font-size: 15px;
+  }
+
+  .mute {
+    bottom: 114px;
+    width: 36px;
+    height: 36px;
+  }
+}

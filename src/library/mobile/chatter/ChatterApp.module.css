@@ -1,0 +1,465 @@
+/*
+ * Chatter follows the page theme (light-dark pairs), in the iOS system font. A deep teal is the accent;
+ * blue is kept for read receipts and green for presence, so each color means one thing. The contact's
+ * orange avatar stays the same in both themes, like a photo would.
+ */
+.app {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.3;
+  color: light-dark(#111b21, #e9edef);
+  /* Chat wallpaper: a faint dot grid on a soft tint, so the bubbles have something to sit on */
+  background-color: light-dark(#e8edf0, #0c1317);
+  background-image: radial-gradient(circle, light-dark(rgb(17 27 33 / 0.07), rgb(233 237 239 / 0.05)) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+}
+
+.icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Status bar and header share one frosted bar, as on iOS; older messages scroll up underneath */
+.top {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  border-bottom: 1px solid light-dark(rgb(17 27 33 / 0.1), rgb(233 237 239 / 0.08));
+  background: light-dark(rgb(247 248 249 / 0.88), rgb(23 29 33 / 0.88));
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 50px;
+  padding: 0 6px 0 4px;
+}
+
+.back {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 34px;
+  color: light-dark(#0b7a75, #3cc6bd);
+}
+
+/* iOS draws its back chevron heavier than the other icons */
+.chevron {
+  stroke-width: 2.6;
+}
+
+/* Unread count: a pill that grows with the number */
+.unread {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: -3px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: light-dark(#fff, #04211f);
+  background: light-dark(#0b7a75, #3cc6bd);
+}
+
+.avatar {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #f97316, #c2410c);
+}
+
+/* Presence dot: a ring in the bar's color cuts it out of the avatar */
+.presence {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid light-dark(#f7f8f9, #171d21);
+  border-radius: 50%;
+  background: light-dark(#34c759, #30d158);
+}
+
+.contact {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.status {
+  font-size: 11.5px;
+  color: light-dark(#5f6f78, #8b9aa3);
+}
+
+.callButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: light-dark(#0b7a75, #3cc6bd);
+}
+
+/* The conversation is anchored to the composer: new messages arrive at the bottom and push older ones up */
+.thread {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 80px;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin: 0;
+  padding: 0 10px 12px;
+  overflow: hidden;
+  list-style: none;
+}
+
+/* Date divider: a floating pill that sticks just below the header while scrolling */
+.day {
+  position: sticky;
+  top: 104px;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  margin: 10px 0 4px;
+}
+
+.dayPill {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: light-dark(#54656f, #8b9aa3);
+  background: light-dark(rgb(255 255 255 / 0.92), rgb(31 42 48 / 0.92));
+  box-shadow: 0 1px 1px light-dark(rgb(11 20 26 / 0.08), rgb(0 0 0 / 0.3));
+}
+
+/* Bubbles: neutral on the left for them, accent-tinted on the right for you */
+.received,
+.sent {
+  position: relative;
+  max-width: 80%;
+  margin-top: 2px;
+  padding: 6px 8px 6px 9px;
+  border-radius: 10px;
+  box-shadow: 0 1px 0.5px light-dark(rgb(11 20 26 / 0.13), rgb(0 0 0 / 0.3));
+}
+
+.received {
+  align-self: flex-start;
+  background: light-dark(#fff, #1f2a30);
+}
+
+.sent {
+  align-self: flex-end;
+  background: light-dark(#d5f2ee, #0f4f49);
+}
+
+/* The first bubble in a row gets a tail: its top corner turns square and a small triangle sticks out */
+.first {
+  margin-top: 8px;
+}
+
+.first::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 13px;
+  background: inherit;
+}
+
+.received.first {
+  border-top-left-radius: 0;
+}
+
+.received.first::before {
+  left: -8px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+.sent.first {
+  border-top-right-radius: 0;
+}
+
+.sent.first::before {
+  right: -8px;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+/* Time (and receipt) float at the end of the last line; when that line is full, they drop below it */
+.meta {
+  float: right;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 5px -2px -5px 10px;
+  font-size: 10.5px;
+  line-height: 13px;
+  color: light-dark(rgb(17 27 33 / 0.6), rgb(233 237 239 / 0.6));
+}
+
+.receipt {
+  fill: none;
+  stroke: light-dark(#0a84ff, #53bdeb);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Reaction: a chip hanging off the bubble's bottom edge, on the side away from the time */
+.reacted {
+  margin-bottom: 14px;
+}
+
+.reaction {
+  position: absolute;
+  bottom: -16px;
+  left: 8px;
+  display: grid;
+  place-items: center;
+  height: 22px;
+  padding: 0 5px;
+  border: 2px solid light-dark(#e8edf0, #0c1317);
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1;
+  background: light-dark(#fff, #233038);
+  box-shadow: 0 1px 2px light-dark(rgb(11 20 26 / 0.12), rgb(0 0 0 / 0.4));
+}
+
+/* Reply: the quote sits inset at the top of the bubble, the answer below it */
+.reply {
+  padding: 4px;
+}
+
+.quote {
+  display: grid;
+  margin-bottom: 3px;
+  padding: 4px 8px 5px;
+  border-left: 3px solid light-dark(#ea580c, #fb923c);
+  border-radius: 6px;
+  background: light-dark(rgb(17 27 33 / 0.06), rgb(0 0 0 / 0.22));
+}
+
+/* The quoted name takes the sender's color, the same orange as her avatar */
+.quoteName {
+  font-size: 12px;
+  font-weight: 600;
+  color: light-dark(#c2410c, #fb923c);
+}
+
+.quoteText {
+  overflow: hidden;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: light-dark(rgb(17 27 33 / 0.7), rgb(233 237 239 / 0.7));
+}
+
+.replyText {
+  display: block;
+  padding: 0 4px 2px 5px;
+}
+
+/* Voice message: play button, waveform, then length and time underneath */
+.voice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px 5px 7px;
+}
+
+.play {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: light-dark(#fff, #04211f);
+  background: light-dark(#0b7a75, #3cc6bd);
+}
+
+/* Nudged right: a triangle looks off-center when its box is centered */
+.playIcon {
+  margin-left: 2px;
+  fill: currentColor;
+}
+
+.track {
+  display: grid;
+  gap: 2px;
+}
+
+.wave {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 24px;
+}
+
+.bar,
+.barPlayed {
+  flex: none;
+  width: 3px;
+  border-radius: 999px;
+  background: light-dark(#b8c3c9, #51606a);
+}
+
+.barPlayed {
+  background: light-dark(#0b7a75, #3cc6bd);
+}
+
+/* Playhead: overlaps its neighbors without taking up space in the row */
+.playhead {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin: 0 -6px;
+  border-radius: 50%;
+  background: light-dark(#0b7a75, #3cc6bd);
+}
+
+.voiceMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  line-height: 13px;
+  color: light-dark(rgb(17 27 33 / 0.6), rgb(233 237 239 / 0.6));
+}
+
+/* Typing indicator: three dots rise and brighten one after another */
+.typing {
+  display: flex;
+  gap: 4px;
+  padding: 10px 12px;
+}
+
+.typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: light-dark(#8a979e, #8b9aa3);
+  animation: typing 1.2s ease-in-out infinite;
+}
+
+.typing span:nth-child(2) {
+  animation-delay: 160ms;
+}
+
+.typing span:nth-child(3) {
+  animation-delay: 320ms;
+}
+
+/* Holds still while the example is inspected */
+.typing[data-paused] span {
+  animation-play-state: paused;
+}
+
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typing span {
+    animation: none;
+  }
+}
+
+/* Composer: pinned to the bottom; the deep bottom padding keeps it clear of the home indicator */
+.composer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 37px;
+  border-top: 1px solid light-dark(rgb(17 27 33 / 0.1), rgb(233 237 239 / 0.08));
+  color: light-dark(#0b7a75, #3cc6bd);
+  background: light-dark(#f7f8f9, #171d21);
+}
+
+.composer > svg {
+  flex: none;
+}
+
+.field {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  height: 34px;
+  padding: 0 8px 0 12px;
+  border: 1px solid light-dark(#dde2e5, #2c3840);
+  border-radius: 17px;
+  background: light-dark(#fff, #222c32);
+}
+
+.placeholder {
+  font-size: 14px;
+  color: light-dark(#74838b, #75848c);
+}
+
+.sticker {
+  flex: none;
+  color: light-dark(#74838b, #75848c);
+}
+
+.homeIndicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  z-index: 3;
+  width: 112px;
+  height: 5px;
+  border-radius: 999px;
+  background: light-dark(#000, #fff);
+  transform: translateX(-50%);
+}

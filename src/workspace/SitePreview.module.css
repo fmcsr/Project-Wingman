@@ -1,0 +1,15 @@
+.preview {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: var(--color-surface);
+}
+
+/* The site at its design size (1280 × 800), shrunk to the card's width from the top left */
+.page {
+  width: 1280px;
+  height: 800px;
+  overflow: hidden;
+  transform-origin: top left;
+  pointer-events: none;
+}

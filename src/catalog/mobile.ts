@@ -1,23 +1,9 @@
+import { homeIndicator, statusBar } from './shared';
 import type { UiElementSpec } from './types';
 
 /** Elements in the Wave mobile app. `value` fields are the actual values from WaveApp.module.css. */
 export const mobile: UiElementSpec[] = [
-  {
-    id: 'status-bar',
-    name: 'Status bar',
-    variant: 'iOS',
-    summary:
-      'The thin strip at the very top with the time, signal, and battery. It belongs to the phone, not the app.',
-    aliases: ['top bar', 'the clock and battery'],
-    concepts: [
-      {
-        kind: 'behavior',
-        term: 'Safe area',
-        value: 'env(safe-area-inset-top)',
-        plain: "The space reserved for the status bar and camera cutout, so the app's content isn't hidden under them.",
-      },
-    ],
-  },
+  statusBar,
   {
     id: 'large-title',
     name: 'Large title',
@@ -72,7 +58,7 @@ export const mobile: UiElementSpec[] = [
         kind: 'appearance',
         term: 'Selected chip',
         value: 'inverted colors',
-        plain: 'The active chip switches to a dark fill so you know which filter is on.',
+        plain: 'The active chip flips its colors (dark on light, light on dark) so you know which filter is on.',
       },
       {
         kind: 'behavior',
@@ -167,19 +153,5 @@ export const mobile: UiElementSpec[] = [
       },
     ],
   },
-  {
-    id: 'home-indicator',
-    name: 'Home indicator',
-    variant: 'iOS',
-    summary: 'The thin bar at the bottom of the screen. Swipe up on it to go home or switch apps.',
-    aliases: ['home bar', 'the line at the bottom'],
-    concepts: [
-      {
-        kind: 'behavior',
-        term: 'System gesture',
-        value: 'swipe up',
-        plain: "A gesture owned by the phone itself — apps shouldn't put their own controls right on top of it.",
-      },
-    ],
-  },
+  homeIndicator,
 ];

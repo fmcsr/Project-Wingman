@@ -1,5 +1,7 @@
 import type { CSSProperties, HTMLAttributes, Ref } from 'react';
+import { valueFor } from '../catalog';
 import type { ConceptKind, UiElementSpec } from '../catalog';
+import { useTheme } from '../theme';
 import type { AnchorPosition } from './useAnchorPosition';
 import type { InspectMode } from './useInspectSurface';
 import styles from './Explainer.module.css';
@@ -28,6 +30,8 @@ type ExplainerProps = Pick<
 export function Explainer({ ref, id, spec, mode, position, onClose, ...handlers }: ExplainerProps) {
   const titleId = `${id}title`;
   const pinned = mode === 'pinned';
+  // The example sites follow the page theme, so color values are shown for the theme in use
+  const theme = useTheme();
   const style = position
     ? ({ top: position.top, left: position.left, '--arrow-x': `${position.arrowX}px` } as CSSProperties)
     : undefined;
@@ -90,7 +94,11 @@ export function Explainer({ ref, id, spec, mode, position, onClose, ...handlers 
                       <li key={concept.term} className={styles.concept}>
                         <div className={styles.termRow}>
                           <code className={styles.term}>{concept.term}</code>{' '}
-                          {concept.value && <code className={styles.value}>{concept.value}</code>}
+                          {concept.value && (
+                            <code className={styles.value}>
+                              {valueFor(concept.value, theme)}
+                            </code>
+                          )}
                         </div>
                         <p className={styles.plain}>{concept.plain}</p>
                       </li>

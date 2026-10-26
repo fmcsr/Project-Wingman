@@ -1,12 +1,12 @@
-/* The example app stays light in every theme; it uses the system font to look like iOS. */
+/* The example app follows the page theme with iOS's light and dark system colors, in the iOS system font. */
 .app {
   position: relative;
   height: 100%;
   overflow: hidden;
   font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
   font-size: 14px;
-  color: #000;
-  background: #f2f2f7;
+  color: light-dark(#000, #fff);
+  background: light-dark(#f2f2f7, #000);
 }
 
 .app svg {
@@ -48,8 +48,8 @@
   border-radius: 50%;
   font-size: 12px;
   font-weight: 700;
-  color: #1d4ed8;
-  background: #dbeafe;
+  color: light-dark(#1d4ed8, #93c5fd);
+  background: light-dark(#dbeafe, rgb(10 132 255 / 0.22));
 }
 
 /* Daily goal card and progress ring */
@@ -60,7 +60,7 @@
   margin: 14px 14px 0;
   padding: 12px 14px;
   border-radius: 18px;
-  background: #fff;
+  background: light-dark(#fff, #1c1c1e);
 }
 
 .ring {
@@ -76,7 +76,7 @@
 }
 
 .app .ringTrack {
-  stroke: #e5e5ea;
+  stroke: light-dark(#e5e5ea, #2c2c2e);
 }
 
 .app .ringValue {
@@ -87,7 +87,7 @@
 }
 
 .app .ringLabel {
-  fill: #000;
+  fill: light-dark(#000, #fff);
   stroke: none;
   font-size: 13px;
   font-weight: 700;
@@ -115,8 +115,9 @@
   display: flex;
   gap: 8px;
   margin: 12px 14px 0;
-  overflow-x: auto;
-  scrollbar-width: none;
+  /* A still picture: it clips the row. A real app scrolls it (overflow-x: auto, as the balloon says); a scrollable
+     row would also become keyboard-focusable inside the example. clip, unlike hidden, isn't a scroll container */
+  overflow: clip;
 }
 
 .chip,
@@ -129,12 +130,12 @@
 }
 
 .chip {
-  background: #fff;
+  background: light-dark(#fff, #1c1c1e);
 }
 
 .chipActive {
-  color: #fff;
-  background: #000;
+  color: light-dark(#fff, #000);
+  background: light-dark(#000, #fff);
 }
 
 /* List */
@@ -153,7 +154,7 @@
   overflow: hidden;
   border-radius: 14px;
   list-style: none;
-  background: #fff;
+  background: light-dark(#fff, #1c1c1e);
 }
 
 .row {
@@ -173,7 +174,7 @@
   bottom: 0;
   left: 60px;
   height: 1px;
-  background: #e5e5ea;
+  background: light-dark(#e5e5ea, #38383a);
 }
 
 .rowIcon {
@@ -210,11 +211,11 @@
   width: 44px;
   height: 26px;
   border-radius: 999px;
-  background: #e5e5ea;
+  background: light-dark(#e5e5ea, #39393d);
 }
 
 .switchOn {
-  background: #34c759;
+  background: light-dark(#34c759, #30d158);
 }
 
 .thumb {
@@ -258,8 +259,8 @@
   grid-template-columns: repeat(4, 1fr);
   height: 80px;
   padding-top: 8px;
-  border-top: 1px solid #d1d1d6;
-  background: rgb(249 249 249 / 0.94);
+  border-top: 1px solid light-dark(#d1d1d6, #38383a);
+  background: light-dark(rgb(249 249 249 / 0.94), rgb(22 22 24 / 0.94));
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
 }
@@ -287,6 +288,6 @@
   width: 112px;
   height: 5px;
   border-radius: 999px;
-  background: #000;
+  background: light-dark(#000, #fff);
   transform: translateX(-50%);
 }
