@@ -1,11 +1,13 @@
 import styles from './BrandMark.module.css';
 
-/** Project Wingman logo: a "W" mark that changes color with the theme. */
+/**
+ * Project Wingman logo: two square brackets facing each other, empty inside. It's the site's `[ ]` label motif
+ * (as in `[ PROJECT WINGMAN ]`) turned into a mark. Follows the text color.
+ */
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <svg className={className ? `${styles.mark} ${className}` : styles.mark} viewBox="0 0 32 32" aria-hidden="true">
-      <rect width="32" height="32" rx="8" />
-      <path d="M8 10l3.5 12L16 13l4.5 9L24 10" />
+    <svg className={className ? `${styles.mark} ${className}` : styles.mark} viewBox="0 0 18 22" aria-hidden="true">
+      <path d="M6 1H1v20h5M12 1h5v20h-5" />
     </svg>
   );
 }
