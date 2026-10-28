@@ -17,7 +17,7 @@ balloons show the values for the theme you're in.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/inspect-dark.png">
-  <img alt="The Acme example pinned in its scroll scene, with the frosted-glass navbar's explanation open" src="docs/screenshots/inspect-light.png">
+  <img alt="The Acme example pinned in its scroll scene: its product screenshot passes under the frosted-glass navbar, whose explanation is open" src="docs/screenshots/inspect-light.png">
 </picture>
 
 Three mobile apps side by side, with a preview of Muse's Liquid Glass navbar:
