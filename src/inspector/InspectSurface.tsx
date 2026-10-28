@@ -86,6 +86,8 @@ type InspectSurfaceProps = {
   fill?: boolean;
   /** Descriptions of the elements this example marks with `data-inspect`. */
   specs: readonly UiElementSpec[];
+  /** A control for the pinned balloon, given the element it shows (the library's Add to brief). */
+  renderAction?: (spec: UiElementSpec) => ReactNode;
   children: ReactNode;
 };
 
@@ -94,7 +96,7 @@ type InspectSurfaceProps = {
  * inspectable: hovering shows its name, a short dwell its summary, and a click its full explanation.
  * The demo is visual only; for screen readers the example is conveyed by a single focus stop and a live region.
  */
-export function InspectSurface({ label, onCount, fill = false, specs, children }: InspectSurfaceProps) {
+export function InspectSurface({ label, onCount, fill = false, specs, renderAction, children }: InspectSurfaceProps) {
   const id = useId();
   const hintId = `${id}hint`;
   const layer = useInspectorLayer();
@@ -183,6 +185,7 @@ export function InspectSurface({ label, onCount, fill = false, specs, children }
             mode={mode}
             position={position}
             onClose={closeFromPanel}
+            action={mode === 'pinned' ? renderAction?.(spec) : undefined}
             {...panelProps}
           />,
           layer,

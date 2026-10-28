@@ -1,6 +1,8 @@
 import type { User } from '../auth/session';
 import { signOut } from '../auth/session';
 import { BrandMark } from '../brand/BrandMark';
+import { BriefPage } from '../brief/BriefPage';
+import { useBriefItems } from '../brief/briefStore';
 import { ThemeToggle } from '../landing/ThemeToggle';
 import { findExample } from '../library';
 import { Link, navigate, Redirect } from '../router';
@@ -10,15 +12,19 @@ import styles from './Workspace.module.css';
 
 type WorkspaceProps = {
   user: User;
-  /** Path segments after /app: the library tab and, optionally, an example id. */
+  /** Path segments after /app: the library tab (or `brief`) and, optionally, an example id. */
   platform?: string;
   exampleId?: string;
 };
 
-/** The signed-in area: the library at /app/mobile and /app/web, and each example at /app/<platform>/<id>. */
+/**
+ * The signed-in area: the library at /app/mobile and /app/web, each example at /app/<platform>/<id>, and the
+ * brief at /app/brief.
+ */
 export function Workspace({ user, platform, exampleId }: WorkspaceProps) {
-  if (platform !== 'mobile' && platform !== 'web') return <Redirect to="/app/mobile" />;
-  const example = exampleId ? findExample(platform, exampleId) : undefined;
+  const briefCount = useBriefItems().length;
+  if (platform !== 'mobile' && platform !== 'web' && platform !== 'brief') return <Redirect to="/app/mobile" />;
+  const example = platform !== 'brief' && exampleId ? findExample(platform, exampleId) : undefined;
   if (exampleId && !example) return <Redirect to={`/app/${platform}`} />;
 
   const leave = () => {
@@ -32,9 +38,22 @@ export function Workspace({ user, platform, exampleId }: WorkspaceProps) {
         <div className={`container ${styles.headerInner}`}>
           <Link className={styles.brand} href="/" aria-label="Project Wingman, home">
             <BrandMark />
-            <span>Project Wingman</span>
+            <span className={styles.brandName}>Project Wingman</span>
           </Link>
           <div className={styles.actions}>
+            <Link
+              href="/app/brief"
+              className={styles.briefLink}
+              aria-current={platform === 'brief' ? 'page' : undefined}
+            >
+              Brief
+              {briefCount > 0 && (
+                <span className={styles.briefCount}>
+                  {briefCount}
+                  <span className="sr-only"> {briefCount === 1 ? 'element' : 'elements'}</span>
+                </span>
+              )}
+            </Link>
             <ThemeToggle />
             <span className={styles.user}>
               <span className={styles.avatar} aria-hidden="true">
@@ -59,7 +78,13 @@ export function Workspace({ user, platform, exampleId }: WorkspaceProps) {
             </p>
           </div>
         )}
-        {example ? <ExamplePage key={example.id} example={example} /> : <Library platform={platform} />}
+        {platform === 'brief' ? (
+          <BriefPage />
+        ) : example ? (
+          <ExamplePage key={example.id} example={example} />
+        ) : (
+          <Library platform={platform} />
+        )}
       </main>
     </div>
   );

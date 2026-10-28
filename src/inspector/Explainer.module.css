@@ -244,6 +244,10 @@
   color: var(--balloon-body);
 }
 
+.action {
+  margin-top: 16px;
+}
+
 .hint {
   margin-top: 12px;
   padding-top: 10px;

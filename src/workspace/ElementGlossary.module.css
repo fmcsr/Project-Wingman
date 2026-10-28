@@ -33,6 +33,15 @@
   background: var(--color-surface);
 }
 
+/* The name on the left, Add to brief on the right; on a narrow card the button drops below */
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px 12px;
+}
+
 .name {
   display: flex;
   flex-wrap: wrap;

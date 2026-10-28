@@ -38,6 +38,44 @@
   gap: 10px;
 }
 
+/* The brief goes along on every page, with the number of elements in it */
+.briefLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--color-text);
+  background: var(--color-fill-secondary);
+  transition: background-color 150ms;
+}
+
+.briefLink:has(.briefCount) {
+  padding-right: 6px;
+}
+
+.briefLink:hover,
+.briefLink[aria-current='page'] {
+  background: var(--color-fill-secondary-hover);
+}
+
+.briefCount {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+}
+
 .user {
   display: inline-flex;
   align-items: center;
@@ -96,9 +134,10 @@
   color: var(--color-text-subtle);
 }
 
-/* On a phone the avatar alone stands for the user */
+/* On a phone the avatar alone stands for the user, and the mark alone for the product */
 @media (max-width: 479px) {
-  .userName {
+  .userName,
+  .brandName {
     display: none;
   }
 }

@@ -1,0 +1,402 @@
+.page {
+  padding-block: 32px 96px;
+}
+
+.header {
+  max-width: 760px;
+  margin-top: 24px;
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.title {
+  margin-top: 12px;
+  font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+}
+
+.muted {
+  color: var(--color-text-faint);
+}
+
+.lead {
+  max-width: 60ch;
+  margin-top: 12px;
+  color: var(--color-text-muted);
+}
+
+/* Editor on the left, the Markdown on the right; stacked on narrow screens */
+.layout {
+  display: grid;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+@media (min-width: 960px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 32px;
+  }
+
+  /* The Markdown stays in view while the list scrolls (64px header + 24px gap) */
+  .preview {
+    position: sticky;
+    top: 88px;
+  }
+
+  .code {
+    max-height: calc(100vh - 88px - 120px);
+    max-height: calc(100svh - 88px - 120px);
+  }
+}
+
+.editor {
+  display: grid;
+  gap: 32px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 28px;
+  letter-spacing: -0.025em;
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-subtle);
+}
+
+/* Fields: as on the sign-in form, the field's own border takes the focus ring */
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+  resize: vertical;
+  field-sizing: content;
+  transition:
+    border-color 150ms,
+    box-shadow 150ms;
+}
+
+.textarea::placeholder {
+  color: var(--color-text-faint);
+}
+
+.textarea:hover {
+  border-color: var(--color-text-subtle);
+}
+
+.textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus) 25%, transparent);
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--color-text-subtle);
+}
+
+.listHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.textButton {
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 14px;
+  color: var(--color-text-subtle);
+  background: none;
+  cursor: pointer;
+}
+
+.textButton:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.danger,
+.danger:hover {
+  font-weight: 500;
+  color: var(--color-danger);
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: grid;
+  gap: 8px;
+  padding: 16px 16px 18px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.itemHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.index {
+  padding-top: 3px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-subtle);
+}
+
+.itemTitle {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemName {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* The tag is a learning moment, as in the glossary */
+.tag {
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+}
+
+.itemMeta {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--color-text-subtle);
+}
+
+.itemMeta a {
+  color: var(--color-text-muted);
+  text-underline-offset: 3px;
+}
+
+.itemMeta a:hover {
+  color: var(--color-text);
+}
+
+.itemActions {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  margin: -4px -6px 0 0;
+}
+
+.iconButton {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--color-text-subtle);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color 150ms,
+    color 150ms;
+}
+
+.iconButton svg,
+.primary svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.iconButton:hover:not(:disabled) {
+  color: var(--color-text);
+  background: var(--color-fill-secondary);
+}
+
+.iconButton:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.noteLabel {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.noteLabel span {
+  margin-left: 4px;
+  font-weight: 400;
+  color: var(--color-text-subtle);
+}
+
+.preview {
+  display: grid;
+  gap: 12px;
+}
+
+.previewHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.previewActions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Pills, like the site's buttons */
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-full);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.primary {
+  min-width: 112px;
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+}
+
+.primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.secondary {
+  color: var(--color-text);
+  background: var(--color-fill-secondary);
+}
+
+.secondary:hover {
+  background: var(--color-fill-secondary-hover);
+}
+
+/* The Markdown as it will be pasted: wrapped, never scrolled sideways */
+.code {
+  max-height: 560px;
+  margin: 0;
+  padding: 18px 20px;
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
+}
+
+.status {
+  min-height: 20px;
+  font-size: 13px;
+  color: var(--color-text-subtle);
+}
+
+.empty {
+  max-width: 560px;
+  margin-top: 40px;
+  padding: 28px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+}
+
+.emptyTitle {
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: -0.025em;
+}
+
+.emptyText {
+  margin-top: 8px;
+  color: var(--color-text-muted);
+}
+
+.emptyText strong {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.emptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
