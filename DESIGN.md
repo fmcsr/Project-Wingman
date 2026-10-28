@@ -1,6 +1,6 @@
 # Project Wingman — Design decisions
 
-Last updated: 2026-10-26 · Status: Applied to the landing page
+Last updated: 2026-10-28 · Status: Applied to the landing page
 
 ## Decisions
 
@@ -18,6 +18,7 @@ Last updated: 2026-10-26 · Status: Applied to the landing page
 | Inspection model | Like “Inspect element” in browser developer tools | Nearly every element can explain itself, and adding a new one takes a single `data-inspect` attribute. |
 | Pages and routing | `/` landing page, `/sign-in`, `/sign-up`, `/app` (signed-in workspace). A tiny router on the History API instead of a library | Four routes don't justify a dependency; links stay real `<a href>` elements, so opening in a new tab works. |
 | Auth | No backend yet. The session lives in `localStorage`; the sign-in functions already have the shape a real provider will need | The pages won't change when a provider (Supabase, Firebase, Clerk…) is connected. Until then, a development-only account opens the workspace. |
+| Brief | The elements a user picks become Markdown for AI coding tools, put together from the element descriptions; no LLM yet. Kept in `localStorage` | The descriptions already hold the terms, values and behaviors a coding tool needs, so the brief works today without a backend. Writing it from a plain description (the LLM step) comes later. |
 | Scrolling in the example sites | No scrolling inside the frames. As on Apple's product pages, the window pins and page scrolling scrolls the site inside it | Nested scrolling (a window that scrolls inside the page) trapped the cursor and made the page harder to use. |
 
 ## Page structure (information architecture)
@@ -31,7 +32,7 @@ Hero          [ PROJECT WINGMAN ] · “Every PM needs a wingman.” · See exam
 Footer        Text links · Back to top
 ```
 
-Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the plans' buttons lead here) and the signed-in library: `/app/mobile`, `/app/web` and one page per example at `/app/<platform>/<id>`. Once signed in, Sign in becomes Workspace in the header and the footer. Under the landing page's examples, “Explore the library” leads in.
+Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the plans' buttons lead here) and the signed-in library: `/app/mobile`, `/app/web` and one page per example at `/app/<platform>/<id>`, plus the brief at `/app/brief`. Once signed in, Sign in becomes Workspace in the header and the footer. Under the landing page's examples, “Explore the library” leads in.
 
 - **The header isn't a bar, but it's sticky:** Fully transparent at the top of the page; as you scroll down it takes on a borderless frosted-glass background. Links go to sections, the logo goes back to the top, and the link of the section in view gets darker. Sections stop below the header thanks to `scroll-margin-top`.
 - **Footer:** Not a bar; text links sitting on the page background.
@@ -65,13 +66,23 @@ In the scaled-down phones and in windows settling into place, the outline and th
 - **Example page:** the example at full size and all of its elements written out as a glossary: name, tag, variant, summary, “also called”, and each concept with its term and value (for the theme in use). Phones stay in view on the left while the list scrolls; sites use the scroll scene, with the glossary below. Previous/next links walk through the tab.
 - The library loads separately from the landing page, so the public page stays light.
 
+## Brief
+
+- **Collecting:** Every element in the library can go into the brief: **Add to brief** sits at the bottom of the pinned balloon (in the library only, not on the landing page) and on every glossary entry. It's a gray pill that fills in as “Added to brief”; pressing it again takes the element out. The app header's Brief link shows how many elements are in.
+- **The page:** The editor on the left: what you're building, then the elements in order, each with an optional note, arrows to reorder, a remove button and a “Clear brief” that asks first. The Markdown on the right stays in view while the list scrolls, with Copy brief and Download .md. On phones the two stack.
+- **The Markdown:** Written for an AI coding tool, in English:
+  - The goal, then one instruction: match the look and behavior, and use the project's own components and design tokens where they exist.
+  - Each element: name, HTML tag, variant, summary, what people also call it, then its Look and Behavior terms with the example's values. A color that differs by theme gives both values. The user's note follows.
+  - Acceptance criteria: each behavior, each note, and a line on light and dark mode when colors differ.
+- **Storage:** The brief lives in `localStorage` (`pw-brief`) and follows along in other tabs. Items point at an element of an example rather than copying it, so descriptions stay current; items whose element no longer exists drop out. It moves to the account once there's a backend.
+
 ## Sign-in and sign-up
 
 - **Layout:** A minimal header (logo and theme toggle), the hero's line art faint behind, and the form in a 400 px card. The card opens like a landing section: a mono `[ SIGN IN ]` label, a large light heading (“Welcome back.”), a muted lead.
 - **Fields:** 46 px tall with 12 px corners. On focus the field's own border turns signal green with a soft ring. An error appears under the field in `--color-danger` and is read out by screen readers. Passwords have a show/hide button.
 - **Buttons:** The main action is the primary pill. “Continue with Google” follows Google's button colors: white, a `#747775` border and `#1F1F1F` text in light mode; `#131314`, `#8E918F` and `#E3E3E3` in dark mode. It uses the four-color G, in our pill shape (Roboto 500 is Google's own button font).
 - **Messages:** A form-level message is neutral when something isn't connected yet (Google, sign-ups) and red when the input was wrong (email and password don't match).
-- **Workspace:** Unlike the landing page, the app header is a bar (hairline border, frosted glass): it frames a working area rather than a story. The avatar shows the user's initial.
+- **Workspace:** Unlike the landing page, the app header is a bar (hairline border, frosted glass): it frames a working area rather than a story. The Brief link with its count comes first among the actions, and the avatar shows the user's initial. On phones the product's name and the user's name hide, leaving the mark and the avatar.
 - **Dev account (development builds only):** A dashed note under the sign-in card with the credentials and a “Fill in” shortcut, and a dashed banner in the workspace. Both disappear from production builds and are removed before launch.
 
 ## Mobile demos

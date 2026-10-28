@@ -6,8 +6,8 @@
 </picture>
 
 **The PM's best friend for design.** Project Wingman teaches product managers and founders the real names behind
-interface elements. Next, it will turn everyday descriptions like “the top menu with the blurry background” into clear
-design briefs that AI coding tools such as Claude Code and Cursor understand.
+interface elements, and turns the ones you pick into a design brief that AI coding tools such as Claude Code and Cursor
+understand. Next, it will write that brief from everyday descriptions like “the top menu with the blurry background”.
 
 ## A look inside
 
@@ -27,7 +27,7 @@ Three mobile apps side by side, with a preview of Muse's Liquid Glass navbar:
   <img alt="The Wave, Muse and Stride phone examples in one row, with a balloon describing the Liquid Glass navbar" src="docs/screenshots/phones-light.png">
 </picture>
 
-## Current status: landing page, sign-in and the library
+## Current status: landing page, sign-in, the library and the brief
 
 An English landing page with a sticky header (with a theme toggle), a hero, examples, feature cards, pricing and a
 footer. The examples section has five projects (a marketing site, an analytics dashboard and three mobile apps), and
@@ -40,8 +40,13 @@ Airbnb, Stripe, Linear and others). Phones can be inspected right in the grid; e
 (“bottom sheet”, “toast”). There's no auth backend yet: email and password sign-in only works with the development
 account below, and Google sign-in and sign-ups show a “not connected yet” message.
 
+Any element in the library can go into a brief: choose **Add to brief** in its pinned explanation or in the example's
+element list. The brief page (`/app/brief`) adds what you're building and a note per element, and turns it all into
+Markdown to copy or download: each element's look and behavior with the terms and values to use, followed by acceptance
+criteria. The brief is put together from the element descriptions (no LLM yet) and kept in the browser.
+
 Out of scope for now (later phases): a real auth backend, payments and subscriptions (plan prices are placeholders),
-and a real LLM integration.
+and a real LLM integration (writing the brief from a plain description).
 
 ## Before going live
 
@@ -84,6 +89,7 @@ src/
   landing/     Landing page sections: header, theme toggle, hero, examples, feature cards, pricing, footer
   auth/        Sign-in and sign-up pages, the session store (no backend yet) and the dev account
   workspace/   The signed-in area: the library's tabs, search and grids, and each example's page with its glossary
+  brief/       The brief: its store (in localStorage), the Markdown writer, the Add to brief button and the brief page
   library/     The library: types, the registry, and one folder per example (mobile/<id>, web/<id>)
   demos/       The landing page's five examples: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ StatusBar)
   catalog/     Element descriptions (English, typed data) for those five, plus elements every phone shares
