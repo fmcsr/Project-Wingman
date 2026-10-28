@@ -1,3 +1,4 @@
+import { AddToBrief } from '../brief/AddToBrief';
 import { InspectSurface } from '../inspector/InspectSurface';
 import { InspectorLayerHost } from '../inspector/InspectorLayer';
 import { examplesFor } from '../library';
@@ -26,6 +27,7 @@ export function ExamplePage({ example }: { example: LibraryExample }) {
       label={`${example.name} ${example.kind.toLowerCase()}`}
       specs={example.specs}
       fill={example.platform === 'mobile'}
+      renderAction={(spec) => <AddToBrief example={example} specId={spec.id} tone="balloon" />}
     >
       <Component />
     </InspectSurface>
@@ -52,14 +54,14 @@ export function ExamplePage({ example }: { example: LibraryExample }) {
           {example.platform === 'web' ? (
             <div className={styles.webLayout}>
               <BrowserFrame url={example.url ?? `${example.id}.app`}>{surface}</BrowserFrame>
-              <ElementGlossary name={example.name} specs={example.specs} />
+              <ElementGlossary example={example} />
             </div>
           ) : (
             <div className={styles.mobileLayout}>
               <div className={styles.phoneColumn}>
                 <FitPhone>{surface}</FitPhone>
               </div>
-              <ElementGlossary name={example.name} specs={example.specs} />
+              <ElementGlossary example={example} />
             </div>
           )}
         </InspectorLayerHost>

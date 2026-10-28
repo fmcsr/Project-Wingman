@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AddToBrief } from '../brief/AddToBrief';
 import { InspectSurface } from '../inspector/InspectSurface';
 import { InspectorLayerHost } from '../inspector/InspectorLayer';
 import { examplesFor, matchesQuery } from '../library';
@@ -150,7 +151,12 @@ function MobileCard({ example }: { example: LibraryExample }) {
         <span className={styles.count}>{example.specs.length} elements</span>
       </div>
       <FitPhone>
-        <InspectSurface label={`${example.name} ${example.kind.toLowerCase()}`} specs={example.specs} fill>
+        <InspectSurface
+          label={`${example.name} ${example.kind.toLowerCase()}`}
+          specs={example.specs}
+          fill
+          renderAction={(spec) => <AddToBrief example={example} specId={spec.id} tone="balloon" />}
+        >
           <Component />
         </InspectSurface>
       </FitPhone>

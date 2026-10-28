@@ -1,20 +1,19 @@
+import { useId } from 'react';
+import { AddToBrief } from '../brief/AddToBrief';
 import { valueFor } from '../catalog';
-import type { UiElementSpec } from '../catalog';
+import type { LibraryExample } from '../library';
 import { useTheme } from '../theme';
 import styles from './ElementGlossary.module.css';
 
-type ElementGlossaryProps = {
-  /** The example's name, e.g. "Tempo". */
-  name: string;
-  specs: readonly UiElementSpec[];
-};
-
 /**
  * Every element of an example written out, in the order it appears: what it is, what people call it, and the
- * terms and values to brief a coding tool with. Color values follow the theme in use, like the balloons.
+ * terms and values to brief a coding tool with. Each one can go into the brief. Color values follow the theme
+ * in use, like the balloons.
  */
-export function ElementGlossary({ name, specs }: ElementGlossaryProps) {
+export function ElementGlossary({ example }: { example: LibraryExample }) {
+  const id = useId();
   const theme = useTheme();
+  const { name, specs } = example;
 
   return (
     <section className={styles.section} aria-labelledby="glossary-title">
@@ -25,12 +24,15 @@ export function ElementGlossary({ name, specs }: ElementGlossaryProps) {
       <ol className={styles.list}>
         {specs.map((spec) => (
           <li key={spec.id} className={styles.entry}>
-            <div>
-              <h3 className={styles.name}>
-                {spec.name}
-                {spec.htmlTag && <code className={styles.tag}>{spec.htmlTag}</code>}
-              </h3>
-              {spec.variant && <p className={styles.variant}>{spec.variant}</p>}
+            <div className={styles.head}>
+              <div>
+                <h3 id={`${id}${spec.id}`} className={styles.name}>
+                  {spec.name}
+                  {spec.htmlTag && <code className={styles.tag}>{spec.htmlTag}</code>}
+                </h3>
+                {spec.variant && <p className={styles.variant}>{spec.variant}</p>}
+              </div>
+              <AddToBrief example={example} specId={spec.id} describedBy={`${id}${spec.id}`} />
             </div>
             <p className={styles.summary}>{spec.summary}</p>
             {spec.aliases.length > 0 && (

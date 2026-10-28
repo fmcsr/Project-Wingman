@@ -1,0 +1,70 @@
+/* A small pill: a gray button on the page, an outlined one on the balloon; filled once the element is in */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px 0 11px;
+  border: 0;
+  border-radius: var(--radius-full);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 150ms,
+    color 150ms;
+}
+
+.button svg {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.button[data-tone='page'] {
+  color: var(--color-text);
+  background: var(--color-fill-secondary);
+}
+
+.button[data-tone='page']:hover {
+  background: var(--color-fill-secondary-hover);
+}
+
+.button[data-tone='page'][data-added] {
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+}
+
+.button[data-tone='page'][data-added]:hover {
+  background: var(--color-primary-hover);
+}
+
+.button[data-tone='balloon'] {
+  color: var(--balloon-text);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--balloon-line-strong);
+}
+
+.button[data-tone='balloon']:hover {
+  background: rgb(255 255 255 / 0.08);
+}
+
+.button[data-tone='balloon'][data-added] {
+  color: var(--balloon-bg);
+  background: var(--balloon-text);
+  box-shadow: none;
+}
+
+.button[data-tone='balloon'][data-added]:hover {
+  background: var(--balloon-body);
+}
+
+.button[data-tone='balloon']:focus-visible {
+  outline: 2px solid var(--balloon-focus);
+  outline-offset: 2px;
+}

@@ -1,4 +1,4 @@
-import type { CSSProperties, HTMLAttributes, Ref } from 'react';
+import type { CSSProperties, HTMLAttributes, ReactNode, Ref } from 'react';
 import { valueFor } from '../catalog';
 import type { ConceptKind, UiElementSpec } from '../catalog';
 import { useTheme } from '../theme';
@@ -21,13 +21,15 @@ type ExplainerProps = Pick<
   mode: InspectMode;
   position: AnchorPosition | null;
   onClose: () => void;
+  /** A control at the bottom of the pinned balloon, such as the library's Add to brief. */
+  action?: ReactNode;
 };
 
 /**
  * Explainer balloon. In preview, a short summary and term chips; once pinned, everyday names
  * and plain-language explanations of the concepts ("hover: learn its name, click: understand it").
  */
-export function Explainer({ ref, id, spec, mode, position, onClose, ...handlers }: ExplainerProps) {
+export function Explainer({ ref, id, spec, mode, position, onClose, action, ...handlers }: ExplainerProps) {
   const titleId = `${id}title`;
   const pinned = mode === 'pinned';
   // The example sites follow the page theme, so color values are shown for the theme in use
@@ -118,6 +120,8 @@ export function Explainer({ ref, id, spec, mode, position, onClose, ...handlers 
           ))}
         </ul>
       )}
+
+      {pinned && action && <div className={styles.action}>{action}</div>}
 
       <p className={styles.hint}>
         {pinned ? (

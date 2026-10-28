@@ -8,7 +8,7 @@ import { Redirect, usePath, useScrollOnNavigate } from './router';
 // The signed-in area carries the whole library, so it loads separately and the landing page stays light
 const Workspace = lazy(() => import('./workspace/Workspace').then((module) => ({ default: module.Workspace })));
 
-/** Pages: the landing page, sign-in and sign-up, and the signed-in library under /app. */
+/** Pages: the landing page, sign-in and sign-up, and the signed-in library and brief under /app. */
 export function App() {
   const path = usePath();
   const user = useUser();
