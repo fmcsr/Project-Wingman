@@ -119,6 +119,12 @@ export const dashboard: UiElementSpec[] = [
         value: 'font-variant-numeric: tabular-nums',
         plain: "Every digit takes the same width, so numbers line up and don't jiggle when they update.",
       },
+      {
+        kind: 'behavior',
+        term: 'Comparison period',
+        value: 'vs last week',
+        plain: 'A short note says what the change is measured against, so “+12%” has a meaning.',
+      },
     ],
   },
   {
@@ -159,9 +165,16 @@ export const dashboard: UiElementSpec[] = [
       },
       {
         kind: 'appearance',
-        term: 'Gridlines',
-        value: 'stroke-dasharray: 4 4',
-        plain: 'Faint dashed lines help the eye estimate values without adding noise.',
+        term: 'Axes and gridlines',
+        value: 'stroke-dasharray: 4 4 · $0–$45k',
+        plain:
+          'Values up the side, dates along the bottom and faint dashed lines give the curve a scale, so you can read real numbers off it.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Data point label',
+        value: '$48.2k',
+        plain: 'The latest value gets a dot and a small label, the way a tooltip shows it when you hover a point.',
       },
     ],
   },

@@ -21,7 +21,7 @@ export const marketing: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Translucent background',
-        value: { light: 'rgb(255 255 255 / 0.6)', dark: 'rgb(15 23 42 / 0.6)' },
+        value: { light: 'rgb(255 255 255 / 0.6)', dark: 'rgb(10 10 10 / 0.6)' },
         plain: 'A 60% opaque background, so the colors behind it softly show through.',
       },
       {
@@ -48,13 +48,13 @@ export const marketing: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Logomark',
-        value: '26 × 26px',
+        value: '24 × 24px',
         plain: "The standalone symbol. It works where the name doesn't fit, like favicons and app icons.",
       },
       {
         kind: 'appearance',
         term: 'Wordmark',
-        value: 'font-weight: 700',
+        value: 'font-weight: 650',
         plain: 'The brand name set in type. Mark and wordmark together form the full logo, often called a lockup.',
       },
     ],
@@ -82,30 +82,31 @@ export const marketing: UiElementSpec[] = [
     ],
   },
   {
-    id: 'button-gradient',
-    name: 'Gradient button',
+    id: 'button-cta',
+    name: 'CTA button',
     htmlTag: '<a>',
-    variant: 'Pill · Call to action',
-    summary: 'The most important action in the bar, styled to stand out with a color blend and a soft glow.',
-    aliases: ['CTA', 'the colorful button'],
+    variant: 'Pill · In the navbar',
+    summary:
+      'The most important action on the site, repeated in the navbar so it stays one click away while you scroll.',
+    aliases: ['call to action', 'the blue button', 'Start free button'],
     concepts: [
       {
         kind: 'appearance',
-        term: 'linear-gradient',
-        value: '(135deg, #6366f1, #ec4899)',
-        plain: 'Blends colors along a straight line — here from indigo to pink, at a 135° angle.',
-      },
-      {
-        kind: 'appearance',
-        term: 'box-shadow',
-        value: '0 6px 16px -6px',
-        plain: "A blurred shadow in the button's own color lifts it off the page, like a glow.",
+        term: 'Brand color',
+        value: { light: 'background: #2f54eb', dark: 'background: #3b5bdb' },
+        plain: "The only button filled with the brand's color, so the eye lands here first.",
       },
       {
         kind: 'appearance',
         term: 'Pill shape',
         value: 'border-radius: 999px',
         plain: 'A huge corner radius turns any rectangle into a pill with fully rounded ends.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Always in reach',
+        value: 'inside the sticky navbar',
+        plain: 'Because it lives in the pinned bar, it never scrolls out of view.',
       },
     ],
   },
@@ -146,8 +147,14 @@ export const marketing: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Hairline border',
-        value: { light: '1px solid rgb(15 23 42 / 0.08)', dark: '1px solid rgb(255 255 255 / 0.12)' },
+        value: { light: '1px solid #e5e5e5', dark: '1px solid #262626' },
         plain: 'A barely visible outline separates it from the background without shouting.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Tag inside',
+        value: '“New”',
+        plain: 'A tinted chip at the start says what kind of news it is before you read the rest.',
       },
     ],
   },
@@ -162,13 +169,13 @@ export const marketing: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Fluid type',
-        value: 'clamp(28px, 5.4cqi, 46px)',
-        plain: 'The size grows with its container but never drops below 28px or goes above 46px.',
+        value: 'clamp(30px, 5.2cqi, 54px)',
+        plain: 'The size grows with its container but never drops below 30px or goes above 54px.',
       },
       {
         kind: 'appearance',
         term: 'Negative letter-spacing',
-        value: '-0.03em',
+        value: '-0.04em',
         plain: 'Tightens large text slightly so it reads as one confident shape.',
       },
       {
@@ -189,7 +196,7 @@ export const marketing: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Solid fill',
-        value: { light: 'background: #0f172a', dark: 'background: #f8fafc' },
+        value: { light: 'background: #0a0a0a', dark: 'background: #ededed' },
         plain: 'A solid fill in the strongest contrast to the page (dark in light mode, light in dark mode).',
       },
       {
@@ -203,21 +210,55 @@ export const marketing: UiElementSpec[] = [
   {
     id: 'button-secondary',
     name: 'Secondary button',
-    variant: 'Outlined',
+    variant: 'Outlined · With icon',
     summary: 'An alternative action next to the primary one. It is available, but quieter.',
-    aliases: ['outline button', 'ghost button', 'the white button'],
+    aliases: ['outline button', 'ghost button', 'the bordered button'],
     concepts: [
       {
         kind: 'appearance',
         term: 'Outline',
-        value: { light: '1px solid rgb(15 23 42 / 0.12)', dark: '1px solid rgb(255 255 255 / 0.16)' },
+        value: { light: '1px solid #e5e5e5', dark: '1px solid #262626' },
         plain: 'A thin border on the page color instead of a solid fill.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Leading icon',
+        value: '▶ 14px',
+        plain: 'A small play icon before the label says what happens: a video starts.',
       },
       {
         kind: 'behavior',
         term: 'Lower emphasis',
         value: 'secondary',
-        plain: "It sits beside the primary action without competing with it.",
+        plain: 'It sits beside the primary action without competing with it.',
+      },
+    ],
+  },
+  {
+    id: 'product-shot',
+    name: 'Product screenshot',
+    variant: 'Hero visual',
+    summary:
+      'A picture of the product itself, right under the headline. Seeing the real screen explains what it does faster than any illustration.',
+    aliases: ['hero image', 'app preview', 'the screenshot'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'Window frame',
+        value: '1px border · 12px radius',
+        plain: 'A hairline border and rounded corners make it read as an app window sitting on the page.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Elevation',
+        value: 'box-shadow: 0 24px 48px -12px',
+        plain: 'A large, faint shadow lifts it off the page, like a sheet of paper hovering above the desk.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Real UI, real data',
+        value: 'the roadmap view',
+        plain: 'It shows an actual screen with believable content instead of abstract shapes, so visitors see the product at work.',
       },
     ],
   },
@@ -231,8 +272,8 @@ export const marketing: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Muted logos',
-        value: { light: 'color: #94a3b8', dark: 'color: #64748b' },
-        plain: 'The logos are grayed out so they support the page instead of pulling attention.',
+        value: { light: 'color: #a3a3a3', dark: 'color: #6b6b6b' },
+        plain: 'Every logo is shown in the same gray, so they support the page instead of pulling attention.',
       },
       {
         kind: 'behavior',
@@ -247,25 +288,25 @@ export const marketing: UiElementSpec[] = [
     name: 'Card',
     htmlTag: '<article>',
     variant: 'Feature card',
-    summary: 'A container that groups an image, a title, and a short description into one unit.',
+    summary: 'A container that groups a picture, a title and a short description into one unit.',
     aliases: ['tile', 'box', 'feature block'],
     concepts: [
       {
         kind: 'appearance',
         term: 'Border and radius',
-        value: '1px border · 16px radius',
+        value: '1px border · 14px radius',
         plain: "A hairline border and rounded corners define the card's edges without heavy shadows.",
       },
       {
         kind: 'appearance',
-        term: 'Thumbnail',
-        value: 'linear-gradient(135deg, …)',
-        plain: 'A colorful header area gives each card its own identity.',
+        term: 'Feature preview',
+        value: 'a slice of the real UI',
+        plain: 'The picture on top is a small piece of the feature itself, so it shows what you get instead of decorating.',
       },
       {
         kind: 'behavior',
         term: 'Grid layout',
-        value: 'repeat(3, 1fr)',
+        value: 'repeat(3, minmax(0, 1fr))',
         plain: 'Cards sit in three equal columns and stack into one on narrow screens.',
       },
     ],
@@ -273,21 +314,21 @@ export const marketing: UiElementSpec[] = [
   {
     id: 'cta-banner',
     name: 'CTA banner',
-    variant: 'Gradient section',
-    summary: 'A bold strip near the end of the page that repeats the main call to action.',
-    aliases: ['call-to-action section', 'the colorful box at the bottom'],
+    variant: 'Inverted section',
+    summary: 'A bold block near the end of the page that repeats the main call to action.',
+    aliases: ['call-to-action section', 'the dark box at the bottom'],
     concepts: [
       {
         kind: 'appearance',
-        term: 'linear-gradient',
-        value: '(120deg, #4f46e5, #db2777)',
-        plain: 'A diagonal blend from indigo to pink fills the whole banner.',
+        term: 'Inverted colors',
+        value: { light: 'background: #0a0a0a', dark: 'background: #171717' },
+        plain: "The page's colors flip for this one block, so the closing call to action can't be missed.",
       },
       {
         kind: 'behavior',
         term: 'Flex wrap',
         value: 'justify-content: space-between',
-        plain: 'Text sits on the left and the button on the right; on narrow screens the button drops below.',
+        plain: 'Text sits on the left and the buttons on the right; on narrow screens the buttons drop below.',
       },
     ],
   },
