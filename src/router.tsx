@@ -28,7 +28,7 @@ export function navigate(to: string, { replace = false } = {}) {
 type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
 
 /**
- * A link that navigates inside the app for paths like `/sign-in`. In-page anchors (`#pricing`), external links
+ * A link that navigates inside the app for paths like `/sign-in`. In-page anchors (`#support`), external links
  * and modified clicks (new tab, download) keep the browser's default behavior.
  */
 export function Link({ href, onClick, ...props }: LinkProps) {
