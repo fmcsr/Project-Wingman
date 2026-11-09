@@ -12,8 +12,8 @@ understand. Next, it will write that brief from everyday descriptions like “th
 ## A look inside
 
 Hover anything in the examples to learn what it's called. Click to pin the full explanation: how it looks, how it
-behaves, and the exact CSS behind it. The examples switch to dark mode with the page (Muse is dark by design), and the
-balloons show the values for the theme you're in.
+behaves, and the exact CSS behind it. The examples switch to dark mode with the page (products that are dark by design
+stay dark), and the balloons show the values for the theme you're in.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/inspect-dark.png">
@@ -35,9 +35,9 @@ nearly every element shows its name on hover, a summary after a short pause and 
 
 Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to the library (`/app/mobile`, `/app/web`): mobile apps and
 websites in two tabs, each a fictional product built from the patterns of well-known ones (“inspired by” Spotify,
-Airbnb, Stripe, Linear and others). Phones can be inspected right in the grid; every example also has its own page
-(`/app/<platform>/<id>`) with all of its elements written out. A search finds examples by name or by element
-(“bottom sheet”, “toast”). There's no auth backend yet: email and password sign-in only works with the development
+Airbnb, Stripe, Notion, Figma, TikTok and others). Phones can be inspected right in the grid; every example also has
+its own page (`/app/<platform>/<id>`) with all of its elements written out. A search finds examples by name or by
+element (“bottom sheet”, “toast”). There's no auth backend yet: email and password sign-in only works with the development
 account below, and Google sign-in and sign-ups show a “not connected yet” message.
 
 Any element in the library can go into a brief: choose **Add to brief** in its pinned explanation or in the example's
@@ -122,6 +122,11 @@ src/library/<mobile|web>/<id>/
   `homeIndicator` specs from `src/catalog`. **Web** sets `container-type: inline-size` and works from about 340 px to
   1150 px wide; it can be taller than the window.
 - **Names are fictional;** real products go in `inspiredBy`.
+- **Same design type, our own identity:** follow one familiar product's real screen closely (layout, type scale, color
+  scheme, component shapes) so people recognize it, with our own name, logo, accent hue, copy and data. No real logos,
+  mascots or brand marks.
+- **Real photos:** anything that stands for a photo (avatars, video frames, food, places) is a free-license Unsplash
+  photo, stored in the example's `photos/` folder and listed in its `CREDITS.md`.
 
 ## Adding a UI element
 
