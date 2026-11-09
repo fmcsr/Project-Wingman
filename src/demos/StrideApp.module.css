@@ -1,253 +1,244 @@
-/* The example app follows the page theme (light-dark pairs), in the iOS system font. */
+/*
+ * Stride's product page follows the Nike app's: a plain page in one type family, a full-width product photo on a pale
+ * gray studio backdrop, then the name, price, photo swatches, a size grid and two pill buttons stacked full width.
+ * Color comes from the photos. The one accent, a cobalt blue, marks the saving and the Stride mark.
+ * The chrome follows the page theme (light-dark pairs). The photo is content and looks the same in both themes, so
+ * the page dots drawn on it stay dark in both.
+ */
 .app {
+  --text: light-dark(#111111, #ffffff);
+  --text-secondary: light-dark(#707072, #9e9ea0);
+  --line: light-dark(#e5e5e5, #3a3a3c);
+  --outline: light-dark(#cacacb, #545456);
+  --sold-out-fill: light-dark(#f5f5f5, #1c1c1e);
+  --sold-out-text: light-dark(#bdbdbf, #5a5a5e);
+  --accent: light-dark(#1f4fd8, #7d9cff);
+  --backdrop: #f3f3f3;
+
   position: relative;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   overflow: hidden;
   font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
-  font-size: 14px;
-  color: light-dark(#111, #f5f5f7);
-  background: light-dark(#fff, #1c1c1e);
+  font-size: 11.5px;
+  line-height: 1.3;
+  color: var(--text);
+  background: light-dark(#fff, #000);
 }
 
 .icon {
   fill: none;
   stroke: currentColor;
-  stroke-width: 2;
+  stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-/* Photo gallery */
+.statusBar {
+  flex: none;
+}
+
+/* Navigation bar: Back on the left, the product name in the middle, Share and Search on the right */
+.navBar {
+  display: grid;
+  flex: none;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: 34px;
+  padding: 0 10px 0 12px;
+}
+
+.back {
+  display: grid;
+  justify-self: start;
+  place-items: center;
+  width: 24px;
+  height: 28px;
+}
+
+.navTitle {
+  max-width: 150px;
+  overflow: hidden;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.navActions {
+  display: flex;
+  justify-self: end;
+  gap: 4px;
+}
+
+.navIcon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 28px;
+}
+
+/* Image carousel: the first of four photos, edge to edge */
 .gallery {
   position: relative;
-  display: grid;
-  place-items: center;
-  height: 272px;
-  padding-top: 30px;
-  background: radial-gradient(120% 90% at 50% 30%, light-dark(#ffe9dc, #3d2a24), light-dark(#ffd1bd, #241814));
+  flex: none;
+  height: 196px;
+  background: var(--backdrop);
 }
 
-.shoe {
-  width: 228px;
-  height: auto;
-  transform: rotate(-8deg);
+.photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.counter {
-  position: absolute;
-  right: 14px;
-  bottom: 32px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-  background: light-dark(rgb(255 255 255 / 0.7), rgb(0 0 0 / 0.45));
-}
-
-/* Pagination dots: the active one stretches into a small pill */
-.dots {
-  position: absolute;
-  bottom: 36px;
-  left: 50%;
-  display: flex;
-  gap: 5px;
-  transform: translateX(-50%);
-}
-
-.dot,
-.dotActive {
-  height: 6px;
-  border-radius: 999px;
-}
-
-.dot {
-  width: 6px;
-  background: light-dark(rgb(0 0 0 / 0.25), rgb(255 255 255 / 0.3));
-}
-
-.dotActive {
-  width: 16px;
-  background: light-dark(#111, #fff);
-}
-
-.statusBar {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 3;
-}
-
-/* Round buttons floating over the photo */
-.topBar {
-  position: absolute;
-  top: 48px;
-  right: 14px;
-  left: 14px;
-  z-index: 3;
-  display: flex;
-  justify-content: space-between;
-}
-
-.topActions {
-  display: flex;
-  gap: 8px;
-}
-
-.roundButton {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: light-dark(rgb(255 255 255 / 0.85), rgb(44 44 46 / 0.85));
-  box-shadow: 0 2px 8px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.3));
-}
-
-.heart {
-  fill: #ef4444;
-  stroke: none;
-}
-
-/* Count badge: a small pill pinned to the icon's corner */
+/* Badge pinned to the photo's corner, with the Stride mark in front of the words */
 .badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  display: grid;
-  place-items: center;
-  min-width: 18px;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   height: 18px;
-  padding: 0 5px;
-  border: 2px solid light-dark(#fff, #2c2c2e);
+  padding: 0 7px 0 4px;
   border-radius: 999px;
-  font-size: 10px;
-  font-weight: 700;
-  color: #fff;
-  background: #ef4444;
-}
-
-/* Product details: a rounded-corner panel that overlaps the photo */
-.details {
-  position: relative;
-  z-index: 1;
-  margin-top: -20px;
-  padding: 18px 18px 0;
-  border-radius: 24px 24px 0 0;
+  font-size: 9.5px;
+  font-weight: 500;
   background: light-dark(#fff, #1c1c1e);
 }
 
-.titleRow {
+.mark {
+  display: block;
+  flex: none;
+  fill: var(--accent);
+}
+
+/* Page indicator: same-size dots, the current photo's in solid black */
+.dots {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 7px;
+  transform: translateX(-50%);
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgb(17 17 17 / 0.22);
+}
+
+.dotActive {
+  background: #111;
+}
+
+/* Everything under the photo shares one 17px margin */
+.info {
+  padding: 10px 17px 0;
 }
 
 .title {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.01em;
 }
 
-.discount {
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #fff;
-  background: #e11d48;
-}
-
-.subtitle {
-  margin-top: 2px;
-  font-size: 13px;
-  color: light-dark(#6b7280, #a1a1aa);
-}
-
-.rating {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  margin-top: 6px;
-}
-
-.defs {
-  position: absolute;
-}
-
-.star {
-  width: 14px;
-  height: 14px;
-}
-
-/* The unfilled part of the partial star */
-.starEmpty {
-  stop-color: light-dark(#e5e7eb, #3f3f46);
-}
-
-.score {
-  margin-left: 6px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.reviews {
-  margin-left: 4px;
-  font-size: 12px;
-  color: light-dark(#6b7280, #a1a1aa);
+.category {
+  font-size: 11.5px;
+  line-height: 15px;
 }
 
 .price {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.now {
-  font-size: 22px;
-  font-weight: 700;
+  gap: 6px;
+  margin-top: 4px;
+  font-weight: 500;
+  line-height: 16px;
 }
 
 .was {
-  font-size: 14px;
-  color: light-dark(#9ca3af, #71717a);
+  font-weight: 400;
+  color: var(--text-secondary);
   text-decoration: line-through;
 }
 
-.label {
-  margin-top: 10px;
-  font-size: 12px;
-  font-weight: 600;
-  color: light-dark(#6b7280, #a1a1aa);
+.off {
+  color: var(--accent);
 }
 
+/* Color picker: photos of the other colorways, the selected one outlined */
 .swatches {
-  display: flex;
-  gap: 10px;
-  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-top: 9px;
 }
 
 .swatch {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  /* A faint rim keeps dark swatches (Black) visible on the dark panel */
-  box-shadow: inset 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.2));
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  background: var(--backdrop);
 }
 
-.swatchSelected {
-  box-shadow:
-    0 0 0 2px light-dark(#fff, #1c1c1e),
-    0 0 0 4px light-dark(#111, #fff);
+.swatch img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
 }
 
+/* Selected: in light, a dark ring right on the photo's edge. In dark, a white ring right on the light photo would
+   disappear into it, so the ring stands 2px off the photo instead */
+.swatchSelected::before,
+.swatchSelected::after {
+  content: '';
+  position: absolute;
+  border: 1px solid transparent;
+}
+
+.swatchSelected::before {
+  inset: -1px;
+  border-color: light-dark(#111, transparent);
+  border-radius: 5px;
+}
+
+.swatchSelected::after {
+  inset: -3px;
+  border-color: light-dark(transparent, #fff);
+  border-radius: 7px;
+}
+
+/* Size grid: a label and a link, then six columns of sizes */
 .sizes {
+  margin-top: 12px;
+}
+
+.sizeHeader {
   display: flex;
-  gap: 6px;
-  margin-top: 8px;
+  align-items: baseline;
+  justify-content: space-between;
+  font-weight: 500;
+  line-height: 14px;
+}
+
+.sizeGuide {
+  color: var(--text-secondary);
+}
+
+.sizeGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5px;
+  margin-top: 7px;
 }
 
 .size,
@@ -255,137 +246,53 @@
 .sizeSoldOut {
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 34px;
-  border: 1px solid light-dark(#e5e7eb, #3f3f46);
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 11px;
 }
 
 .sizeSelected {
-  border-color: light-dark(#111, #fff);
-  color: light-dark(#fff, #111);
-  background: light-dark(#111, #fff);
+  border-color: var(--text);
 }
 
-/* Sold-out size: visible but struck through */
+/* Sold out: still in its place, filled gray with a faded number */
 .sizeSoldOut {
-  border-style: dashed;
-  color: light-dark(#c4c4c4, #52525b);
-  text-decoration: line-through;
-  background: light-dark(#fafafa, #232326);
+  border-color: var(--sold-out-fill);
+  color: var(--sold-out-text);
+  background: var(--sold-out-fill);
 }
 
-/* Toast: slides in from below and disappears the same way */
-.toast {
-  position: absolute;
-  right: 14px;
-  bottom: 96px;
-  left: 14px;
-  z-index: 4;
+/* The two actions, stacked: a solid pill for the main one, an outlined pill under it */
+.addToBag,
+.favorite {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-size: 13px;
+  justify-content: center;
+  height: 38px;
+  border-radius: 999px;
   font-weight: 500;
-  color: #fff;
-  background: light-dark(#111, #3a3a3c);
-  box-shadow: 0 10px 24px rgb(0 0 0 / 0.2);
-  transform: translateY(16px);
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    opacity 250ms ease,
-    visibility 0s linear 250ms;
 }
 
-.toast[data-visible] {
-  transform: translateY(0);
-  opacity: 1;
-  visibility: visible;
-  transition-delay: 0s;
-}
-
-.toastIcon {
-  flex: none;
-  color: #4ade80;
-}
-
-.toastAction {
-  margin-left: auto;
-  font-weight: 600;
-  color: #93c5fd;
-}
-
-/* Sticky buy bar: always within thumb reach */
-.buyBar {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 84px;
-  padding: 10px 14px 26px;
-  border-top: 1px solid light-dark(#f0f0f0, #2c2c2e);
-  background: light-dark(rgb(255 255 255 / 0.9), rgb(28 28 30 / 0.9));
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-}
-
-.stepper {
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: 2px;
-  padding: 3px;
-  border: 1px solid light-dark(#e5e7eb, #3f3f46);
-  border-radius: 999px;
-}
-
-.stepButton {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 18px;
-  background: light-dark(#f5f5f5, #2c2c2e);
-}
-
-.qty {
-  width: 22px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.addButton {
-  display: grid;
-  flex: 1;
-  place-items: center;
-  height: 46px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
+.addToBag {
+  margin-top: 12px;
   color: light-dark(#fff, #111);
-  background: light-dark(#111, #fff);
+  background: var(--text);
+}
+
+.favorite {
+  gap: 4px;
+  margin-top: 6px;
+  border: 1px solid var(--outline);
 }
 
 .homeIndicator {
   position: absolute;
   bottom: 8px;
   left: 50%;
-  z-index: 5;
   width: 112px;
   height: 5px;
   border-radius: 999px;
-  background: light-dark(#111, #fff);
+  background: var(--text);
   transform: translateX(-50%);
 }

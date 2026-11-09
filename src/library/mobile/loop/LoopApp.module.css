@@ -1,18 +1,32 @@
 /*
- * Loop follows the page theme (light-dark pairs) on a plain white or black canvas, in the iOS system font.
- * The photos, the story gradient and the red and blue brand colors stay the same in both themes.
+ * Loop follows the page theme like the feed it is modeled on: a plain white or black canvas, near-black or near-white
+ * type in the iOS system font, gray for secondary text and hairlines. Color comes from the photos and from one brand
+ * hue, jade, used sparingly: the story rings (a lime-to-jade sweep), the liked heart, the active page dot and the
+ * badges. Photos and the brand colors look the same in both themes.
  */
 .app {
+  --page: light-dark(#fff, #000);
+  --ink: light-dark(#0c1014, #f5f5f5);
+  --ink-2: light-dark(#737373, #a8a8a8);
+  --line: light-dark(#dbdbdb, #262626);
+  --seen: light-dark(#c7c7c7, #3d3d3d);
+  --dot-off: light-dark(#d4d4d4, #4a4a4a);
+  --accent: #00a67e;
+  --on-accent: #fff;
+  /* The story ring: lime in the lower left sweeping to jade in the upper right and back */
+  --ring: conic-gradient(from 210deg, #b5e853, #00a67e 50%, #b5e853);
+
   position: relative;
   height: 100%;
   overflow: hidden;
   font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
-  font-size: 13px;
-  line-height: 1.3;
-  color: light-dark(#0c1014, #f5f5f5);
-  background: light-dark(#fff, #000);
+  font-size: 10px;
+  line-height: 13px;
+  color: var(--ink);
+  background: var(--page);
 }
 
+/* Outline icons on a 24px grid with round, fairly thin strokes */
 .icon {
   fill: none;
   stroke: currentColor;
@@ -21,76 +35,100 @@
   stroke-linejoin: round;
 }
 
-/* App bar: the wordmark on the left, activity and messages on the right */
-.appBar {
+.glyph {
+  fill: currentColor;
+}
+
+/* Top bar: the wordmark on the left, activity and messages on the right */
+.topBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 40px;
-  padding: 0 10px 0 14px;
+  height: 36px;
+  padding: 0 5px 0 12px;
 }
 
-/* Wordmark: the name set in type, heavy and tightly spaced */
-.wordmark {
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.06em;
-}
-
-.appActions {
+.brand {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 3px;
+  height: 30px;
 }
 
-.headerIcon {
+/* Wordmark: the name drawn in thick round strokes, so it renders the same everywhere */
+.wordmark {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3.3;
+  stroke-linecap: round;
+}
+
+/* The chevron says the wordmark opens a menu (which feed to show) */
+.chevron {
+  display: block;
+  margin-top: 3px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Icon buttons: a 30px touch target around a 20px icon */
+.topButton {
   position: relative;
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
 }
 
-/* Dot badge: says "something's new" without a number; the border cuts it out of the icon */
-.newDot {
+/* Dot badge: "something's new", no number; the ring in the page color cuts it out of the heart */
+.dot {
   position: absolute;
   top: 5px;
-  right: 3px;
-  width: 12px;
-  height: 12px;
-  border: 2px solid light-dark(#fff, #000);
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--page);
   border-radius: 50%;
-  background: #ff3040;
+  background: var(--accent);
 }
 
 /* Count badge: a pill that grows with the number */
-.count {
+.badge {
   position: absolute;
-  top: 0;
-  right: -3px;
-  display: grid;
-  place-items: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 4px;
-  border: 2px solid light-dark(#fff, #000);
+  top: -1px;
+  right: -2px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border: 1.5px solid var(--page);
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 700;
-  line-height: 1;
-  color: #fff;
-  background: #ff3040;
+  line-height: 11px;
+  text-align: center;
+  color: var(--on-accent);
+  background: var(--accent);
 }
 
 /* Stories row: scrolls sideways; the last circle is cut off at the edge to hint that there's more */
 .stories {
   display: flex;
   gap: 6px;
-  padding: 4px 10px 8px;
+  padding: 3px 8px 6px;
   /* A still picture: it clips the row. A real app scrolls it (overflow-x: auto, as the balloon says); a scrollable
      row would also become keyboard-focusable inside the example. clip, unlike hidden, isn't a scroll container */
   overflow: clip;
-  border-bottom: 1px solid light-dark(#dbdbdb, #262626);
+  border-bottom: 0.5px solid var(--line);
 }
 
 .story {
@@ -98,28 +136,29 @@
   flex: none;
   justify-items: center;
   gap: 3px;
-  width: 58px;
+  width: 56px;
 }
 
 .ring,
 .ringSeen,
 .own {
   position: relative;
+  display: block;
   width: 56px;
   height: 56px;
-  padding: 2.5px;
+  padding: 2px;
   border-radius: 50%;
 }
 
-/* Unseen story: the gradient behind the photo shows through as a ring */
+/* Unseen story: the sweep behind the photo shows through as a 2px ring */
 .ring {
-  background: linear-gradient(45deg, #ffc13d, #ff5148 45%, #e3308e 70%, #8f3cff);
+  background: var(--ring);
 }
 
-/* Seen story: a thin gray ring; the wider border keeps the photo the same size */
+/* Seen story: a thin gray ring; the wider gap keeps the photo the same size */
 .ringSeen {
   padding: 1px;
-  background: light-dark(#c7c7c7, #3d3d3d);
+  background: var(--seen);
 }
 
 /* The border in the page color is the gap between ring and photo */
@@ -127,61 +166,68 @@
   display: block;
   width: 100%;
   height: 100%;
-  border: 2.5px solid light-dark(#fff, #000);
+  border: 2.5px solid var(--page);
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .ringSeen .storyPhoto {
-  border-width: 4px;
+  border-width: 3.5px;
 }
 
-/* Your story: no ring yet, a plus badge to add one */
+/* Your story: no ring until you post one, and a plus badge to add one */
 .plus {
   position: absolute;
-  right: 0;
-  bottom: 0;
+  right: 1px;
+  bottom: 1px;
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
-  border: 2px solid light-dark(#fff, #000);
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--page);
   border-radius: 50%;
-  color: #fff;
-  background: #2b8cf2;
+  color: var(--page);
+  background: var(--ink);
 }
 
 .plus .icon {
-  stroke-width: 3;
+  stroke-width: 3.6;
 }
 
-.storyName,
-.ownName {
+.storyName {
   max-width: 100%;
   overflow: hidden;
-  font-size: 11px;
-  line-height: 14px;
+  font-size: 8.5px;
+  line-height: 11px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.ownName {
-  color: light-dark(#737373, #a8a8a8);
-}
-
-/* Post header: avatar, name with badge and time, location, then the menu */
+/* Post header: the author's photo (ringed: they have a story), name and place, then the menu */
 .postHeader {
   display: flex;
   align-items: center;
-  gap: 9px;
-  height: 44px;
-  padding: 0 6px 0 12px;
+  gap: 7px;
+  height: 38px;
+  padding: 0 3px 0 8px;
+}
+
+.postRing {
+  flex: none;
+  width: 27px;
+  height: 27px;
+  padding: 1.5px;
+  border-radius: 50%;
+  background: var(--ring);
 }
 
 .postAvatar {
-  flex: none;
-  width: 30px;
-  height: 30px;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 1.5px solid var(--page);
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .byline {
@@ -191,158 +237,109 @@
 }
 
 .author {
-  display: flex;
-  align-items: center;
-  gap: 4px;
   font-weight: 600;
-  line-height: 16px;
-}
-
-.verified {
-  flex: none;
-  fill: #2b8cf2;
-  stroke: #2b8cf2;
-  stroke-width: 1;
-}
-
-.verifiedCheck {
-  fill: none;
-  stroke: #fff;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.age {
-  font-weight: 400;
-  color: light-dark(#737373, #a8a8a8);
+  line-height: 13px;
 }
 
 .place {
-  font-size: 11.5px;
-  line-height: 14px;
+  font-size: 8.5px;
+  line-height: 11px;
 }
 
 .more {
   display: grid;
   flex: none;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
 }
 
-.dotsIcon {
-  fill: currentColor;
-}
-
-/* Carousel: one photo at a time. The photo is drawn with gradients: a dawn sky, a ridge and a fjord */
-.carousel {
+/* The photo runs edge to edge; the counter sits on it, so it looks the same in both themes */
+.photo {
   position: relative;
-  aspect-ratio: 3 / 2;
+  height: 244px;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 70% 46%, #fff7e3 0 3.5%, rgb(255 220 170 / 0.9) 4.5%, rgb(255 190 150 / 0) 20%),
-    linear-gradient(180deg, #34407e 0%, #8a68b0 30%, #f08ea0 54%, #ffc690 70%);
+  background: light-dark(#efefef, #121212);
 }
 
-/* Mountain ridge */
-.carousel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, #4a3d78, #262350 70%);
-  clip-path: polygon(0 66%, 10% 54%, 19% 59%, 33% 36%, 45% 53%, 55% 46%, 64% 57%, 78% 44%, 90% 55%, 100% 50%, 100% 100%, 0 100%);
+.photoImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* Fjord: dark water with the sun's glitter path, widening toward the viewer */
-.carousel::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    conic-gradient(from 162deg at 70% 66%, transparent, rgb(255 210 165 / 0.55) 18deg, transparent 36deg),
-    linear-gradient(180deg, #3a3470, #17153a);
-  clip-path: polygon(0 76%, 100% 76%, 100% 100%, 0 100%);
-}
-
-/* Counter and dots sit on the photo, so they keep the same colors in both themes */
 .counter {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 1;
-  padding: 3px 8px;
+  top: 8px;
+  right: 8px;
+  padding: 2px 6px;
   border-radius: 999px;
-  font-size: 11.5px;
+  font-size: 8.5px;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 11px;
   color: #fff;
   background: rgb(18 18 18 / 0.7);
 }
 
-.dots {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  z-index: 1;
-  display: flex;
-  gap: 4px;
-  transform: translateX(-50%);
-}
-
-.dot,
-.dotActive {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgb(255 255 255 / 0.45);
-}
-
-.dotActive {
-  background: #fff;
-}
-
-/* Action bar: like, comment and share on the left; save on its own at the right */
+/* Action bar: like, comment and share on the left, the page dots in the middle, save on its own at the right */
 .actions {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
-  height: 40px;
-  padding: 0 12px;
+  gap: 11px;
+  height: 34px;
+  padding: 0 8px 0 10px;
 }
 
-/* Liked: the outline heart becomes a solid red one */
+.actionIcon {
+  display: block;
+  flex: none;
+}
+
+/* Liked: the outline heart becomes a solid one in the brand color */
 .liked {
-  fill: #ff3040;
+  fill: var(--accent);
 }
 
 .save {
   margin-left: auto;
 }
 
+/* Page dots: one per photo, centered under the carousel; the colored one is the photo on screen */
+.dots {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  gap: 3px;
+  transform: translate(-50%, -50%);
+}
+
+.pageDot {
+  width: 4.5px;
+  height: 4.5px;
+  border-radius: 50%;
+  background: var(--dot-off);
+}
+
+.pageDotOn {
+  background: var(--accent);
+}
+
+/* Likes, caption, comments and time share one left edge under the icons */
+.likes,
+.caption,
+.comments,
+.time {
+  display: block;
+  padding: 0 10px;
+}
+
 .likes {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 12px;
-  line-height: 18px;
-}
-
-/* Facepile: small overlapping avatars of friends who liked it */
-.facepile {
-  display: flex;
-  flex: none;
-}
-
-.face {
-  width: 18px;
-  height: 18px;
-  border: 1.5px solid light-dark(#fff, #000);
-  border-radius: 50%;
-}
-
-.face + .face {
-  margin-left: -6px;
+  gap: 4px;
 }
 
 .likes b,
@@ -350,35 +347,57 @@
   font-weight: 600;
 }
 
-/* Caption: clamped to two lines; "more" covers the end of the last one with a soft fade */
+/* Facepile: small overlapping photos of people you follow who liked it */
+.facepile {
+  display: flex;
+  flex: none;
+}
+
+.face {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--page);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.face + .face {
+  margin-left: -5px;
+}
+
+/* Caption: one line; the ellipsis and a gray "more" say it goes on */
 .caption {
-  position: relative;
-  display: -webkit-box;
-  margin: 3px 12px 0;
+  display: flex;
+  margin-top: 2px;
+}
+
+.captionText {
+  min-width: 0;
   overflow: hidden;
-  line-height: 17px;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .captionMore {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  padding-left: 20px;
-  color: light-dark(#737373, #a8a8a8);
-  background: linear-gradient(90deg, transparent, light-dark(#fff, #000) 18px);
+  flex: none;
+  padding-left: 3px;
+  color: var(--ink-2);
 }
 
 .comments {
-  display: block;
-  margin: 3px 12px 0;
-  line-height: 17px;
-  color: light-dark(#737373, #a8a8a8);
+  margin-top: 2px;
+  color: var(--ink-2);
 }
 
-/* Tab bar: icons only; the current tab is filled, the last one is your own photo */
+.time {
+  margin-top: 3px;
+  font-size: 8.5px;
+  line-height: 11px;
+  color: var(--ink-2);
+}
+
+/* Tab bar: icons only; the current tab is filled in, and the last one is your own photo */
 .tabBar {
   position: absolute;
   right: 0;
@@ -388,10 +407,14 @@
   grid-template-columns: repeat(5, 1fr);
   align-items: start;
   justify-items: center;
-  height: 76px;
-  padding-top: 10px;
-  border-top: 1px solid light-dark(#dbdbdb, #262626);
-  background: light-dark(#fff, #000);
+  height: 56px;
+  padding-top: 9px;
+  border-top: 0.5px solid var(--line);
+  background: var(--page);
+}
+
+.tabIcon {
+  display: block;
 }
 
 .tabActive {
@@ -399,9 +422,11 @@
 }
 
 .tabAvatar {
-  width: 24px;
-  height: 24px;
+  display: block;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .homeIndicator {

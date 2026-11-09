@@ -1,48 +1,57 @@
 import { homeIndicator, statusBar } from '../../../catalog';
 import type { UiElementSpec } from '../../../catalog';
 
-/** Elements in the Loop social feed. `value` fields are the actual values from LoopApp.module.css. */
+/** Elements in the Loop photo feed, in the order they appear. `value` fields are the actual values from LoopApp. */
 export const loopSpecs: UiElementSpec[] = [
   statusBar,
   {
     id: 'wordmark',
     name: 'Wordmark',
-    variant: 'Logotype in the app bar',
-    summary: "The app's name set as its logo, in the top-left corner of the home feed.",
-    aliases: ['logo', 'logotype', 'app name', 'the brand name at the top'],
+    variant: 'With a feed menu',
+    summary:
+      "The app's name drawn as its logo in the top-left corner. The small chevron next to it opens a menu to switch feeds.",
+    aliases: ['logo', 'logotype', 'app name', 'the brand name at the top', 'feed switcher'],
     concepts: [
       {
         kind: 'appearance',
-        term: 'Logotype',
-        value: '26px · 800 · letter-spacing: -0.06em',
-        plain: 'A heavy weight and tight letter-spacing turn the plain name into a recognizable mark.',
+        term: 'Vector logotype',
+        value: '<svg> · 43 × 23px · stroke-width: 3.3',
+        plain:
+          'Drawn as a shape instead of typed in a font, so it looks exactly the same on every phone and stays sharp at any size.',
       },
       {
         kind: 'appearance',
-        term: 'Live text',
-        value: '“Loop”',
-        plain: 'Set in type instead of an image, it stays sharp at any size and turns white in dark mode on its own.',
+        term: 'currentColor',
+        value: 'stroke: currentColor',
+        plain: 'The strokes take the color of the text around them, so the logo turns white in dark mode on its own.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Disclosure chevron',
+        value: '9 × 9px',
+        plain:
+          'The small arrow says the logo is also a button: tap it to choose a feed, like only the people you follow or your favorites.',
       },
     ],
   },
   {
     id: 'activity-button',
     name: 'Activity button',
-    variant: 'With a notification dot',
+    variant: 'With a dot badge',
     summary:
-      'The heart at the top opens your notifications. The red dot means something new happened, without saying how much.',
-    aliases: ['notifications', 'the heart at the top', 'red dot', 'activity feed'],
+      'The heart at the top opens your notifications: likes, comments and new followers. The dot means something new happened, without saying how much.',
+    aliases: ['notifications', 'the heart at the top', 'activity', 'the dot on the heart'],
     concepts: [
       {
         kind: 'appearance',
         term: 'Dot badge',
-        value: 'background: #ff3040',
-        plain: 'A plain red dot, no number: it nudges you to look without the pressure of a count to clear.',
+        value: '8 × 8px · #00a67e',
+        plain: 'A plain dot, no number: it nudges you to look without the pressure of a count to clear.',
       },
       {
         kind: 'appearance',
         term: 'Cut-out ring',
-        value: { light: 'border: 2px solid #fff', dark: 'border: 2px solid #000' },
+        value: { light: 'border: 1.5px solid #fff', dark: 'border: 1.5px solid #000' },
         plain: "A ring in the page color separates the dot from the heart's outline.",
       },
       {
@@ -58,41 +67,42 @@ export const loopSpecs: UiElementSpec[] = [
     id: 'messages-button',
     name: 'Messages button',
     variant: 'With a count badge',
-    summary: 'Opens your direct messages. The red number says how many conversations have something unread.',
-    aliases: ['DMs', 'inbox', 'direct messages', 'the message icon with a number'],
+    summary: 'The paper plane opens your direct messages. The number says how many conversations have something unread.',
+    aliases: ['DMs', 'inbox', 'direct messages', 'the paper plane at the top'],
     concepts: [
       {
         kind: 'appearance',
         term: 'Count badge',
-        value: 'min-width: 18px · border-radius: 999px',
+        value: 'min-width: 14px · border-radius: 999px',
         plain: 'A small pill that stays round for one digit and stretches to fit bigger numbers.',
       },
       {
         kind: 'appearance',
         term: 'Corner anchor',
-        value: 'position: absolute; top: 0; right: -3px',
+        value: 'position: absolute; top: -1px; right: -2px',
         plain: "It overlaps the icon's top-right corner, right where people expect a badge.",
       },
       {
         kind: 'appearance',
-        term: 'Attention color',
-        value: 'background: #ff3040',
-        plain: 'The same red as the dot, saved for things that need your attention.',
+        term: 'One icon, one meaning',
+        value: 'paper plane',
+        plain:
+          'The paper plane means “send” everywhere in the app: up here it opens your messages, and under a post it sends that post to someone.',
       },
     ],
   },
   {
     id: 'add-story',
     name: 'Add story button',
-    variant: 'Plus badge on your avatar',
+    variant: 'Plus badge on your photo',
     summary: 'Your own photo, first in the row, with a small plus: tap it to post a new story.',
     aliases: ['your story', 'create story', 'the plus on my photo', 'post a story'],
     concepts: [
       {
         kind: 'appearance',
         term: 'Plus badge',
-        value: '20 × 20px · #2b8cf2',
-        plain: 'A blue plus pinned to the corner turns your avatar into a “create” button.',
+        value: { light: '18 × 18px · #0c1014', dark: '18 × 18px · #f5f5f5' },
+        plain: 'A small plus in the text color, pinned to the corner, turns your photo into a “create” button.',
       },
       {
         kind: 'appearance',
@@ -103,8 +113,8 @@ export const loopSpecs: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Same footprint',
-        value: 'padding: 2.5px',
-        plain: "There's no colored ring until you post, but the same spacing keeps your photo the size of the others.",
+        value: '56 × 56px · padding: 2px',
+        plain: "There's no ring until you post, but the same spacing keeps your photo the size of the others.",
       },
     ],
   },
@@ -113,20 +123,15 @@ export const loopSpecs: UiElementSpec[] = [
     name: 'Story ring',
     variant: 'Unseen and seen',
     summary:
-      "A colorful ring around a profile photo means that person has a story you haven't watched. Once you have, the ring turns thin and gray.",
-    aliases: ['stories', 'the circle around the profile picture', 'gradient ring', 'story bubble'],
+      "A colored ring around a profile photo means that person posted a story you haven't watched yet. Once you have, the ring turns thin and gray.",
+    aliases: ['stories', 'the circle around the profile picture', 'story bubble', 'the ring'],
     concepts: [
       {
         kind: 'appearance',
         term: 'Gradient ring',
-        value: 'linear-gradient(45deg, #ffc13d, #ff5148 45%, #e3308e 70%, #8f3cff)',
-        plain: 'A sunset gradient behind the photo shows through as a 2.5px ring.',
-      },
-      {
-        kind: 'appearance',
-        term: 'Gap ring',
-        value: { light: 'border: 2.5px solid #fff', dark: 'border: 2.5px solid #000' },
-        plain: 'A band in the page color between ring and photo makes the ring stand out.',
+        value: 'conic-gradient(from 210deg, #b5e853, #00a67e 50%, #b5e853)',
+        plain:
+          'A lime-to-jade sweep behind the photo shows through as a 2px ring, with a band in the page color between ring and photo.',
       },
       {
         kind: 'appearance',
@@ -146,54 +151,28 @@ export const loopSpecs: UiElementSpec[] = [
     id: 'post-header',
     name: 'Post header',
     htmlTag: '<header>',
-    variant: 'Author, badge, time, menu',
-    summary: 'The row above a post that says who posted it, when and where, with a menu for everything else.',
-    aliases: ['author line', 'byline', 'the name above the photo'],
+    variant: 'Author, place, menu',
+    summary: 'The row above a post that says who posted it and where, with a menu for everything else.',
+    aliases: ['author line', 'byline', 'the name above the photo', 'location'],
     concepts: [
-      {
-        kind: 'appearance',
-        term: 'Relative time',
-        value: '“2h”',
-        plain: 'Short relative times like 2h or 3d are quicker to read than full dates.',
-      },
       {
         kind: 'appearance',
         term: 'Two-line byline',
-        value: '13px · 600 over 11.5px',
-        plain: 'The bold username comes first; a smaller line underneath adds context, here the location.',
+        value: '10px · 600 over 8.5px',
+        plain: 'The bold username comes first; a smaller line under it adds context, here where the photo was taken.',
       },
       {
         kind: 'appearance',
-        term: 'Avatar',
-        value: '30 × 30px',
-        plain: 'A small round photo puts a face to the name.',
-      },
-    ],
-  },
-  {
-    id: 'verified-badge',
-    name: 'Verified badge',
-    variant: 'Blue check',
-    summary: 'The blue badge with a check next to a name: the platform has confirmed the account is who it says it is.',
-    aliases: ['blue check', 'blue tick', 'verified checkmark'],
-    concepts: [
-      {
-        kind: 'appearance',
-        term: 'Scalloped badge',
-        value: '<svg> · 14 × 14px',
-        plain: 'A rosette shape with a white check, drawn as a vector icon so it stays sharp at any size.',
+        term: 'Avatar with a story ring',
+        value: '27 × 27px',
+        plain:
+          "The author's photo wears the same ring as in the stories row: they have a story you haven't seen, and tapping the photo plays it.",
       },
       {
-        kind: 'appearance',
-        term: 'Brand blue',
-        value: '#2b8cf2',
-        plain: "The same blue in light and dark mode, so it reads as the platform's own stamp.",
-      },
-      {
-        kind: 'appearance',
-        term: 'Next to the name',
-        value: 'gap: 4px',
-        plain: 'It sits right after the username, so it clearly belongs to that account.',
+        kind: 'behavior',
+        term: 'Location tag',
+        value: '“Trastevere, Rome”',
+        plain: 'Tapping the place opens a page of other posts from the same spot.',
       },
     ],
   },
@@ -214,7 +193,7 @@ export const loopSpecs: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Touch target',
-        value: '32 × 32px',
+        value: '16px icon · 28 × 28px target',
         plain: 'The tappable square is much bigger than the three small dots, so it is easy to hit.',
       },
     ],
@@ -222,34 +201,29 @@ export const loopSpecs: UiElementSpec[] = [
   {
     id: 'photo-carousel',
     name: 'Image carousel',
-    variant: 'With a counter and dots',
+    variant: 'With a counter and page dots',
     summary:
-      'Several photos in one post that you swipe through one at a time. The counter and the dots show where you are.',
-    aliases: ['photo slider', 'swipeable photos', 'multi-photo post', 'gallery'],
+      'Several photos in one post that you swipe through one at a time. The counter on the photo and the dots under it show where you are.',
+    aliases: ['photo slider', 'swipeable photos', 'multi-photo post', 'gallery', 'carousel dots'],
     concepts: [
       {
         kind: 'appearance',
-        term: 'aspect-ratio',
-        value: '3 / 2',
-        plain: 'A fixed shape keeps the post the same height on every screen, whatever size the photo is.',
-      },
-      {
-        kind: 'appearance',
         term: 'Counter chip',
-        value: '“1/3”',
-        plain: 'A pill in the corner says how many photos there are and which one you are on.',
+        value: '“1/4” · rgb(18 18 18 / 0.7)',
+        plain:
+          'A see-through dark pill in the corner says how many photos there are and which one you are on, readable on any photo.',
       },
       {
         kind: 'appearance',
         term: 'Page dots',
-        value: '6px dots',
-        plain: 'One dot per photo; the solid white one is the photo you are looking at.',
+        value: '4.5px dots · #00a67e',
+        plain: 'One dot per photo, centered under the post; the colored one is the photo on screen.',
       },
       {
-        kind: 'appearance',
-        term: 'Scrim behind text',
-        value: 'rgb(18 18 18 / 0.7)',
-        plain: 'A see-through dark backing keeps the white counter readable on any photo, light or dark.',
+        kind: 'behavior',
+        term: 'Scroll snapping',
+        value: 'scroll-snap-type: x mandatory',
+        plain: 'Each swipe moves exactly one photo and snaps it into place; the counter and the dots follow along.',
       },
     ],
   },
@@ -257,14 +231,14 @@ export const loopSpecs: UiElementSpec[] = [
     id: 'action-bar',
     name: 'Action bar',
     variant: 'Liked · comment · share · save',
-    summary: 'The row of icons under a post: like, comment, share, and save it for later.',
+    summary: 'The row of icons under a post: like it, comment, send it to someone, and save it for later.',
     aliases: ['post actions', 'engagement bar', 'like, comment, share', 'the icons under the photo'],
     concepts: [
       {
         kind: 'appearance',
         term: 'Liked state',
-        value: 'fill: #ff3040',
-        plain: 'A liked post shows a solid red heart; before you like it, the heart is just an outline.',
+        value: 'fill: #00a67e',
+        plain: 'A liked post shows a solid heart in the brand color; before you like it, the heart is just an outline.',
       },
       {
         kind: 'appearance',
@@ -275,7 +249,7 @@ export const loopSpecs: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Icon rhythm',
-        value: '24px icons · gap: 14px',
+        value: '19px icons · gap: 11px',
         plain: 'Same-size outline icons at even spacing read as one group of actions.',
       },
     ],
@@ -290,13 +264,13 @@ export const loopSpecs: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Facepile',
-        value: 'margin-left: -6px',
-        plain: 'Tiny overlapping avatars of friends who liked it put faces to the number.',
+        value: '14px photos · margin-left: -5px',
+        plain: 'Tiny overlapping photos of people you follow who liked it put faces to the number.',
       },
       {
         kind: 'behavior',
         term: 'Friend first',
-        value: '“maya.k”',
+        value: '“theo.frames”',
         plain: 'Naming someone you know makes the post feel more relevant than a bare number would.',
       },
       {
@@ -312,20 +286,20 @@ export const loopSpecs: UiElementSpec[] = [
     name: 'Caption',
     variant: 'Truncated with “more”',
     summary:
-      "The text that goes with the post, starting with the author's name. Long captions are cut short, with a “more” to expand them.",
+      "The text that goes with the post, starting with the author's name. In the feed it is cut to one line, with a “more” to read the rest.",
     aliases: ['post text', 'description', 'the text under the photo', 'read more'],
     concepts: [
       {
         kind: 'appearance',
-        term: 'line-clamp',
-        value: '-webkit-line-clamp: 2',
-        plain: 'Shows at most two lines; the rest stays hidden until you tap “more”.',
+        term: 'text-overflow',
+        value: 'ellipsis · white-space: nowrap',
+        plain: 'The line stops at the edge of the screen with “…” instead of wrapping onto a second line.',
       },
       {
-        kind: 'appearance',
-        term: 'Fade into “more”',
-        value: '“… more”',
-        plain: "The last words fade out under a gray “… more”, so it's clear the text goes on.",
+        kind: 'behavior',
+        term: 'Expand in place',
+        value: '“more”',
+        plain: 'The gray “more” after the ellipsis says the text goes on; a tap opens the whole caption right there.',
       },
       {
         kind: 'appearance',
@@ -350,10 +324,44 @@ export const loopSpecs: UiElementSpec[] = [
         plain: 'Gray marks it as secondary, so the caption stays the focus.',
       },
       {
-        kind: 'behavior',
+        kind: 'appearance',
         term: 'Comment count',
         value: '84',
         plain: 'The number tells you how lively the conversation is before you open it.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Bottom sheet',
+        plain: 'A tap slides up a sheet with every comment and a field to add yours, without leaving the feed.',
+      },
+    ],
+  },
+  {
+    id: 'timestamp',
+    name: 'Timestamp',
+    htmlTag: '<time>',
+    variant: 'Relative time',
+    summary: 'When the post was shared, written as time ago rather than as a date.',
+    aliases: ['post time', 'date', 'how long ago', 'posted at'],
+    concepts: [
+      {
+        kind: 'appearance',
+        term: 'Relative time',
+        value: '“2 hours ago”',
+        plain: 'Time ago is quicker to grasp than a date and a clock time; older posts switch to a date like “October 12”.',
+      },
+      {
+        kind: 'appearance',
+        term: 'Least emphasis',
+        value: { light: '8.5px · #737373', dark: '8.5px · #a8a8a8' },
+        plain: 'The smallest, grayest line of the post: useful context, never the focus.',
+      },
+      {
+        kind: 'behavior',
+        term: 'datetime',
+        value: 'datetime="2026-10-29T07:41"',
+        plain:
+          'People read friendly words, while the tag also carries the exact moment for screen readers, search engines and tooltips.',
       },
     ],
   },
@@ -375,7 +383,7 @@ export const loopSpecs: UiElementSpec[] = [
       {
         kind: 'appearance',
         term: 'Avatar tab',
-        value: '24 × 24px',
+        value: '20 × 20px',
         plain: 'Your profile tab shows your photo instead of an icon, so it is unmistakably yours.',
       },
       {

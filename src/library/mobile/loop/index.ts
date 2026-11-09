@@ -6,11 +6,11 @@ export const loop: LibraryExample = {
   id: 'loop',
   platform: 'mobile',
   name: 'Loop',
-  kind: 'Social feed',
+  kind: 'Photo feed',
   category: 'Social',
-  inspiredBy: ['Instagram', 'Threads'],
+  inspiredBy: ['Instagram'],
   description:
-    'A social home feed: story rings, dot and count badges, a verified post with a photo carousel, the action bar, social proof, a clamped caption and a tab bar that ends in your photo.',
+    'A photo home feed: a wordmark with dot and count badges, story rings, a carousel post with its header, action bar and page dots, a like line with a facepile, a one-line caption, the comments link, a timestamp and a tab bar that ends in your photo.',
   Component: LoopApp,
   specs: loopSpecs,
 };
