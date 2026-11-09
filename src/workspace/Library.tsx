@@ -135,6 +135,11 @@ export function Library({ platform }: { platform: Platform }) {
           ))}
         </ul>
       )}
+
+      <p className={styles.footnote}>
+        Every example is a fictional product built from common patterns. The products named under “Inspired by” belong
+        to their owners, who aren't affiliated with Project Wingman.
+      </p>
     </div>
   );
 }

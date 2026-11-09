@@ -1,0 +1,352 @@
+/*
+ * Munch follows the page theme (light-dark pairs), in the iOS system font. The item sheet is black and white: black
+ * type, gray fills and hairlines, and black controls and button that turn white in dark mode. The one color is
+ * Munch's cobalt, used only for the satisfied Required label. The store page behind shows as a dimmed strip of its
+ * cover photo. The photos are content, so they look the same in both themes.
+ */
+.app {
+  --ink: light-dark(#000, #fff);
+  --ink-2: light-dark(#5e5e5e, #a6a6a6);
+  --ink-3: light-dark(#afafaf, #5e5e5e);
+  --sheet: light-dark(#fff, #000);
+  --fill: light-dark(#f3f3f3, #262626);
+  --band: light-dark(#f3f3f3, #161616);
+  --line: light-dark(#e8e8e8, #262626);
+  --control: light-dark(#6b6b6b, #8c8c8c);
+  /* Selected controls and the main button: black in light mode, white in dark mode */
+  --solid: light-dark(#000, #fff);
+  --on-solid: light-dark(#fff, #000);
+  --accent: light-dark(#2350d8, #86a3ff);
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.25;
+  color: var(--ink);
+  background: var(--sheet);
+}
+
+.icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The status bar sits on the dimmed photo of the store page, so it stays white in both themes */
+.statusBar {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+}
+
+/*
+ * The store page, behind the sheet: only its cover photo shows, above the sheet's top edge. Its ::after is the scrim;
+ * the pointer passes through it, so the strip under the status bar inspects as the scrim.
+ */
+.page {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--sheet);
+}
+
+.page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: light-dark(rgb(0 0 0 / 0.4), rgb(0 0 0 / 0.6));
+  pointer-events: none;
+}
+
+.storePhoto {
+  display: block;
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+/* Bottom sheet: nearly full height, square at the bottom, with the photo tucked into its rounded top corners */
+.sheet {
+  position: absolute;
+  top: 56px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 10px 10px 0 0;
+  background: var(--sheet);
+}
+
+/* What scrolls in a real sheet; the picture clips it under the footer instead, so nothing can scroll */
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow: clip;
+}
+
+/* The dish's photo, edge to edge, with round buttons floating on it */
+.photo {
+  position: relative;
+  height: 130px;
+}
+
+.photoImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.round {
+  position: absolute;
+  top: 5px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--ink);
+  background: light-dark(#fff, #1f1f1f);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.16);
+}
+
+.close {
+  left: 6px;
+}
+
+.close .icon {
+  stroke-width: 1.9;
+}
+
+.share {
+  right: 6px;
+}
+
+.share .icon {
+  stroke-width: 1.7;
+}
+
+/* Name, then the price with a tag beside it and the stepper at the far end */
+.item {
+  padding: 11px 12px;
+}
+
+.title {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 21px;
+  letter-spacing: -0.02em;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+}
+
+.price {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tag: gray, square-ish corners, not a button */
+.tag {
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--ink);
+  background: var(--fill);
+}
+
+/* Stepper: minus, count and plus on one gray pill; minus is grayed out at 1 */
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 84px;
+  height: 26px;
+  margin-left: auto;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--fill);
+}
+
+.step,
+.stepOff {
+  display: grid;
+  place-items: center;
+}
+
+.stepOff {
+  color: var(--ink-3);
+}
+
+.step .icon,
+.stepOff .icon {
+  stroke-width: 1.8;
+}
+
+.count {
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Option groups sit between thick gray bands */
+.group {
+  border-top: 6px solid var(--band);
+}
+
+.groupHead {
+  padding: 12px 12px 4px;
+}
+
+.groupTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: -0.01em;
+}
+
+/* The group's rule: Required or Optional, then how many to choose */
+.rule {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--ink-2);
+}
+
+/* Satisfied: a check in a circle and the word in Munch cobalt */
+.required {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.required .icon {
+  stroke-width: 2.2;
+}
+
+/* One choice: name with its price change underneath, the control on the right, a hairline under it */
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 12px;
+  padding: 7px 12px 7px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.option:last-child {
+  border-bottom: 0;
+}
+
+.optionText {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.optionName {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 15px;
+}
+
+.delta {
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.radio,
+.radioOn,
+.checkbox,
+.checkboxOn {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid var(--control);
+}
+
+.radio,
+.radioOn {
+  border-radius: 50%;
+}
+
+/* On: a solid disc with a small hole in the middle */
+.radioOn {
+  border: 5px solid var(--solid);
+  background: var(--on-solid);
+}
+
+.checkbox,
+.checkboxOn {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.checkboxOn {
+  border-color: var(--solid);
+  color: var(--on-solid);
+  background: var(--solid);
+}
+
+.checkboxOn .icon {
+  stroke-width: 3;
+}
+
+/* Sticky footer: the main button stays at the bottom while the options scroll under the hairline */
+.footer {
+  padding: 8px 12px 26px;
+  border-top: 1px solid var(--line);
+  background: var(--sheet);
+}
+
+/* Primary button: a solid black bar, barely rounded, with the total of everything chosen above */
+.addButton {
+  display: grid;
+  place-items: center;
+  height: 40px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--on-solid);
+  background: var(--solid);
+  font-variant-numeric: tabular-nums;
+}
+
+.homeIndicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  z-index: 2;
+  width: 112px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--ink);
+  transform: translateX(-50%);
+}

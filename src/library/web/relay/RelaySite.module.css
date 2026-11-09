@@ -1,0 +1,1609 @@
+/*
+ * The example app follows the page theme: the message pane and the thread are light-dark(light, dark) pairs. Relay's
+ * frame (top bar and workspace rail) and its sidebar are deep pine green in both themes, one shade darker in dark
+ * mode, the way the reference keeps its colored sidebar. Photos (faces and the link preview) and the workspace logo
+ * are content, so they look the same in both themes.
+ */
+/* Container queries apply to child elements, not the container itself; that's why the grid sits inside it */
+.root {
+  container-type: inline-size;
+}
+
+/*
+ * An app window: a top bar across the full width, the workspace rail under it on the left, and the rest as one card
+ * with rounded top corners: sidebar, channel and thread. A 4px strip of the frame shows on the right and at the bottom.
+ */
+.app {
+  /* Message pane: white and neutral grays; dark mode is a cool charcoal */
+  --bg: light-dark(#ffffff, #1a1d21);
+  --raised: light-dark(#ffffff, #222529);
+  --hover: light-dark(#f8f8f8, #222529);
+  --fill: light-dark(#f0f0f0, #2c2f33);
+  --toolbar: light-dark(#f8f8f8, #222529);
+  --line: light-dark(#e3e3e3, #35383c);
+  --line-strong: light-dark(#cfcfcf, #4f5256);
+  --text: light-dark(#1d1c1d, #d1d2d3);
+  --muted: light-dark(#616061, #ababad);
+  --subtle: light-dark(#8b8a8b, #898b8e);
+  --faint: light-dark(#bcbcbc, #5c5f63);
+  /* Links, mentions and reply counts: the usual link blue */
+  --link: light-dark(#1264a3, #1d9bd1);
+  --link-soft: light-dark(#e8f4fa, #1d2e3a);
+  --link-line: light-dark(#1d9bd1, #1d9bd1);
+  /* Relay's frame and sidebar: deep pine green, a shade darker in dark mode */
+  --frame: light-dark(#0f2e26, #0a1b17);
+  --sidebar: light-dark(#183f34, #11291f);
+  --side-text: rgb(255 255 255 / 0.74);
+  --side-dim: rgb(255 255 255 / 0.46);
+  --side-fill: rgb(255 255 255 / 0.12);
+  --side-current: light-dark(#e3f0ea, #2d6956);
+  --side-current-text: light-dark(#123329, #ffffff);
+  /* Relay's attention color, ember: count badges, the "New" line, inline code */
+  --ember: light-dark(#c2501c, #c5531f);
+  --ember-text: light-dark(#b0461a, #f2875a);
+  --tab-line: light-dark(#1f5c4b, #6cc4a3);
+  --online: light-dark(#2f9e68, #3cb878);
+  /* Heights the sticky parts line up with: the top bar, and the channel header with its tabs */
+  --bar-h: 40px;
+  --head-h: 89px;
+
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-rows: var(--bar-h) minmax(0, 1fr) 4px;
+  min-height: 900px;
+  /* The operating system's own font; the emoji fonts come last so reactions render in color */
+  font-family:
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Helvetica,
+    Arial,
+    sans-serif,
+    'Apple Color Emoji',
+    'Segoe UI Emoji';
+  font-size: 15px;
+  line-height: 1.4667;
+  color: var(--text);
+  background: var(--frame);
+}
+
+/* Resets sit in :where() (zero specificity), so any class below can override them */
+:where(.app p, .app h2, .app h3, .app ul, .app ol) {
+  margin: 0;
+  padding: 0;
+}
+
+:where(.app ul) {
+  list-style: none;
+}
+
+/* Line icons on a 20px grid */
+.icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dots {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* Photo avatars: rounded squares, never circles */
+.avatar {
+  display: block;
+  flex: none;
+  object-fit: cover;
+}
+
+/* Count badge: an ember pill with a white number */
+.badge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  background: var(--ember);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Presence: a dot on the avatar's corner, cut out of it by a ring in the color behind (--ring) */
+.presence {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--ring);
+  border-radius: 50%;
+}
+
+.active {
+  background: var(--online);
+}
+
+/* Away: a hollow ring, so it differs in shape and not only in color */
+.away {
+  background: var(--ring);
+  box-shadow: inset 0 0 0 1.5px var(--side-text);
+}
+
+/* Top bar: back, forward and history, then the search field in the middle */
+.topBar {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(0, 620px) minmax(44px, 1fr);
+  align-items: center;
+  column-gap: 8px;
+  height: var(--bar-h);
+  color: #ffffff;
+  background: var(--frame);
+}
+
+/* The card's rounded top corners: drawn on the top bar so they stay put while the conversation scrolls */
+.topBar::before,
+.topBar::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  width: 8px;
+  height: 8px;
+}
+
+.topBar::before {
+  left: 64px;
+  background: radial-gradient(circle at 100% 100%, transparent 7.5px, var(--frame) 8px);
+}
+
+.topBar::after {
+  right: 4px;
+  background: radial-gradient(circle at 0 100%, transparent 7.5px, var(--frame) 8px);
+}
+
+.topStart {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+/* Relay's mark sits above the rail */
+.logo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 64px;
+}
+
+.logoMark {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.logoTile {
+  fill: #c2501c;
+}
+
+.logoR {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.logoDot {
+  fill: #ffffff;
+}
+
+.history {
+  display: flex;
+  gap: 2px;
+}
+
+.topButton {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: rgb(255 255 255 / 0.9);
+}
+
+.topButton .icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Nowhere to go forward yet */
+.topButtonOff {
+  color: rgb(255 255 255 / 0.4);
+}
+
+/* Search: a field on a lighter tint of the frame */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 6px;
+  color: rgb(255 255 255 / 0.84);
+  background: rgb(255 255 255 / 0.18);
+}
+
+.search .icon {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.7;
+}
+
+.searchText {
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.topEnd {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 8px;
+}
+
+/* Workspace rail: the workspace's logo, the main destinations with labels, then create and your avatar */
+.rail {
+  --ring: var(--frame);
+  grid-row: 2 / 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0 16px;
+  color: #ffffff;
+}
+
+/* The rail stays in the window, wherever the conversation is scrolled */
+.railTop {
+  position: sticky;
+  top: calc(var(--bar-h) + 8px);
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+.workspaceTile {
+  display: grid;
+  margin-bottom: 4px;
+}
+
+.workspaceLogo {
+  display: block;
+  width: 36px;
+  height: 36px;
+}
+
+.railItem {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+.railIcon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+/* Where you are: a lighter tile behind the icon, and the icon filled in */
+.railItem[aria-current='page'] .railIcon {
+  background: rgb(255 255 255 / 0.22);
+}
+
+.railItem[aria-current='page'] .icon {
+  fill: currentColor;
+}
+
+.railBadge {
+  position: absolute;
+  top: -5px;
+  right: -7px;
+  box-shadow: 0 0 0 2px var(--frame);
+}
+
+.railLabel {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 14px;
+}
+
+.railBottom {
+  position: sticky;
+  bottom: 20px;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+}
+
+.create {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.2);
+}
+
+.me {
+  position: relative;
+  display: grid;
+}
+
+.meAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+/* The card: sidebar, channel and thread side by side */
+.card {
+  grid-row: 2;
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: 228px minmax(0, 1fr) 340px;
+  margin-right: 4px;
+  background: var(--bg);
+}
+
+/* The bottom strip of the frame, with the card's rounded bottom corners above it; stays at the window's edge */
+.frameBottom {
+  position: sticky;
+  bottom: 0;
+  z-index: 6;
+  grid-row: 3;
+  grid-column: 2;
+  background: var(--frame);
+}
+
+.frameBottom::before,
+.frameBottom::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  width: 8px;
+  height: 8px;
+}
+
+.frameBottom::before {
+  left: 0;
+  background: radial-gradient(circle at 100% 0, transparent 7.5px, var(--frame) 8px);
+}
+
+.frameBottom::after {
+  right: 4px;
+  background: radial-gradient(circle at 0 0, transparent 7.5px, var(--frame) 8px);
+}
+
+/* Sidebar: light text on pine; the open channel is a light pill */
+.sidebar {
+  --ring: var(--sidebar);
+  color: var(--side-text);
+  background: var(--sidebar);
+}
+
+.sidebarInner {
+  position: sticky;
+  top: var(--bar-h);
+  display: flex;
+  flex-direction: column;
+  padding: 0 8px 16px;
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 50px;
+  padding: 0 4px 0 10px;
+}
+
+.workspaceName {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  margin-right: auto;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #ffffff;
+}
+
+.workspaceChevron {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.8;
+}
+
+.headerTool {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  color: #ffffff;
+}
+
+.headerTool .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.compose {
+  background: var(--side-fill);
+}
+
+.rows {
+  display: grid;
+  gap: 2px;
+}
+
+.sections {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px 0 8px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.caret {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 8px 0 10px;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.rowIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.rowLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* The open channel: a light pill with dark text */
+.row[aria-current='page'] {
+  font-weight: 600;
+  color: var(--side-current-text);
+  background: var(--side-current);
+}
+
+/* Unread: bold, full white */
+.rowUnread {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Muted: dimmed, and it never turns bold */
+.rowMuted {
+  color: var(--side-dim);
+}
+
+.addIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-left: -1px;
+  border-radius: 5px;
+  background: var(--side-fill);
+}
+
+.addIcon .icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.8;
+}
+
+.dmAvatar {
+  position: relative;
+  display: grid;
+}
+
+.rowAvatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.dmAvatar .presence {
+  right: -4px;
+  bottom: -3px;
+  width: 9px;
+  height: 9px;
+}
+
+.you {
+  margin-left: 6px;
+  font-weight: 400;
+  color: var(--side-dim);
+}
+
+/* Channel */
+.channel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Header and tabs stay pinned while the conversation scrolls under them */
+.top {
+  position: sticky;
+  top: var(--bar-h);
+  z-index: 4;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 50px;
+  padding: 0 12px 0 20px;
+}
+
+/* Phones only: back to the channel list, with the unread count from other conversations */
+.back {
+  display: none;
+  align-items: center;
+  gap: 2px;
+  margin-left: -8px;
+}
+
+.back .icon {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.8;
+}
+
+/* Name on top; on phones, the member count under it */
+.titleBlock {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.channelName {
+  display: flex;
+  min-width: 0;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 24px;
+}
+
+/* The name opens the channel's details, so it's one button with its chevron */
+.channelButton {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.titleHash {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
+.channelLabel {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.titleChevron {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.8;
+}
+
+.memberLine {
+  display: none;
+  font-size: 13px;
+  line-height: 17px;
+  color: var(--muted);
+}
+
+/* Members, Call and more: outlined buttons on the right */
+.members,
+.call,
+.moreButton {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.members {
+  gap: 6px;
+  padding: 0 9px 0 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Avatar stack: each face overlaps the one before; a ring in the background color keeps the edges apart */
+.stack {
+  display: flex;
+}
+
+.stackAvatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px var(--bg);
+}
+
+.stackAvatar + .stackAvatar {
+  margin-left: -4px;
+}
+
+/* Call: a split button, the call itself and a menu of options */
+.callMain,
+.callMenu {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.callMain {
+  gap: 6px;
+  padding: 0 10px 0 8px;
+  color: var(--text);
+}
+
+.callMain .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.callMenu {
+  padding: 0 4px 0 3px;
+  border-left: 1px solid var(--line);
+}
+
+.callMenu .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.moreButton {
+  justify-content: center;
+  width: 30px;
+  color: var(--text);
+}
+
+.moreButton .dots {
+  width: 18px;
+  height: 18px;
+}
+
+.tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+}
+
+/* The tab you're on is underlined in Relay's pine; the line sits on the header's bottom edge */
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: -1px;
+  padding: 0 6px;
+  border-bottom: 2px solid transparent;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.tab .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.tab[aria-selected='true'] {
+  border-bottom-color: var(--tab-line);
+  color: var(--text);
+}
+
+.addTab {
+  display: grid;
+  place-items: center;
+  align-self: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  color: var(--muted);
+}
+
+.addTab .icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Messages sit at the bottom, right above the composer, like any chat */
+.messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 10px 0 14px;
+}
+
+.day {
+  position: relative;
+}
+
+/* The rule the date pill sits on, from edge to edge */
+.day::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--line);
+}
+
+/* Sticks under the header while you scroll through the day */
+.datePill {
+  position: sticky;
+  top: calc(var(--bar-h) + var(--head-h) + 8px);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: fit-content;
+  height: 28px;
+  margin: 0 auto 2px;
+  padding: 0 8px 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--bg);
+}
+
+.dateChevron {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.8;
+}
+
+/* Message: avatar in the gutter, name and time, then the text; follow-ups skip the avatar and the name */
+.message {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  column-gap: 8px;
+  padding: 8px 20px 6px;
+}
+
+.followUp {
+  padding-top: 2px;
+}
+
+.messageAvatar {
+  width: 36px;
+  height: 36px;
+  margin-top: 4px;
+  border-radius: 6px;
+}
+
+/* A follow-up's time only appears in the gutter while the message is hovered */
+.gutterTime {
+  visibility: hidden;
+  padding-top: 3px;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: right;
+  white-space: nowrap;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.hovered {
+  background: var(--hover);
+}
+
+.hovered .gutterTime {
+  visibility: visible;
+}
+
+.messageBody {
+  min-width: 0;
+}
+
+.messageMeta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  line-height: 22px;
+}
+
+.author {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.time {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.text {
+  font-size: 15px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+
+.text strong {
+  font-weight: 700;
+}
+
+.edited {
+  font-size: 13px;
+  color: var(--subtle);
+}
+
+.link {
+  color: var(--link);
+}
+
+/* Inline code: monospace in a light box, the text in Relay's ember */
+.code {
+  padding: 2px 3px 1px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  color: var(--ember-text);
+  background: var(--toolbar);
+}
+
+/* Mentions: blue on a pale blue chip; a mention of you is highlighted in yellow instead */
+.mention {
+  padding: 0 2px;
+  border-radius: 3px;
+  color: var(--link);
+  background: var(--link-soft);
+}
+
+.mentionYou {
+  color: light-dark(#1d1c1d, #f3e7c0);
+  background: light-dark(#fbe6a6, #594a1c);
+}
+
+/* Hover toolbar: floats over the top-right corner of the hovered message */
+.toolbar {
+  position: absolute;
+  top: -16px;
+  right: 18px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--raised);
+  box-shadow: 0 1px 3px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.4));
+}
+
+.quickReaction {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.tool {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 8px 0 6px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.tool .icon {
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+}
+
+.toolMore {
+  justify-content: center;
+  width: 30px;
+  padding: 0;
+}
+
+/* Reactions: one pill per emoji with its count; yours is outlined in blue */
+.reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.reaction,
+.addReaction {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--fill);
+}
+
+.reaction {
+  gap: 4px;
+  padding: 0 8px 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.reactionMine {
+  color: var(--link);
+  background: var(--link-soft);
+  box-shadow: inset 0 0 0 1px var(--link-line);
+}
+
+.emoji {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.addReaction {
+  justify-content: center;
+  width: 32px;
+  color: var(--muted);
+}
+
+.addReaction .icon {
+  width: 17px;
+  height: 17px;
+}
+
+/* Link preview: a gray bar on the left, then the site, the title as a link, the description and the image */
+.unfurl {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  max-width: 420px;
+  margin: 6px 0 2px;
+  padding-left: 16px;
+}
+
+.unfurl::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--line-strong);
+}
+
+.unfurlSite {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 22px;
+}
+
+.favicon {
+  display: block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.unfurlTitle {
+  font-weight: 700;
+  line-height: 22px;
+  color: var(--link);
+}
+
+.unfurlText {
+  line-height: 22px;
+}
+
+/* The page's image: cropped to the card's shape, with soft corners */
+.unfurlImage {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 9 / 5;
+  margin-top: 8px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Thread summary: who replied, how many replies and when the last one came */
+.threadSummary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  height: 32px;
+  margin: 2px 0 0 -4px;
+  padding: 0 8px 0 4px;
+  border-radius: 6px;
+}
+
+.summaryAvatars {
+  display: flex;
+  flex: none;
+  gap: 4px;
+}
+
+.summaryAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+}
+
+.replyCount {
+  flex: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--link);
+}
+
+.lastReply {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--muted);
+}
+
+/* "New" line: everything below it arrived since you last read the channel */
+.newDivider {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 20px;
+  margin: 4px 0;
+}
+
+.newDivider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--ember);
+}
+
+.newLabel {
+  position: relative;
+  padding: 0 14px 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 20px;
+  color: var(--ember-text);
+  background: var(--bg);
+}
+
+/* Composer and typing indicator stay pinned at the bottom while the conversation scrolls */
+.footer {
+  position: sticky;
+  bottom: 4px;
+  z-index: 3;
+  padding: 0 20px;
+  background: var(--bg);
+}
+
+.composer {
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+/* Formatting: dimmed until there's text to format */
+.formatBar {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 4px;
+  overflow: hidden;
+  border-radius: 7px 7px 0 0;
+  background: var(--toolbar);
+}
+
+.formatGroup {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.divider {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+  background: var(--line);
+}
+
+.formatButton {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  color: var(--faint);
+}
+
+.formatButton .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.field {
+  padding: 9px 12px 1px;
+}
+
+.placeholder {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--subtle);
+}
+
+.alsoSend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.checkbox {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  background: var(--bg);
+}
+
+.alsoSendChannel {
+  display: flex;
+  align-items: center;
+  margin-left: -4px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.alsoSendChannel .icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.8;
+}
+
+.composerActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 40px;
+  padding: 0 6px;
+}
+
+.composerButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--muted);
+}
+
+.composerButton .icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Attach: the first stop for files, in a filled circle */
+.attach {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: 0 3px 0 2px;
+  border-radius: 50%;
+  color: var(--muted);
+  background: var(--fill);
+}
+
+.attach .icon {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.8;
+}
+
+/* Aa shows or hides the formatting bar; it's underlined while the bar is open */
+.formatToggle {
+  font-size: 15px;
+  line-height: 1;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+/* Send: gray while there's nothing to send, with a menu to schedule it */
+.send {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  color: var(--faint);
+}
+
+.sendButton,
+.sendMenu {
+  display: grid;
+  place-items: center;
+  height: 28px;
+}
+
+.sendButton {
+  width: 30px;
+}
+
+.sendButton .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.sendDivider {
+  width: 1px;
+  height: 20px;
+  background: var(--line);
+}
+
+.sendMenu {
+  width: 22px;
+}
+
+.sendMenu .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Typing indicator: under the composer, who's writing right now */
+.typing {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding-left: 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.typingName {
+  font-weight: 700;
+}
+
+/* Thread panel */
+.thread {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-left: 1px solid var(--line);
+}
+
+.threadHeader {
+  position: sticky;
+  top: var(--bar-h);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 50px;
+  padding: 0 10px 0 16px;
+  background: var(--bg);
+}
+
+.threadTitle {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 24px;
+}
+
+.threadChannel {
+  display: flex;
+  align-items: center;
+  margin-right: auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.threadChannel .icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.8;
+}
+
+.close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  color: var(--muted);
+}
+
+/*
+ * The thread scrolls on its own in the real app; here it simply stays put under its header while the channel
+ * scrolls. A short thread's reply box follows the last reply instead of sitting at the bottom.
+ */
+.threadBody {
+  position: sticky;
+  top: calc(var(--bar-h) + 50px);
+  padding: 4px 0 16px;
+}
+
+.thread .message {
+  padding-right: 16px;
+  padding-left: 16px;
+}
+
+/* "4 replies" and a rule: the parent above, the conversation below */
+.replyDivider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 2px 16px 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.replyDivider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.options {
+  padding-left: 22px;
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.threadReply {
+  margin: 8px 16px 0;
+}
+
+/* The hover toolbar keeps its icons and drops the words; the thread's formatting bar drops its quote button */
+@container (width < 1140px) {
+  .toolLabel,
+  .thread .formatOptional {
+    display: none;
+  }
+
+  .tool {
+    width: 30px;
+    justify-content: center;
+    padding: 0;
+  }
+}
+
+/* Narrower windows: the sidebar and the thread slim down, and the thread's composer drops its clip buttons */
+@container (width < 1080px) {
+  .card {
+    grid-template-columns: 212px minmax(0, 1fr) 320px;
+  }
+
+  .thread .clipGroup {
+    display: none;
+  }
+}
+
+/* No room for a second conversation: the thread panel closes and the channel takes its space */
+@container (width < 1000px) {
+  .card {
+    grid-template-columns: 212px minmax(0, 1fr);
+  }
+
+  .thread {
+    display: none;
+  }
+}
+
+/*
+ * Narrow windows: Call keeps only its icon, the member count steps aside, the hover toolbar keeps only its icons and
+ * the composer drops its clip buttons and quote button
+ */
+@container (width < 780px) {
+  .callLabel,
+  .members,
+  .quickReaction,
+  .clipGroup,
+  .formatOptional,
+  .lastReply {
+    display: none;
+  }
+
+  .callMain {
+    padding: 0 6px;
+  }
+}
+
+/* Phone width: only the channel, with a back button to the list. No hover toolbar: nothing hovers on touch */
+@container (width < 640px) {
+  .app {
+    --bar-h: 0px;
+    --head-h: 101px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    background: var(--bg);
+  }
+
+  .topBar,
+  .rail,
+  .sidebar,
+  .frameBottom,
+  .members,
+  .moreButton,
+  .callMenu,
+  .toolbar,
+  .addTab {
+    display: none;
+  }
+
+  .card {
+    grid-row: 1;
+    grid-column: 1;
+    grid-template-columns: minmax(0, 1fr);
+    margin: 0;
+  }
+
+  .header {
+    height: 62px;
+    padding: 0 12px 0 14px;
+  }
+
+  .back {
+    display: flex;
+  }
+
+  .memberLine {
+    display: block;
+  }
+
+  .call {
+    border: 0;
+  }
+
+  .callMain .icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .tabs {
+    padding: 0 10px;
+  }
+
+  .hovered {
+    background: none;
+  }
+
+  .hovered .gutterTime {
+    visibility: hidden;
+  }
+
+  .footer {
+    bottom: 0;
+    padding: 0 12px;
+  }
+}
+
+@container (width < 440px) {
+  .message {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  /* The formatting bar folds behind the Aa button, leaving more of the small screen to the conversation */
+  .formatBar {
+    display: none;
+  }
+
+  .formatToggle {
+    text-decoration: none;
+  }
+
+  /* The thread summary keeps its faces and count; the time of the last reply waits for more room */
+  .lastReply {
+    display: none;
+  }
+
+  .field {
+    padding-top: 10px;
+  }
+}

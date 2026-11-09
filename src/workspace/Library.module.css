@@ -256,6 +256,14 @@ a.name:hover {
   color: var(--color-text-subtle);
 }
 
+/* The examples are fictional; the products they're inspired by belong to their owners */
+.footnote {
+  max-width: 72ch;
+  margin-top: 56px;
+  font-size: 13px;
+  color: var(--color-text-subtle);
+}
+
 .webGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));

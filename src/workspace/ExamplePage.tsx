@@ -46,7 +46,9 @@ export function ExamplePage({ example }: { example: LibraryExample }) {
           {example.name} <span className={styles.muted}>{example.kind}</span>
         </h1>
         <p className={styles.lead}>{example.description}</p>
-        <p className={styles.inspired}>Inspired by {example.inspiredBy.join(', ')}</p>
+        <p className={styles.inspired}>
+          Inspired by {example.inspiredBy.join(', ')}. A fictional example, not affiliated with them.
+        </p>
       </header>
 
       <div className={styles.stage}>

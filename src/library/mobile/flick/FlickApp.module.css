@@ -1,0 +1,518 @@
+/*
+ * Flick plays one video at a time, full screen, and like the feeds it follows it is dark by design: the same in both
+ * themes. The video is content; everything laid over it is white with a soft shadow, and the tab bar under it is
+ * black. The brand color is a warm orange, used sparingly (the liked heart, the follow badge, the Friends dot and the
+ * Inbox badge), always with near-black glyphs on it.
+ */
+.app {
+  --accent: #ff8a1f;
+  --on-accent: #1f1206;
+  /* White text and icons on the video carry a faint shadow, so they stay readable on bright frames too */
+  --overlay-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  --dimmed: rgb(255 255 255 / 0.75);
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 1.3;
+  color: #fff;
+  background: #000;
+}
+
+.icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.glyph {
+  fill: currentColor;
+}
+
+/* The status bar sits on the video */
+.statusBar {
+  position: relative;
+  z-index: 1;
+}
+
+/* Overlay groups let touches through to the video between their buttons (a tap on the video pauses it) */
+.topBar,
+.rail,
+.info {
+  pointer-events: none;
+}
+
+.topBar > *,
+.rail > *,
+.info > * {
+  pointer-events: auto;
+}
+
+/* Top bar: LIVE on the left, the two feeds in the middle, search on the right */
+.topBar {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: 22px;
+  padding: 0 6px;
+}
+
+/* Icon buttons: the touch target is bigger than the drawing and spills over the row a little */
+.live,
+.search {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-block: -3px;
+  filter: drop-shadow(var(--overlay-shadow));
+}
+
+.live {
+  justify-self: start;
+}
+
+.live .icon {
+  stroke-width: 1.6;
+}
+
+.search {
+  justify-self: end;
+}
+
+.search .icon {
+  stroke-width: 2.3;
+}
+
+.feedTabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  text-shadow: var(--overlay-shadow);
+}
+
+.feedTab {
+  color: var(--dimmed);
+}
+
+.feedDivider {
+  width: 1px;
+  height: 9px;
+  background: rgb(255 255 255 / 0.4);
+}
+
+.feedTabActive {
+  position: relative;
+  font-weight: 700;
+}
+
+/* The selected feed is underlined with a short bar, not the full width of the words */
+.feedTabActive::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: var(--overlay-shadow);
+  transform: translateX(-50%);
+}
+
+/* The video fills everything above the tab bar, cropped to fit like object-fit: cover */
+.video {
+  position: absolute;
+  inset: 0 0 59px;
+  overflow: hidden;
+  background: #111;
+}
+
+.frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Scrims: soft dark fades at the top and bottom keep the white overlays readable on any frame */
+.video::before,
+.video::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  left: 0;
+}
+
+.video::before {
+  top: 0;
+  height: 110px;
+  background: linear-gradient(rgb(0 0 0 / 0.36), transparent);
+}
+
+.video::after {
+  bottom: 0;
+  height: 250px;
+  background: linear-gradient(transparent, rgb(0 0 0 / 0.5));
+}
+
+/* Action rail: stacked down the right edge, within reach of the thumb */
+.rail {
+  position: absolute;
+  right: 0;
+  bottom: 69px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 42px;
+}
+
+.creator {
+  position: relative;
+  width: 33px;
+  height: 33px;
+  margin-bottom: 9px;
+}
+
+.creatorPhoto {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Follow badge: pinned to the bottom edge of the photo, half on and half off */
+.follow {
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  color: var(--on-accent);
+  background: var(--accent);
+  transform: translateX(-50%);
+}
+
+.follow .icon {
+  stroke-width: 3.4;
+}
+
+/* Each action: an icon with its count right under it */
+.action {
+  display: grid;
+  justify-items: center;
+  font-size: 9.5px;
+  font-weight: 600;
+  line-height: 12px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: var(--overlay-shadow);
+}
+
+.actionIcon {
+  display: block;
+  fill: #fff;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.25));
+}
+
+/* Liked: the white heart turns solid brand orange */
+.liked {
+  fill: var(--accent);
+}
+
+/* Sound disc: a small record with the sound's picture in the middle; it turns while the video plays */
+.disc {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-top: 1px;
+  border-radius: 50%;
+  /* A sheen, fine grooves, and a black label area that lightens toward the rim */
+  background:
+    conic-gradient(from 30deg, transparent, rgb(255 255 255 / 0.1) 40deg, transparent 80deg 200deg, rgb(255 255 255 / 0.07) 230deg, transparent 270deg),
+    repeating-radial-gradient(circle, transparent 0 1px, rgb(255 255 255 / 0.04) 1px 1.5px),
+    radial-gradient(circle, #141416 50%, #2c2c2f);
+  box-shadow:
+    0 0 0 0.5px rgb(255 255 255 / 0.2),
+    0 2px 6px rgb(0 0 0 / 0.3);
+  animation: spin 8s linear infinite;
+}
+
+.discPhoto {
+  display: block;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Inspecting freezes the disc mid-turn, the way it freezes when the video is paused */
+.disc[data-paused] {
+  animation-play-state: paused;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* Bottom left: who posted it, the caption and the sound */
+.info {
+  position: absolute;
+  right: 62px;
+  bottom: 69px;
+  left: 9px;
+  z-index: 1;
+  display: grid;
+  gap: 4px;
+  text-shadow: var(--overlay-shadow);
+}
+
+.handle {
+  display: flex;
+  align-items: baseline;
+  justify-self: start;
+  gap: 4px;
+  margin-bottom: 1px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.posted {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--dimmed);
+}
+
+/* Caption: two lines at most. The flex parent gives the text a definite height, so the empty float before it can
+   push "more" down to the end of the second line, whatever the font; the text wraps around it */
+.caption {
+  display: flex;
+}
+
+.captionText {
+  max-height: 27px;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 13.5px;
+}
+
+.captionText::before {
+  content: '';
+  float: right;
+  height: 100%;
+  margin-bottom: -13.5px;
+}
+
+.captionText b {
+  font-weight: 600;
+}
+
+.more {
+  float: right;
+  clear: both;
+}
+
+.more b {
+  color: var(--dimmed);
+}
+
+/* Sound ticker: two copies of the name slide left together, so the loop has no seam */
+.sound {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 142px;
+  height: 14px;
+}
+
+.note {
+  flex: none;
+  filter: drop-shadow(var(--overlay-shadow));
+}
+
+/* The name is cut off sharply at both ends, without a fade. clip, unlike hidden, isn't a scroll container */
+.tickerWindow {
+  flex: 1;
+  min-width: 0;
+  overflow: clip;
+}
+
+.tickerTrack {
+  display: flex;
+  width: max-content;
+  animation: ticker 9s linear infinite;
+}
+
+.tickerTrack span {
+  padding-right: 24px;
+  white-space: nowrap;
+}
+
+.tickerTrack[data-paused] {
+  animation-play-state: paused;
+}
+
+@keyframes ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disc,
+  .tickerTrack {
+    animation: none;
+  }
+}
+
+/* Progress bar: a hairline along the bottom edge of the video, inside a taller strip that's easy to touch */
+.progress {
+  position: absolute;
+  right: 9px;
+  bottom: 59px;
+  left: 9px;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  height: 10px;
+}
+
+.progressTrack {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.18);
+}
+
+.progressFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 38%;
+  border-radius: inherit;
+  background: rgb(255 255 255 / 0.6);
+}
+
+/* The thumb: a small dot where the played part ends */
+.progressFill::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fff;
+  transform: translateY(-50%);
+}
+
+/* Tab bar: labeled icons; the middle item is the create button. Black in both themes, like the feed */
+.tabBar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: start;
+  justify-items: center;
+  height: 59px;
+  padding-top: 4px;
+  color: var(--dimmed);
+  background: #000;
+}
+
+.tab {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 9px;
+}
+
+.tabActive {
+  color: #fff;
+}
+
+.tabActive .icon {
+  fill: currentColor;
+}
+
+/* Friends: a dot on the icon's top-right corner says something's new there, without a number */
+.newDot {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* Create button: a plain white tile with a black plus, wider than it is tall */
+.create {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 20px;
+  margin-top: 2px;
+  border-radius: 6px;
+  color: #000;
+  background: #fff;
+}
+
+.create .icon {
+  stroke-width: 3;
+}
+
+/* Count badge: a pill that grows with the number */
+.badge {
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  min-width: 12px;
+  height: 12px;
+  margin-left: 3px;
+  padding: 0 3.5px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 12px;
+  text-align: center;
+  color: var(--on-accent);
+  background: var(--accent);
+}
+
+.homeIndicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  z-index: 2;
+  width: 112px;
+  height: 5px;
+  border-radius: 999px;
+  background: #fff;
+  transform: translateX(-50%);
+}

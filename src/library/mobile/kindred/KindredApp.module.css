@@ -1,0 +1,469 @@
+/*
+ * Kindred's swipe screen is dark by design, like the swipe screen it follows: the profile photo runs edge to edge under
+ * the status bar, and the action buttons and the floating tab bar sit on black. So it looks the same in both page
+ * themes. Photos are content; everything laid over them is white. The brand color is aqua: the dot in the wordmark,
+ * the LIKE stamp, the like button's heart, the verified badge, the shared interest and the tab bar's badges, always with
+ * dark green glyphs on it. The other action icons each have a hue of their own: sky, silver, violet and gold.
+ */
+.app {
+  --accent: #34d6c3;
+  --on-accent: #04302b;
+  --rewind: #6ec3ff;
+  --nope: #e9ebef;
+  --super-like: #a78bfa;
+  --boost: #ffc84a;
+  /* White text and icons on the photo carry a faint shadow, so they stay readable on bright skies too */
+  --overlay-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 1.3;
+  color: #fff;
+  background: #000;
+}
+
+.icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.glyph {
+  fill: currentColor;
+}
+
+/* The status bar sits on the photo */
+.statusBar {
+  position: relative;
+  z-index: 3;
+}
+
+/* Top bar: floats on the photo, with the wordmark on the left and the filters on the right */
+.topBar {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 30px;
+  padding: 0 8px 0 13px;
+}
+
+/* Wordmark: the name set in type, heavy, lowercase and tightly spaced */
+.wordmark {
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  text-shadow: var(--overlay-shadow);
+}
+
+/*
+ * A dotless i with a round aqua dot of our own on top. The i keeps its full width, so the dot centers on the stem in
+ * any font; the negative margin takes back the tight spacing the rest of the word has.
+ */
+.dotlessI {
+  position: relative;
+  margin-right: -0.045em;
+  letter-spacing: 0;
+}
+
+.dotlessI::after {
+  content: '';
+  position: absolute;
+  top: 0.12em;
+  left: 50%;
+  width: 0.24em;
+  height: 0.24em;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: translateX(-50%);
+}
+
+.filterButton {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(var(--overlay-shadow));
+}
+
+.filterButton .icon {
+  stroke-width: 1.8;
+}
+
+/* Card stack: the top card and, right behind it at the same size, the next profile */
+.stack {
+  position: absolute;
+  inset: 0 0 69px;
+}
+
+/* Full-bleed photo cards: the top corners follow the screen's, the bottom ones are tighter */
+.card,
+.nextCard {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 42px 42px 16px 16px;
+  background: #1c1c1e;
+}
+
+/*
+ * The top card, caught at the start of a swipe to the right: shifted and turned the way a finger drags it. Its shadow
+ * falls on the next card where that one shows.
+ */
+.card {
+  box-shadow: 0 0 24px rgb(0 0 0 / 0.6);
+  transform: translateX(10px) rotate(3deg);
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Scrims: a light shade at the top for the status bar and top bar, a deep one at the bottom for the text and buttons */
+.card::before,
+.nextCard::before,
+.card::after,
+.nextCard::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  left: 0;
+}
+
+.card::before,
+.nextCard::before {
+  top: 0;
+  height: 128px;
+  background: linear-gradient(rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.18) 55%, transparent);
+}
+
+.card::after,
+.nextCard::after {
+  bottom: 0;
+  height: 290px;
+  background: linear-gradient(transparent, rgb(0 0 0 / 0.5) 34%, rgb(0 0 0 / 0.82) 64%, rgb(0 0 0 / 0.88));
+}
+
+/* Photo segments: one short bar per photo, centered under the top bar; the padding makes the row easier to point at */
+.segments {
+  position: absolute;
+  top: 74px;
+  left: 50%;
+  z-index: 1;
+  display: flex;
+  gap: 3px;
+  padding: 5px 6px;
+  transform: translateX(-50%);
+}
+
+.segment,
+.segmentActive {
+  width: 7px;
+  height: 2.5px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.42);
+}
+
+.segmentActive {
+  width: 9px;
+  background: #fff;
+}
+
+/* Swipe stamp: fades in as the card is dragged right. It sits on the photo, so it looks the same in both themes */
+.stamp {
+  position: absolute;
+  top: 150px;
+  left: 18px;
+  z-index: 1;
+  padding: 1px 8px 0;
+  border: 3px solid var(--accent);
+  border-radius: 7px;
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  filter: drop-shadow(0 1px 3px rgb(0 0 0 / 0.35));
+  transform: rotate(-16deg);
+  transform-origin: left top;
+  opacity: 0.9;
+}
+
+/* Name, details and interests on the photo, over the bottom scrim; the info button sits level with the name */
+.info {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 10px;
+  padding: 0 12px 70px;
+  text-shadow: var(--overlay-shadow);
+}
+
+.details {
+  min-width: 0;
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 24px;
+  letter-spacing: -0.01em;
+}
+
+.age {
+  font-weight: 400;
+}
+
+.verified {
+  flex: none;
+  margin-left: 1px;
+}
+
+.seal {
+  fill: var(--accent);
+  stroke: var(--accent);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.check {
+  fill: none;
+  stroke: var(--on-accent);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+}
+
+.meta .icon {
+  flex: none;
+  stroke-width: 2.3;
+}
+
+/* Info button: a dark circle with a thin white ring and an up arrow; it opens the full profile */
+.infoButton {
+  display: grid;
+  grid-row: 1;
+  grid-column: 2;
+  align-self: start;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border: 1px solid rgb(255 255 255 / 0.85);
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.45);
+}
+
+.infoButton .icon {
+  stroke-width: 1.9;
+}
+
+/* Interest chips: near-black pills; an interest you share is filled in with the brand color */
+.chips {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 5px;
+  margin: 9px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip,
+.chipShared {
+  display: flex;
+  align-items: center;
+  height: 19px;
+  padding: 0 8.5px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: rgb(12 12 12 / 0.82);
+}
+
+.chipShared {
+  font-weight: 600;
+  color: var(--on-accent);
+  text-shadow: none;
+  background: var(--accent);
+}
+
+/* Action row: rewind, nope, super like, like, boost. Black circles over the bottom of the photo; the two choices you
+   make on every card are the big ones */
+.actions {
+  position: absolute;
+  top: 474px;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11.5px;
+  height: 48px;
+}
+
+.round {
+  display: grid;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: #000;
+}
+
+.small {
+  width: 34px;
+  height: 34px;
+}
+
+.big {
+  width: 47px;
+  height: 47px;
+}
+
+.rewind {
+  color: var(--rewind);
+  stroke-width: 3;
+}
+
+.nope {
+  color: var(--nope);
+  stroke-width: 3.8;
+}
+
+.superLike {
+  color: var(--super-like);
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+
+.like {
+  color: var(--accent);
+}
+
+.boost {
+  color: var(--boost);
+  stroke: currentColor;
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+
+/* Tab bar: a floating capsule with labeled icons; the current tab sits in a lighter pill */
+.tabBar {
+  position: absolute;
+  top: 538px;
+  right: 15px;
+  left: 15px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  height: 43px;
+  padding: 3px;
+  border: 1px solid rgb(255 255 255 / 0.09);
+  border-radius: 999px;
+  background: rgb(17 17 17 / 0.94);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.tab,
+.tabActive {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: 999px;
+  font-size: 8.5px;
+  font-weight: 600;
+  line-height: 10px;
+}
+
+.tabActive {
+  background: rgb(255 255 255 / 0.17);
+}
+
+.tabActive .icon {
+  fill: currentColor;
+}
+
+/* The back card of the Discover icon stays an outline, so the filled front card reads as a second card */
+.tabActive .outline {
+  fill: none;
+}
+
+.tabIcon {
+  position: relative;
+  display: grid;
+}
+
+/* Count badge: a pill that grows with the number */
+.count {
+  position: absolute;
+  top: -4px;
+  left: 8px;
+  min-width: 14px;
+  height: 10px;
+  padding: 0 3px;
+  border-radius: 999px;
+  font-size: 7.5px;
+  font-weight: 700;
+  line-height: 10px;
+  text-align: center;
+  color: var(--on-accent);
+  background: var(--accent);
+}
+
+/* Dot badge: something new, no number */
+.dot {
+  position: absolute;
+  top: -1px;
+  right: -2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.homeIndicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  z-index: 3;
+  width: 112px;
+  height: 5px;
+  border-radius: 999px;
+  background: #fff;
+  transform: translateX(-50%);
+}
