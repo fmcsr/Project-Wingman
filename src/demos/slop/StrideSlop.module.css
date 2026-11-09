@@ -1,0 +1,403 @@
+/*
+ * The AI slop version of Stride, generic on purpose: a giant emoji for a product photo on a violet-to-pink gradient,
+ * glass buttons, emoji stars, gradient text and glowing buttons. The panel follows the theme (light-dark pairs); the
+ * gradients don't.
+ */
+.app {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  font-family: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
+  font-size: 14px;
+  line-height: 1.35;
+  color: light-dark(#1e1b4b, #f5f3ff);
+  background: light-dark(#fff, #120d22);
+}
+
+/* "Photo": the shoe emoji on a gradient with blurred blobs, a glow and sparkles */
+.gallery {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(150deg, #7c3aed 0%, #c026d3 52%, #ec4899 100%);
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(32px);
+}
+
+.blobA {
+  top: 80px;
+  left: -50px;
+  width: 150px;
+  height: 150px;
+  background: rgb(96 165 250 / 0.55);
+}
+
+.blobB {
+  top: -30px;
+  right: -56px;
+  width: 170px;
+  height: 170px;
+  background: rgb(251 146 60 / 0.5);
+}
+
+.statusBar {
+  position: relative;
+}
+
+.topBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 2px 14px 0;
+}
+
+.roundButton {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgb(255 255 255 / 0.35);
+  border-radius: 50%;
+  font-size: 16px;
+  background: rgb(255 255 255 / 0.2);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 20px -8px rgb(76 29 149 / 0.6);
+}
+
+.roundButton svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.topTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #f97316, #ef4444);
+  box-shadow: 0 0 0 2px #b62bd6;
+}
+
+.hotDeal {
+  position: absolute;
+  top: 96px;
+  left: 12px;
+  z-index: 1;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: linear-gradient(135deg, #f97316, #ef4444);
+  box-shadow: 0 8px 20px -6px rgb(239 68 68 / 0.85);
+  transform: rotate(-6deg);
+}
+
+.glow {
+  position: absolute;
+  top: 88px;
+  left: 54%;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.6), rgb(255 255 255 / 0));
+  transform: translateX(-50%);
+}
+
+.shoe {
+  position: absolute;
+  top: 100px;
+  left: 54%;
+  font-size: 112px;
+  line-height: 1;
+  filter: drop-shadow(0 22px 16px rgb(76 29 149 / 0.55));
+  transform: translateX(-50%) rotate(-14deg);
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.sparkleA {
+  top: 100px;
+  right: 42px;
+}
+
+.sparkleB {
+  top: 186px;
+  left: 50px;
+  font-size: 14px;
+}
+
+/* Details panel, rounded on top, overlapping the gradient */
+.details {
+  position: relative;
+  z-index: 1;
+  margin-top: -28px;
+  padding: 18px 18px 0;
+  border-radius: 30px 30px 0 0;
+  background: light-dark(#fff, #120d22);
+  box-shadow: 0 -12px 30px -14px rgb(76 29 149 / 0.4);
+}
+
+.chips {
+  display: flex;
+  gap: 6px;
+}
+
+.chip {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: light-dark(#7c3aed, #d8b4fe);
+  background: light-dark(#f3e8ff, rgb(168 85 247 / 0.18));
+}
+
+.chip + .chip {
+  color: light-dark(#b45309, #fcd34d);
+  background: light-dark(#fef3c7, rgb(245 158 11 / 0.16));
+}
+
+.title {
+  margin-top: 8px;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.score {
+  margin-left: 2px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.reviews,
+.was,
+.description {
+  color: light-dark(#7c73a8, #a39cc8);
+}
+
+.reviews {
+  font-size: 12px;
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.now,
+.guide {
+  color: transparent;
+  background: linear-gradient(90deg, #7c3aed, #ec4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.now {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.was {
+  font-size: 13px;
+  text-decoration: line-through;
+}
+
+.save {
+  align-self: center;
+  margin-left: auto;
+  white-space: nowrap;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  color: light-dark(#047857, #6ee7b7);
+  background: light-dark(#d1fae5, rgb(16 185 129 / 0.18));
+}
+
+.description {
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.labelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.guide {
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.sizes {
+  display: flex;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.size,
+.sizeSelected {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  height: 36px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.size {
+  border: 1.5px solid light-dark(#ede9fe, rgb(255 255 255 / 0.12));
+  background: light-dark(#faf5ff, rgb(255 255 255 / 0.04));
+}
+
+.sizeSelected {
+  color: #fff;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  box-shadow: 0 8px 18px -6px rgb(236 72 153 / 0.8);
+}
+
+.colorRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.colors {
+  display: flex;
+  gap: 10px;
+}
+
+.color {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.colorViolet {
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+}
+
+.colorBlue {
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+}
+
+.colorOrange {
+  background: linear-gradient(135deg, #f97316, #ef4444);
+}
+
+.colorGreen {
+  background: linear-gradient(135deg, #10b981, #84cc16);
+}
+
+.colorSelected {
+  box-shadow:
+    0 0 0 2px light-dark(#fff, #120d22),
+    0 0 0 4px #a855f7,
+    0 6px 14px -2px rgb(168 85 247 / 0.75);
+}
+
+/* Buy bar with a glowing gradient button */
+.buyBar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  gap: 10px;
+  padding: 10px 16px 26px;
+  border-top: 1px solid light-dark(#f3e8ff, rgb(255 255 255 / 0.06));
+  background: light-dark(rgb(255 255 255 / 0.9), rgb(18 13 34 / 0.9));
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.heart {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border: 1.5px solid light-dark(#fbcfe8, rgb(236 72 153 / 0.35));
+  border-radius: 18px;
+  font-size: 20px;
+  background: light-dark(#fdf2f8, rgb(236 72 153 / 0.12));
+}
+
+.addButton {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  height: 50px;
+  border-radius: 18px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #7c3aed, #c026d3 50%, #ec4899);
+  box-shadow: 0 14px 28px -8px rgb(192 38 211 / 0.8);
+}
+
+.homeIndicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  z-index: 3;
+  width: 112px;
+  height: 5px;
+  border-radius: 999px;
+  background: light-dark(#111, #fff);
+  transform: translateX(-50%);
+}

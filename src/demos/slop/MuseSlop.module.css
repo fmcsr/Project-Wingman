@@ -1,0 +1,357 @@
+/*
+ * The AI slop version of Muse stays dark in every theme, as AI chat apps from a vague prompt usually do: purple,
+ * blue and pink blobs, a glowing gradient orb, glass bubbles, gradient text and a glowing send button.
+ */
+.app {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  font-family: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
+  font-size: 14px;
+  line-height: 1.4;
+  color: #fff;
+  background:
+    radial-gradient(60% 40% at 15% 20%, rgb(124 58 237 / 0.8), transparent 70%),
+    radial-gradient(50% 35% at 92% 42%, rgb(37 99 235 / 0.65), transparent 70%),
+    radial-gradient(60% 40% at 25% 82%, rgb(219 39 119 / 0.65), transparent 70%),
+    radial-gradient(45% 30% at 85% 92%, rgb(168 85 247 / 0.55), transparent 70%),
+    #0a0717;
+}
+
+.app svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.statusBar {
+  position: relative;
+  z-index: 4;
+}
+
+/* Glass header with the orb, a gradient name and a PRO badge */
+.header {
+  position: absolute;
+  top: 50px;
+  inset-inline: 12px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 50px;
+  padding: 0 8px 0 6px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 25px;
+  background: rgb(255 255 255 / 0.1);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    0 10px 30px -10px rgb(0 0 0 / 0.5);
+}
+
+.iconButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.1);
+}
+
+.identity {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.orb {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 12px;
+  line-height: 1;
+  background: conic-gradient(from 200deg, #a78bfa, #60a5fa, #f472b6, #a78bfa);
+  box-shadow: 0 0 16px rgb(167 139 250 / 0.75);
+}
+
+.orbLarge {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  box-shadow: 0 0 22px rgb(167 139 250 / 0.9);
+}
+
+.identityText {
+  display: grid;
+  line-height: 1.2;
+}
+
+.name {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: transparent;
+  background: linear-gradient(90deg, #fff, #c4b5fd 50%, #f9a8d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  color: rgb(255 255 255 / 0.65);
+}
+
+.online {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 6px #4ade80;
+}
+
+.pro {
+  flex: none;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #3b0764;
+  background: linear-gradient(90deg, #fde68a, #f9a8d4);
+  box-shadow: 0 0 14px rgb(249 168 212 / 0.6);
+}
+
+/* Chat */
+.chat {
+  position: absolute;
+  top: 112px;
+  inset-inline: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.day {
+  align-self: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: rgb(255 255 255 / 0.7);
+  background: rgb(255 255 255 / 0.08);
+}
+
+.aiRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.received,
+.sent {
+  font-size: 13px;
+  line-height: 1.42;
+}
+
+.received {
+  max-width: 214px;
+  padding: 9px 12px;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: 6px 18px 18px 18px;
+  background: rgb(255 255 255 / 0.1);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.sent {
+  align-self: flex-end;
+  max-width: 200px;
+  padding: 9px 13px;
+  border-radius: 18px 18px 6px 18px;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1 45%, #ec4899);
+  box-shadow: 0 10px 24px -8px rgb(168 85 247 / 0.85);
+}
+
+.outline {
+  display: grid;
+  gap: 2px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reactions {
+  display: flex;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.reaction {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 22px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 8px;
+  font-size: 11px;
+  background: rgb(255 255 255 / 0.08);
+}
+
+.thinking {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: 16px;
+  font-size: 12px;
+  color: rgb(255 255 255 / 0.75);
+  background: rgb(255 255 255 / 0.08);
+}
+
+.dots {
+  display: flex;
+  gap: 3px;
+}
+
+.dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c4b5fd, #f9a8d4);
+  animation: bounce 1.2s ease-in-out infinite;
+}
+
+.dots span:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.dots span:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes bounce {
+  0%,
+  60%,
+  100% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dots span {
+    animation: none;
+  }
+}
+
+/* Suggestion chips: a still picture, so the row is clipped rather than scrollable */
+.suggestions {
+  position: absolute;
+  right: 0;
+  bottom: 100px;
+  left: 0;
+  display: flex;
+  gap: 7px;
+  padding: 0 12px;
+  overflow: clip;
+}
+
+.suggestion {
+  flex: none;
+  padding: 7px 11px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgb(255 255 255 / 0.1);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* Composer with a glowing outline and a gradient send button */
+.composer {
+  position: absolute;
+  bottom: 42px;
+  inset-inline: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 50px;
+  padding: 0 6px 0 8px;
+  border: 1px solid rgb(167 139 250 / 0.5);
+  border-radius: 25px;
+  background: rgb(255 255 255 / 0.1);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  box-shadow:
+    0 0 0 4px rgb(139 92 246 / 0.15),
+    0 0 30px rgb(139 92 246 / 0.4);
+}
+
+.attach {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 15px;
+  background: rgb(255 255 255 / 0.1);
+}
+
+.placeholder {
+  flex: 1;
+  font-size: 13.5px;
+  color: rgb(255 255 255 / 0.6);
+}
+
+.send {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  box-shadow: 0 0 18px rgb(236 72 153 / 0.75);
+}
+
+.footnote {
+  position: absolute;
+  right: 0;
+  bottom: 20px;
+  left: 0;
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: center;
+  color: rgb(255 255 255 / 0.45);
+}
+
+.homeIndicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 112px;
+  height: 5px;
+  border-radius: 999px;
+  background: #fff;
+  transform: translateX(-50%);
+}
