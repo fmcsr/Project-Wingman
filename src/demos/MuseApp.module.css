@@ -1,320 +1,543 @@
-/* The example app stays the same in every theme: Liquid Glass elements on a dark, colorful background. */
+/*
+ * Muse is an AI assistant built like the best chat apps on the phone: a calm page, the user's message in a soft gray
+ * bubble, and the answer set as text without a bubble, in a clear type scale (15.5 / 12 / 11px). The top bar follows
+ * iOS 26's Liquid Glass: no bar of its own, just round glass buttons floating over the conversation, which fades out
+ * beneath them. The one accent, saffron, belongs to Muse itself: its mark, the highlighted figure, the done checkbox
+ * and the voice button, always with near-black glyphs on it. Everything follows the page theme (light-dark pairs).
+ */
 .app {
+  --bg: light-dark(#ffffff, #000000);
+  --surface: light-dark(#ffffff, #1c1c1e);
+  --text: light-dark(#18181b, #f5f5f7);
+  --text-body: light-dark(#2c2c31, #e2e2e6);
+  --text-2: light-dark(#6e6e76, #a1a1a9);
+  --text-3: light-dark(#a0a0a8, #6c6c74);
+  --line: light-dark(#e7e7ea, #2a2a2e);
+  --fill: light-dark(#f2f2f4, #1c1c1f);
+  --fill-subtle: light-dark(#f8f8f9, #111113);
+  --accent: light-dark(#f4a812, #ffb836);
+  --on-accent: #1f1500;
+  /* The highlighter: a marker band on white; on black the words themselves light up in saffron */
+  --marker: light-dark(rgb(244 168 18 / 0.3), transparent);
+  --marker-text: light-dark(#2c2c31, #ffc24d);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
   position: relative;
   height: 100%;
   overflow: hidden;
   font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
-  font-size: 14px;
-  color: #fff;
-  background:
-    radial-gradient(60% 40% at 18% 22%, rgb(124 58 237 / 0.85), transparent 70%),
-    radial-gradient(50% 35% at 86% 36%, rgb(37 99 235 / 0.8), transparent 70%),
-    radial-gradient(55% 40% at 28% 74%, rgb(219 39 119 / 0.7), transparent 70%),
-    radial-gradient(45% 30% at 82% 86%, rgb(20 184 166 / 0.6), transparent 70%),
-    #0b0b14;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
 }
 
-.app svg {
+.icon {
   fill: none;
   stroke: currentColor;
-  stroke-width: 2;
+  stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .statusBar {
   position: relative;
-  z-index: 7;
+  z-index: 4;
 }
 
-/* Liquid Glass: blur + saturation + a highlight line along the top edge */
+/* Scroll edge effect: the conversation fades out under the status bar and the floating buttons */
+.app::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  z-index: 2;
+  height: 92px;
+  background: linear-gradient(var(--bg) 52px, transparent);
+  pointer-events: none;
+}
+
+/* Liquid Glass navbar: no background of its own, three controls floating over the content */
 .navbar {
   position: absolute;
-  top: 50px;
+  top: 48px;
   inset-inline: 12px;
-  z-index: 5;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 44px;
-  padding: 0 4px;
-  border: 1px solid rgb(255 255 255 / 0.22);
-  border-radius: 22px;
-  background: rgb(255 255 255 / 0.12);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  backdrop-filter: blur(18px) saturate(180%);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.35),
-    0 8px 24px rgb(0 0 0 / 0.25);
+  height: 36px;
 }
 
-.iconButton {
+.glassButton {
   display: grid;
   place-items: center;
   width: 36px;
   height: 36px;
   border-radius: 50%;
+  color: var(--text);
+  background: light-dark(rgb(255 255 255 / 0.72), rgb(40 40 44 / 0.62));
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
+  box-shadow:
+    inset 0 0 0 0.5px light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.1)),
+    inset 0 1px 0 light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.12)),
+    0 2px 10px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.5));
 }
 
-.picker {
+/* Model switcher: the name of the model in use; pointing at it opens the menu below */
+.switcher {
+  position: relative;
+}
+
+.model {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 6px 10px;
-  border-radius: 14px;
-  font-size: 15px;
+  height: 30px;
+  padding: 0 9px 0 12px;
+  border-radius: 15px;
+  font-size: 14px;
   font-weight: 600;
-  transition: background-color 220ms;
+  letter-spacing: -0.01em;
+  transition: background-color 150ms;
 }
 
-.picker svg {
-  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+.chevron {
+  fill: none;
+  stroke: var(--text-2);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: rotate 200ms var(--ease);
 }
 
-.picker[data-open] {
-  background: rgb(255 255 255 / 0.14);
+.switcher[data-open] .model,
+:focus-visible .model {
+  background: var(--fill);
 }
 
-.picker[data-open] svg {
-  transform: rotate(180deg);
+.switcher[data-open] .chevron,
+:focus-visible .chevron {
+  rotate: 180deg;
 }
 
-/* Dropdown menu: grows in from the point nearest the button (top center), shrinks on the way out */
+/* Dropdown menu: grows from its top center, right under the button, and shrinks back on the way out */
 .menu {
   position: absolute;
-  top: 100px;
+  top: calc(100% + 10px);
   left: 50%;
-  z-index: 6;
-  width: 210px;
-  padding: 6px;
-  border: 1px solid rgb(255 255 255 / 0.18);
-  border-radius: 18px;
-  background: rgb(28 28 40 / 0.55);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  backdrop-filter: blur(24px) saturate(180%);
+  width: 204px;
+  padding: 5px;
+  border-radius: 16px;
+  background: light-dark(rgb(255 255 255 / 0.9), rgb(36 36 40 / 0.9));
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.25),
-    0 18px 40px rgb(0 0 0 / 0.4);
-  transform-origin: top center;
-  transform: translateX(-50%) scale(0.92) translateY(-6px);
-  opacity: 0;
+    inset 0 0 0 0.5px light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.1)),
+    0 14px 36px -10px light-dark(rgb(0 0 0 / 0.24), rgb(0 0 0 / 0.7)),
+    0 2px 6px light-dark(rgb(0 0 0 / 0.05), rgb(0 0 0 / 0.3));
   visibility: hidden;
+  opacity: 0;
+  translate: -50% 0;
+  scale: 0.96;
+  transform-origin: top center;
   transition:
-    opacity 220ms ease,
-    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    visibility 0s linear 220ms;
+    opacity 150ms ease,
+    scale 200ms var(--ease),
+    visibility 0s linear 200ms;
 }
 
-.menu[data-open] {
-  transform: translateX(-50%) scale(1);
-  opacity: 1;
+/* Open: the pointer reached the model name, or the example is inspected with the keyboard (the example itself holds
+   the focus then), so the arrow keys find the menu on screen */
+.switcher[data-open] .menu,
+:focus-visible .menu {
   visibility: visible;
+  opacity: 1;
+  scale: 1;
   transition-delay: 0s;
 }
 
-.menuItem,
-.menuItemSelected {
+.menuItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 8px 10px;
-  border-radius: 12px;
+  padding: 7px 10px;
+  border-radius: 11px;
 }
 
-.menuItemSelected {
-  background: rgb(255 255 255 / 0.1);
+.menuItem:first-child {
+  background: light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.08));
+}
+
+.menuText {
+  min-width: 0;
 }
 
 .menuName {
   display: block;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
+  line-height: 1.3;
 }
 
 .menuDetail {
   display: block;
-  font-size: 12px;
-  color: rgb(255 255 255 / 0.65);
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--text-2);
 }
 
-.check {
+.menuCheck {
   flex: none;
-  color: #c4b5fd;
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-/* Chat */
-.chat {
+/* The conversation */
+.thread {
   position: absolute;
-  top: 112px;
-  inset-inline: 14px;
+  top: 94px;
+  inset-inline: 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
 }
 
-.received,
-.sent {
-  max-width: 78%;
-  padding: 9px 13px;
-  font-size: 13.5px;
-  line-height: 1.4;
-}
-
-.received {
-  align-self: flex-start;
-  border: 1px solid rgb(255 255 255 / 0.14);
-  border-radius: 18px 18px 18px 4px;
-  background: rgb(255 255 255 / 0.12);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-}
-
-.sent {
+/* The user's message: a soft gray bubble on the right, its lower right corner tucked toward the sender */
+.bubble {
   align-self: flex-end;
-  border-radius: 18px 18px 4px 18px;
-  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  max-width: 80%;
+  padding: 8px 12px;
+  border-radius: 16px 16px 5px 16px;
+  font-size: 12px;
+  line-height: 1.45;
+  background: var(--fill);
 }
 
-.typing {
+/* Reasoning, collapsed: Muse's mark, how long it thought, and a chevron that opens the steps */
+.reasoning {
   display: flex;
   align-self: flex-start;
-  gap: 4px;
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: rgb(255 255 255 / 0.1);
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--text-2);
 }
 
-.typing span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #fff;
-  animation: bounce 1.2s ease-in-out infinite;
-}
-
-.typing span:nth-child(2) {
-  animation-delay: 150ms;
-}
-
-.typing span:nth-child(3) {
-  animation-delay: 300ms;
-}
-
-@keyframes bounce {
-  0%,
-  60%,
-  100% {
-    opacity: 0.5;
-    transform: translateY(0);
-  }
-
-  30% {
-    opacity: 1;
-    transform: translateY(-4px);
-  }
-}
-
-/* Suggestion chips */
-.suggestions {
-  position: absolute;
-  right: 0;
-  bottom: 92px;
-  left: 0;
-  display: flex;
-  gap: 8px;
-  padding: 0 14px;
-  /* A still picture: it clips the row. A real app scrolls it (overflow-x: auto, as the balloon says); a scrollable
-     row would also become keyboard-focusable inside the example. clip, unlike hidden, isn't a scroll container */
-  overflow: clip;
-}
-
-.suggestion {
+.mark {
+  display: block;
   flex: none;
-  padding: 7px 12px;
-  border: 1px solid rgb(255 255 255 / 0.18);
-  border-radius: 999px;
-  font-size: 12.5px;
-  font-weight: 500;
-  background: rgb(255 255 255 / 0.14);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
 }
 
-/* Message composer: a floating glass capsule above the home indicator */
-.composer {
-  position: absolute;
-  bottom: 32px;
-  inset-inline: 12px;
+.markDisc {
+  fill: var(--accent);
+}
+
+.markGlyph {
+  fill: none;
+  stroke: var(--on-accent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.disclosure {
+  fill: none;
+  stroke: var(--text-3);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  margin-left: -2px;
+}
+
+/* The answer: plain text on the page, no bubble, in a three-step type scale */
+.answer {
+  margin-top: 10px;
+}
+
+.title {
+  font-size: 15.5px;
+  font-weight: 650;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+.paragraph {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-body);
+}
+
+.paragraph strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Highlighter: a saffron band behind the lower part of the letters, like a marker stroke */
+.highlight {
+  color: var(--marker-text);
+  background: linear-gradient(transparent 58%, var(--marker) 58%);
+}
+
+/* Citation chip: the source of the sentence before it, as a small pill in the line of text */
+.citation {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 16px;
+  padding: 0 6px 0 5px;
+  border-radius: 8px;
+  font-size: 9.5px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: 1px;
+  color: var(--text-2);
+  background: var(--fill);
+}
+
+.citation svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.citationPage {
+  margin-left: 2px;
+  color: var(--text-3);
+}
+
+/* Table: hairline rows in a rounded frame; numbers in tabular figures, aligned right; the target in bold */
+.tableWrap {
+  margin-top: 12px;
+  overflow: clip;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+
+.table th,
+.table td {
+  padding: 5px 10px;
+  text-align: right;
+}
+
+.table th:first-child,
+.table td:first-child {
+  text-align: left;
+}
+
+.table th {
+  font-weight: 500;
+  color: var(--text-2);
+  background: var(--fill-subtle);
+}
+
+.table td {
+  border-top: 1px solid var(--line);
+  color: var(--text-body);
+}
+
+.table td:last-child {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.subhead {
+  margin: 12px 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Checklist: markdown task items; the done one is checked in saffron and steps back in gray */
+.checklist {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step,
+.stepDone {
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 48px;
-  padding: 0 6px 0 8px;
-  border: 1px solid rgb(255 255 255 / 0.2);
-  border-radius: 24px;
-  background: rgb(255 255 255 / 0.12);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  backdrop-filter: blur(18px) saturate(180%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3);
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-body);
 }
 
-.plus {
+.stepDone {
+  color: var(--text-2);
+}
+
+.checkbox {
   display: grid;
   flex: none;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgb(255 255 255 / 0.14);
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1.25px var(--text-3);
+}
+
+.stepDone .checkbox {
+  background: var(--accent);
+  box-shadow: none;
+}
+
+.checkbox svg {
+  fill: none;
+  stroke: var(--on-accent);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Message actions: quiet icons under the answer, then the version switcher Regenerate creates */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 8px 0 0 -5px;
+  color: var(--text-2);
+}
+
+.action {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+}
+
+.versions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+.versions .icon {
+  stroke-width: 2.6;
+}
+
+/* Follow-up suggestions: outlined pills in one row that runs off the right edge */
+.followUps {
+  display: flex;
+  gap: 6px;
+  margin: 8px -16px 0 0;
+  /* A still picture: it clips the row. A real app scrolls it (overflow-x: auto); a scrollable row would also become
+     keyboard-focusable inside the example. clip, unlike hidden, isn't a scroll container */
+  overflow: clip;
+}
+
+.followUp {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 26px;
+  padding: 0 11px;
+  border-radius: 13px;
+  font-size: 11px;
+  font-weight: 500;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+/* The conversation fades out behind the composer */
+.app::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  inset-inline: 0;
+  z-index: 2;
+  height: 72px;
+  background: linear-gradient(transparent, var(--bg) 55%);
+  pointer-events: none;
+}
+
+/* Composer: one floating pill with attach, the field, dictation and the voice button */
+.composer {
+  position: absolute;
+  bottom: 22px;
+  inset-inline: 12px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 42px;
+  padding: 0 6px 0 7px;
+  border-radius: 21px;
+  background: var(--surface);
+  box-shadow:
+    inset 0 0 0 0.5px light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.1)),
+    0 1px 2px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3)),
+    0 8px 24px -8px light-dark(rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.6));
+}
+
+.composerIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--text);
 }
 
 .placeholder {
   flex: 1;
-  font-size: 14px;
-  color: rgb(255 255 255 / 0.6);
+  padding-left: 2px;
+  font-size: 13px;
+  color: var(--text-3);
 }
 
-/* Voice button: color wheel + a pulsing ring */
+/* Voice button: a saffron disc with a waveform, for talking with Muse (the mic beside it only dictates) */
 .voice {
-  position: relative;
   display: grid;
   flex: none;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: conic-gradient(#a78bfa, #60a5fa, #f472b6, #a78bfa);
+  color: var(--on-accent);
+  background: var(--accent);
 }
 
-.voice::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 2px solid rgb(167 139 250 / 0.7);
-  border-radius: 50%;
-  animation: pulse 2s ease-out infinite;
-}
-
-@keyframes pulse {
-  from {
-    opacity: 0.8;
-    transform: scale(1);
-  }
-
-  to {
-    opacity: 0;
-    transform: scale(1.35);
-  }
+.voice svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
 }
 
 .homeIndicator {
   position: absolute;
   bottom: 8px;
   left: 50%;
+  z-index: 3;
   width: 112px;
   height: 5px;
   border-radius: 999px;
-  background: #fff;
-  transform: translateX(-50%);
+  background: var(--text);
+  translate: -50% 0;
 }

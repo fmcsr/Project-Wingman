@@ -1,12 +1,30 @@
-/* The example app follows the page theme with iOS's light and dark system colors, in the iOS system font. */
+/*
+ * Wave follows the page theme with iOS's grouped surfaces: a gray page with white cards in light mode, black with
+ * #1c1c1e cards in dark mode, in the iOS system font. The chrome stays neutral (ink on glass); color belongs to the
+ * habits. Each habit takes the color of its time of day, from dawn coral to night indigo: six hues with the same
+ * OKLCH lightness and chroma, so none shouts louder than another. Tints are those hues mixed into the card in Oklab.
+ */
 .app {
+  --page: light-dark(#f2f2f7, #000);
+  --card: light-dark(#fff, #1c1c1e);
+  --label: light-dark(#000, #fff);
+  --secondary: light-dark(rgb(60 60 67 / 0.6), rgb(235 235 245 / 0.6));
+  --separator: light-dark(rgb(60 60 67 / 0.14), rgb(84 84 88 / 0.55));
+  --fill: light-dark(rgb(120 120 128 / 0.12), rgb(118 118 128 / 0.24));
+  /* A glyph on a filled habit color: white on the light-mode hues, black on the brighter dark-mode ones */
+  --on-hue: light-dark(#fff, #000);
+  --flame: light-dark(oklch(0.64 0.19 45), oklch(0.76 0.16 55));
+
   position: relative;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   overflow: hidden;
   font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
   font-size: 14px;
-  color: light-dark(#000, #fff);
-  background: light-dark(#f2f2f7, #000);
+  line-height: 1.25;
+  color: var(--label);
+  background: var(--page);
 }
 
 .app svg {
@@ -17,23 +35,50 @@
   stroke-linejoin: round;
 }
 
+/* Time-of-day hues: L 0.67 / C 0.14 in light mode, L 0.78 / C 0.12 in dark mode */
+.dawn {
+  --hue: light-dark(oklch(0.67 0.14 40), oklch(0.78 0.12 40));
+}
+
+.morning {
+  --hue: light-dark(oklch(0.67 0.14 70), oklch(0.78 0.12 70));
+}
+
+.midday {
+  --hue: light-dark(oklch(0.67 0.14 185), oklch(0.78 0.12 185));
+}
+
+.afternoon {
+  --hue: light-dark(oklch(0.67 0.14 230), oklch(0.78 0.12 230));
+}
+
+.evening {
+  --hue: light-dark(oklch(0.67 0.14 260), oklch(0.78 0.12 260));
+}
+
+.night {
+  --hue: light-dark(oklch(0.67 0.14 285), oklch(0.78 0.12 285));
+}
+
+/* Header: the date as an eyebrow over the large title, the avatar on the right */
 .header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  padding: 2px 18px 0;
+  padding: 2px 16px 0 18px;
 }
 
 .date {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #8e8e93;
+  color: var(--secondary);
 }
 
 .largeTitle {
-  font-size: 32px;
+  margin-top: 1px;
+  font-size: 30px;
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -44,125 +89,224 @@
   place-items: center;
   width: 34px;
   height: 34px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   border-radius: 50%;
-  font-size: 12px;
-  font-weight: 700;
-  color: light-dark(#1d4ed8, #93c5fd);
-  background: light-dark(#dbeafe, rgb(10 132 255 / 0.22));
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--label);
+  background: var(--fill);
 }
 
-/* Daily goal card and progress ring */
-.goal {
+/* Segmented control: a capsule track with a raised white thumb on the selected segment */
+.switcher {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 29px;
+  margin: 10px 16px 0;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--fill);
+}
+
+.segment,
+.segmentActive {
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.segmentActive {
+  font-weight: 600;
+  background: light-dark(#fff, #636366);
+  box-shadow:
+    0 3px 8px rgb(0 0 0 / 0.12),
+    0 3px 1px rgb(0 0 0 / 0.04);
+}
+
+/* Summary card: the day's ring and what's left */
+.summary {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin: 14px 14px 0;
-  padding: 12px 14px;
-  border-radius: 18px;
-  background: light-dark(#fff, #1c1c1e);
+  margin: 12px 16px 0;
+  padding: 12px 14px 12px 12px;
+  border-radius: 20px;
+  background: var(--card);
 }
 
 .ring {
+  position: relative;
   flex: none;
-  width: 60px;
-  height: 60px;
+  width: 92px;
+  height: 92px;
+}
+
+.ring svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .app .ringTrack,
 .app .ringValue {
   fill: none;
-  stroke-width: 7;
+  stroke-width: 11;
+  stroke-linecap: round;
 }
 
 .app .ringTrack {
-  stroke: light-dark(#e5e5ea, #2c2c2e);
+  stroke: color-mix(in oklab, var(--hue) 24%, var(--card));
 }
 
 .app .ringValue {
-  stroke: #0a84ff;
-  stroke-linecap: round;
-  transform: rotate(-90deg);
-  transform-origin: 32px 32px;
+  stroke: var(--hue);
 }
 
-.app .ringLabel {
-  fill: light-dark(#000, #fff);
-  stroke: none;
-  font-size: 13px;
+.ringCount {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  padding-top: 1px;
+  font-size: 30px;
   font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
-.goalLabel {
-  font-size: 13px;
-  color: #8e8e93;
+.ringTotal {
+  margin-top: 1px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--secondary);
 }
 
-.goalValue {
-  font-size: 22px;
+.summaryText {
+  min-width: 0;
+}
+
+.summaryTitle {
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
-.goalValue span {
-  font-size: 13px;
+/* What's left, keyed to the ring by color */
+.legend {
+  display: grid;
+  gap: 3px;
+  margin: 5px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
   font-weight: 500;
-  color: #8e8e93;
 }
 
-/* Filter chips */
-.chips {
+.legend li {
   display: flex;
-  gap: 8px;
-  margin: 12px 14px 0;
-  /* A still picture: it clips the row. A real app scrolls it (overflow-x: auto, as the balloon says); a scrollable
-     row would also become keyboard-focusable inside the example. clip, unlike hidden, isn't a scroll container */
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.legend li::before {
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--hue);
+}
+
+.streakChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 4px 9px 4px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: color-mix(in oklab, var(--flame) 75%, var(--label));
+  background: color-mix(in oklab, var(--flame) 14%, var(--card));
+}
+
+.app .flame {
+  flex: none;
+  fill: var(--flame);
+  stroke: none;
+}
+
+/*
+ * The lists take the rest of the screen and run on under the floating bars, as a scrolled list does. They stop 10px
+ * above the screen's edge, where the scroll edge below has already faded them out, so nothing peeks out at the
+ * bottom when the phone is drawn small.
+ */
+.lists {
+  flex: 1;
+  min-height: 0;
+  margin-bottom: 10px;
   overflow: clip;
 }
 
-.chip,
-.chipActive {
-  flex: none;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 13px;
+/* Sections: an all-caps header with a count, and day initials over the rows' week dots */
+.section {
+  margin: 14px 16px 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  /* Right padding = row padding 12 + check 26 + gap 10, so the initials sit over the dots */
+  padding: 0 48px 5px 12px;
+  font-size: 11px;
   font-weight: 600;
-}
-
-.chip {
-  background: light-dark(#fff, #1c1c1e);
-}
-
-.chipActive {
-  color: light-dark(#fff, #000);
-  background: light-dark(#000, #fff);
-}
-
-/* List */
-.sectionTitle {
-  margin: 14px 30px 6px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #8e8e93;
+  color: var(--secondary);
+}
+
+.sectionCount {
+  margin-left: 2px;
+  color: var(--secondary);
+  opacity: 0.6;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 5px);
+  gap: 3.5px;
+  justify-items: center;
+  font-size: 8px;
+  letter-spacing: 0;
+}
+
+.weekdays .today {
+  color: var(--label);
 }
 
 .list {
-  margin: 0 14px;
+  margin: 0;
   padding: 0;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 18px;
   list-style: none;
-  background: light-dark(#fff, #1c1c1e);
+  background: var(--card);
 }
 
 .row {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-height: 52px;
+  gap: 10px;
+  min-height: 50px;
   padding: 8px 12px;
 }
 
@@ -172,97 +316,158 @@
   position: absolute;
   right: 0;
   bottom: 0;
-  left: 60px;
+  left: 54px;
   height: 1px;
-  background: light-dark(#e5e5ea, #38383a);
+  background: var(--separator);
+  transform: scaleY(0.5);
+  transform-origin: bottom;
 }
 
-.rowIcon {
+.icon {
   display: grid;
   flex: none;
   place-items: center;
   width: 32px;
   height: 32px;
-  border-radius: 9px;
-  color: #fff;
+  border-radius: 50%;
+  color: color-mix(in oklab, var(--hue) 78%, var(--label));
+  background: color-mix(in oklab, var(--hue) 16%, var(--card));
 }
 
-.rowText {
+.app .icon svg {
+  stroke-width: 1.9;
+}
+
+.text {
   display: grid;
   flex: 1;
+  gap: 1px;
   min-width: 0;
 }
 
-.rowTitle {
-  font-size: 15px;
-  font-weight: 500;
+.name {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.rowDetail {
-  font-size: 12.5px;
-  color: #8e8e93;
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  color: var(--secondary);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Toggle switch: track + thumb */
-.switch,
-.switchOn {
-  position: relative;
-  flex: none;
-  width: 44px;
-  height: 26px;
-  border-radius: 999px;
-  background: light-dark(#e5e5ea, #39393d);
+.streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-weight: 600;
+  color: var(--label);
 }
 
-.switchOn {
-  background: light-dark(#34c759, #30d158);
-}
-
-.thumb {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 2px 4px rgb(0 0 0 / 0.2);
-}
-
-.switchOn .thumb {
-  transform: translateX(18px);
-}
-
-/* Floating action button */
-.fab {
-  position: absolute;
-  right: 16px;
-  bottom: 92px;
-  z-index: 2;
+/* Week dots: the last seven days, Friday to today */
+.dots {
   display: grid;
-  place-items: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  color: #fff;
-  background: #0a84ff;
-  box-shadow: 0 8px 20px rgb(10 132 255 / 0.4);
+  flex: none;
+  grid-template-columns: repeat(7, 5px);
+  gap: 3.5px;
+  /* A taller box around the 5px dots is easier to point at; the negative margin keeps the row's layout */
+  margin: -7px 0;
+  padding: 7px 0;
 }
 
-/* Bottom tab bar */
+.dots > span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.dots .done {
+  background: var(--hue);
+}
+
+.dots .missed {
+  background: light-dark(#e3e3e8, #3a3a3c);
+}
+
+.dots .open {
+  box-shadow: inset 0 0 0 1.2px var(--hue);
+}
+
+.dots .partial {
+  background: color-mix(in oklab, var(--hue) 40%, var(--card));
+  box-shadow: inset 0 0 0 1.2px var(--hue);
+}
+
+/* Check button */
+.check,
+.checkDone {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
+
+.check {
+  box-shadow: inset 0 0 0 2.2px light-dark(#d1d1d6, #48484a);
+}
+
+.checkDone {
+  color: var(--on-hue);
+  background: var(--hue);
+}
+
+.app .checkDone svg {
+  stroke-width: 2.8;
+}
+
+.checkArc {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+
+.app .checkArc circle {
+  stroke: var(--hue);
+  stroke-width: 2.2;
+}
+
+.checkPlus {
+  color: var(--hue);
+}
+
+.app .checkPlus {
+  stroke-width: 2.4;
+}
+
+/* Floating tab bar: a glass capsule with a pill behind the selected tab */
 .tabBar {
   position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  bottom: 22px;
+  left: 14px;
+  z-index: 2;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  height: 80px;
-  padding-top: 8px;
-  border-top: 1px solid light-dark(#d1d1d6, #38383a);
-  background: light-dark(rgb(249 249 249 / 0.94), rgb(22 22 24 / 0.94));
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  grid-template-columns: repeat(3, 1fr);
+  width: 194px;
+  height: 52px;
+  padding: 4px;
+  border-radius: 999px;
+  background: light-dark(rgb(255 255 255 / 0.72), rgb(40 40 42 / 0.72));
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow:
+    0 8px 24px light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.5)),
+    inset 0 0 0 0.5px light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.14));
 }
 
 .tab,
@@ -270,14 +475,52 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  font-size: 10px;
-  font-weight: 500;
-  color: #8e8e93;
+  justify-content: center;
+  gap: 1px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 600;
 }
 
 .tabActive {
-  color: #0a84ff;
+  background: var(--fill);
+}
+
+/* Floating add button, beside the tab bar */
+.fab {
+  position: absolute;
+  right: 14px;
+  bottom: 23px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  color: light-dark(#fff, #000);
+  background: light-dark(#1c1c1e, #fff);
+  box-shadow: 0 8px 20px light-dark(rgb(0 0 0 / 0.25), rgb(0 0 0 / 0.6));
+}
+
+.app .fab svg {
+  stroke-width: 2.4;
+}
+
+/* Scroll edge under the floating bars: content that scrolls beneath them blurs and fades into the page, as in iOS 26 */
+.app::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  height: 96px;
+  background: linear-gradient(to bottom, transparent, var(--page) 72%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 40%);
+  mask-image: linear-gradient(to bottom, transparent, #000 40%);
+  pointer-events: none;
 }
 
 .homeIndicator {

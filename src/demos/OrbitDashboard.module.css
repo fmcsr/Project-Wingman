@@ -1,106 +1,160 @@
-/* The example app follows the page theme: every color is a light-dark(light, dark) pair. */
-/* Container queries apply to child elements, not the container itself; that's why the grid sits inside it */
+/*
+ * Orbit, a revenue analytics dashboard. It follows the page theme: every color is a light-dark(light, dark) pair,
+ * kept once as a custom property on the root. One accent, Orbit blue, marks the data and the current selection;
+ * green and red only ever mean good and bad.
+ * Container queries apply to the container's children, which is why the grid sits inside .root.
+ */
 .root {
   container-type: inline-size;
+  container-name: orbit;
+
+  --orbit-app: light-dark(#f4f4f5, #09090b);
+  --orbit-panel: light-dark(#ffffff, #111113);
+  --orbit-card: light-dark(#ffffff, #141416);
+  --orbit-raised: light-dark(#ffffff, #1b1b1e);
+  --orbit-fill: light-dark(#f4f4f5, #1c1c1f);
+  --orbit-head: light-dark(#fafafa, #121214);
+  --orbit-line: light-dark(#e8e8eb, #232326);
+  --orbit-line-strong: light-dark(#d9d9de, #303035);
+  --orbit-grid: light-dark(#efeff1, #1f1f23);
+  --orbit-text: light-dark(#18181b, #f4f4f5);
+  --orbit-text-2: light-dark(#52525b, #a1a1aa);
+  --orbit-text-3: light-dark(#71717a, #80808a);
+  --orbit-accent: light-dark(#2f6fed, #4c8dff);
+  --orbit-accent-text: light-dark(#2059d0, #7aa7ff);
+  --orbit-accent-wash: light-dark(#eaf1fe, rgb(76 141 255 / 0.15));
+  --orbit-good: light-dark(#117a43, #4cc38a);
+  --orbit-good-wash: light-dark(#e9f6ee, rgb(76 195 138 / 0.13));
+  --orbit-bad: light-dark(#c2352b, #f47067);
+  --orbit-bad-wash: light-dark(#fdeceb, rgb(244 112 103 / 0.13));
+  --orbit-warn: light-dark(#9a5600, #e8a33d);
+  --orbit-warn-wash: light-dark(#fdf3e3, rgb(232 163 61 / 0.13));
+  --orbit-shadow: light-dark(rgb(24 24 27 / 0.06), rgb(0 0 0 / 0.4));
 }
 
+/* The sidebar sits on the app's gray plane; the page itself is a white panel inset by 8px, with a hairline */
 .app {
   display: grid;
-  grid-template-columns: 196px minmax(0, 1fr);
+  grid-template-columns: 232px minmax(0, 1fr);
   min-height: 100%;
-  font-size: 14px;
-  color: light-dark(#0f172a, #e2e8f0);
-  background: light-dark(#f8fafc, #0b1120);
+  padding: 8px 8px 8px 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--orbit-text);
+  background: var(--orbit-app);
 }
 
 .icon {
   flex: none;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.8;
+  stroke-width: 1.75;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-/* Sidebar */
+/* Sidebar: its contents stay in view while the page scrolls */
 .sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding: 16px 12px;
-  border-right: 1px solid light-dark(#e2e8f0, #1e293b);
-  background: light-dark(#fff, #0f172a);
+  min-width: 0;
 }
 
-.brand {
+.sidebarInner {
+  position: sticky;
+  top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 12px 16px;
+}
+
+/* Workspace switcher: the workspace's logo and name, with an up-and-down chevron that opens the list */
+.switcher {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 4px 8px;
-  font-size: 15px;
-  font-weight: 700;
+  height: 44px;
+  padding: 0 8px;
+  border-radius: 8px;
 }
 
-.brandMark {
-  flex: none;
-  width: 22px;
-  height: 22px;
-  border: 5px solid light-dark(#4f46e5, #818cf8);
-  border-radius: 50%;
-}
-
-/* Workspace switcher: product name, the workspace below it, and an up-down chevron */
-.brandText {
+/* The workspace's own icon: its initial on a rounded square */
+.workspaceLogo {
   display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: light-dark(#fff, #18181b);
+  background: light-dark(#18181b, #f4f4f5);
+}
+
+.workspaceName {
   flex: 1;
   min-width: 0;
-  line-height: 1.2;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-.workspace {
-  font-size: 12px;
-  font-weight: 500;
-  color: light-dark(#64748b, #94a3b8);
-}
-
-.switcher {
+.switcherIcon {
+  composes: icon;
   width: 16px;
   height: 16px;
-  color: light-dark(#94a3b8, #64748b);
+  color: var(--orbit-text-3);
 }
 
-.nav {
+.nav,
+.navGroup {
   display: grid;
-  gap: 2px;
+  gap: 1px;
 }
 
-.group {
-  padding: 4px 10px 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: light-dark(#94a3b8, #64748b);
+.groupLabel {
+  padding: 0 10px 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--orbit-text-3);
 }
 
 .navItem {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 10px;
-  border-radius: 8px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 7px;
   font-weight: 500;
-  color: light-dark(#475569, #94a3b8);
+  white-space: nowrap;
+  color: var(--orbit-text-2);
 }
 
 .navItem[aria-current='page'] {
-  color: light-dark(#4338ca, #c7d2fe);
-  background: light-dark(#eef2ff, rgb(99 102 241 / 0.16));
+  color: var(--orbit-text);
+  background: light-dark(#e6e6e9, #1f1f23);
 }
 
-/* Top bar */
-.main {
+.navItem[aria-current='page'] .icon {
+  color: var(--orbit-accent);
+}
+
+.navMuted {
+  color: var(--orbit-text-3);
+}
+
+/* The page */
+.panel {
+  container: panel / inline-size;
   min-width: 0;
+  border: 1px solid var(--orbit-line);
+  border-radius: 12px;
+  background: var(--orbit-panel);
+  box-shadow: 0 1px 2px var(--orbit-shadow);
 }
 
 .topbar {
@@ -108,191 +162,458 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  height: 56px;
-  padding: 0 20px;
-  border-bottom: 1px solid light-dark(#e2e8f0, #1e293b);
-  background: light-dark(#fff, #0f172a);
+  height: 52px;
+  padding: 0 14px 0 20px;
+  border-bottom: 1px solid var(--orbit-line);
 }
 
 .search {
   display: flex;
+  flex: 0 1 320px;
   align-items: center;
   gap: 8px;
-  width: min(300px, 100%);
-  height: 34px;
-  padding: 0 8px 0 10px;
-  border: 1px solid light-dark(#e2e8f0, #1e293b);
+  min-width: 0;
+  height: 32px;
+  padding: 0 6px 0 10px;
+  border: 1px solid var(--orbit-line);
   border-radius: 8px;
-  color: light-dark(#94a3b8, #64748b);
-  background: light-dark(#f8fafc, #0b1120);
+  color: var(--orbit-text-3);
+  background: var(--orbit-head);
+}
+
+.searchIcon {
+  composes: icon;
 }
 
 .placeholder {
   flex: 1;
+  min-width: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .kbd {
-  padding: 1px 6px;
-  border: 1px solid light-dark(#e2e8f0, #334155);
-  border-radius: 6px;
+  flex: none;
+  padding: 0 5px;
+  border: 1px solid var(--orbit-line-strong);
+  border-radius: 5px;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   font-size: 11px;
-  color: light-dark(#64748b, #94a3b8);
-  background: light-dark(#fff, #1e293b);
+  line-height: 18px;
+  color: var(--orbit-text-2);
+  background: var(--orbit-panel);
+}
+
+.topActions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+}
+
+.iconButton {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--orbit-text-2);
+}
+
+.helpButton {
+  composes: iconButton;
+}
+
+/* Unread dot, ringed in the panel color so it reads against the bell */
+.unread {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--orbit-panel);
+  border-radius: 50%;
+  background: var(--orbit-accent);
 }
 
 .avatar {
   display: grid;
   flex: none;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
+  margin-left: 6px;
   border-radius: 50%;
-  font-size: 12px;
-  font-weight: 700;
-  color: light-dark(#4338ca, #c7d2fe);
-  background: light-dark(#e0e7ff, rgb(99 102 241 / 0.24));
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--orbit-accent-text);
+  background: var(--orbit-accent-wash);
 }
 
-/* Content */
 .content {
   display: grid;
-  gap: 14px;
-  padding: 20px;
+  gap: 16px;
+  padding: 24px 28px 28px;
 }
 
-.titleRow {
+.pageHead {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
+}
+
+.titleBlock {
+  min-width: 0;
 }
 
 .title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 650;
-  letter-spacing: -0.02em;
+  line-height: 1.2;
+  letter-spacing: -0.022em;
+}
+
+.subtitle {
+  margin-top: 4px;
+  color: var(--orbit-text-3);
+}
+
+/* Buttons and pickers share one shape: 32px tall, 8px corners, a hairline and a hint of shadow */
+.button,
+.dateRange,
+.compare {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 11px;
+  border: 1px solid var(--orbit-line-strong);
+  border-radius: 8px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: var(--orbit-panel);
+  box-shadow: 0 1px 2px var(--orbit-shadow);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.dateRange .icon {
+  color: var(--orbit-text-2);
+}
+
+.preset {
+  padding-right: 9px;
+  border-right: 1px solid var(--orbit-line);
+}
+
+.dates {
+  color: var(--orbit-text-2);
+}
+
+.chevron {
+  composes: icon;
+  width: 14px;
+  height: 14px;
+  color: var(--orbit-text-3);
+}
+
+/* Compare: a switch that's on, so the chart draws the previous period too */
+.switch {
+  position: relative;
+  flex: none;
+  width: 26px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--orbit-accent);
+}
+
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 12px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.25);
+}
+
+.compareDates {
+  color: var(--orbit-text-3);
 }
 
 .segmented {
-  display: flex;
-  gap: 2px;
-  padding: 3px;
+  display: inline-flex;
+  margin-left: auto;
+  padding: 2px;
   border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: light-dark(#64748b, #94a3b8);
-  background: light-dark(#f1f5f9, #1e293b);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--orbit-text-2);
+  background: var(--orbit-fill);
 }
 
 .segmented span {
-  padding: 4px 10px;
+  padding: 0 12px;
   border-radius: 6px;
+  line-height: 28px;
 }
 
 .segmented .segmentActive {
-  color: light-dark(#0f172a, #f1f5f9);
-  background: light-dark(#fff, #334155);
-  box-shadow: 0 1px 2px light-dark(rgb(15 23 42 / 0.12), rgb(0 0 0 / 0.4));
+  color: var(--orbit-text);
+  background: light-dark(#ffffff, #2b2b30);
+  box-shadow:
+    0 1px 2px light-dark(rgb(24 24 27 / 0.1), rgb(0 0 0 / 0.5)),
+    0 0 0 1px var(--orbit-line);
 }
 
+/* KPI cards */
 .stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 
 .stat,
 .card {
-  border: 1px solid light-dark(#e2e8f0, #1e293b);
+  min-width: 0;
+  border: 1px solid var(--orbit-line);
   border-radius: 12px;
-  background: light-dark(#fff, #0f172a);
+  background: var(--orbit-card);
+}
+
+/* Cards stack header, body and footer; the footer sits at the bottom, so side-by-side cards line up */
+.card {
+  display: flex;
+  flex-direction: column;
 }
 
 .stat {
   display: grid;
+  align-content: start;
   justify-items: start;
-  gap: 4px;
-  padding: 14px 16px;
+  padding: 14px 16px 12px;
 }
 
 .statLabel {
-  font-size: 12px;
-  color: light-dark(#64748b, #94a3b8);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--orbit-text-2);
 }
 
+/* Large standalone numbers keep proportional figures; tabular ones are for columns */
 .statValue {
-  font-size: 24px;
+  margin-top: 6px;
+  font-size: 26px;
   font-weight: 600;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
 }
 
 .statFoot {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 2px;
+  max-width: 100%;
+  margin-top: 8px;
 }
 
-.deltaUp,
-.deltaDown {
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 11.5px;
+.deltaGood,
+.deltaBad {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  height: 20px;
+  padding: 0 6px 0 4px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
-.deltaUp {
-  color: light-dark(#15803d, #4ade80);
-  background: light-dark(#dcfce7, rgb(34 197 94 / 0.14));
+.deltaGood {
+  color: var(--orbit-good);
+  background: var(--orbit-good-wash);
 }
 
-.deltaDown {
-  color: light-dark(#b91c1c, #f87171);
-  background: light-dark(#fee2e2, rgb(239 68 68 / 0.14));
+.deltaBad {
+  color: var(--orbit-bad);
+  background: var(--orbit-bad-wash);
 }
 
-.card {
-  padding: 14px 16px;
+.deltaIcon {
+  composes: icon;
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.25;
 }
 
+.statFrom {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--orbit-text-3);
+}
+
+.spark {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 32px;
+  margin-top: 14px;
+}
+
+.spark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.sparkLine {
+  fill: none;
+  stroke: var(--orbit-accent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.sparkDot {
+  position: absolute;
+  right: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--orbit-accent);
+  box-shadow: 0 0 0 2px var(--orbit-card);
+  transform: translate(50%, -50%);
+}
+
+/* The washes under the lines fade from the accent to transparent */
+.accentStop {
+  stop-color: var(--orbit-accent);
+}
+
+/* Cards */
 .cardHeader {
   display: flex;
-  align-items: baseline;
+  flex-wrap: wrap;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 13px;
+  gap: 8px 20px;
+  padding: 14px 16px 0;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 14px;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-.muted {
-  font-size: 12px;
-  font-weight: 400;
-  color: light-dark(#64748b, #94a3b8);
+.cardNote {
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: var(--orbit-text-3);
 }
 
-/* Chart with a value axis on the left and dates below */
+.headText {
+  flex: 1;
+  min-width: 0;
+}
+
+.cardMeta {
+  font-size: 12.5px;
+  color: var(--orbit-text-3);
+}
+
+.cardFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding: 11px 16px 12px;
+  border-top: 1px solid var(--orbit-line);
+  font-size: 12.5px;
+  color: var(--orbit-text-2);
+}
+
+.footValue {
+  margin-left: auto;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.footValue b {
+  margin-left: 4px;
+  font-weight: 600;
+  color: var(--orbit-text);
+}
+
+/* Hero chart: legend keys mirror the marks, a solid line for this period and a dashed one for the one before */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  padding-top: 1px;
+  font-size: 12.5px;
+  color: var(--orbit-text-2);
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.keyCurrent,
+.keyBefore {
+  flex: none;
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--orbit-accent);
+}
+
+.keyBefore {
+  background: repeating-linear-gradient(90deg, var(--orbit-text-3) 0 4px, transparent 4px 7px);
+}
+
 .plot {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
-  grid-template-rows: 150px 22px;
-  padding-right: 6px;
+  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-rows: 240px 30px;
+  padding: 20px 20px 4px 8px;
 }
 
 .yAxis,
 .xAxis {
   position: relative;
-  font-size: 11px;
+  font-size: 11.5px;
   font-variant-numeric: tabular-nums;
-  color: light-dark(#94a3b8, #64748b);
+  color: var(--orbit-text-3);
 }
 
 .yAxis span {
   position: absolute;
   right: 10px;
+  line-height: 1;
   transform: translateY(-50%);
 }
 
@@ -302,185 +623,719 @@
 
 .xAxis span {
   position: absolute;
-  bottom: 0;
-  transform: translateX(-50%);
+  top: 9px;
   white-space: nowrap;
+  transform: translateX(-50%);
 }
 
 .xAxis span:first-child {
   transform: none;
 }
 
-.xAxis span:last-child {
-  transform: translateX(-100%);
+.hoverTick {
+  position: absolute;
+  top: 5px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-weight: 600;
+  line-height: 15px;
+  white-space: nowrap;
+  color: light-dark(#fff, #18181b);
+  background: light-dark(#3f3f46, #d4d4d8);
+  transform: translateX(-50%);
 }
 
-.chartArea {
+/* Gridlines are solid hairlines one step off the surface; the baseline is one step stronger */
+.plotArea {
   position: relative;
-}
-
-.chart {
-  display: block;
-  width: 100%;
-  height: 100%;
+  border-bottom: 1px solid var(--orbit-line-strong);
 }
 
 .gridline {
-  stroke: light-dark(#e2e8f0, #1e293b);
-  stroke-dasharray: 4 4;
-  vector-effect: non-scaling-stroke;
-}
-
-.baseline {
-  stroke: light-dark(#cbd5e1, #334155);
-  vector-effect: non-scaling-stroke;
-}
-
-.point {
   position: absolute;
-  left: 100%;
-  width: 10px;
-  height: 10px;
-  border: 2px solid light-dark(#6366f1, #818cf8);
-  border-radius: 50%;
-  background: light-dark(#fff, #0f172a);
-  transform: translate(-50%, -50%);
+  right: 0;
+  left: 0;
+  border-top: 1px solid var(--orbit-grid);
 }
 
-.tip {
+.chart {
   position: absolute;
-  right: 12px;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 11.5px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: light-dark(#fff, #0f172a);
-  background: light-dark(#0f172a, #f1f5f9);
-  transform: translateY(-50%);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
 .line {
   fill: none;
-  stroke: light-dark(#6366f1, #818cf8);
+  stroke: var(--orbit-accent);
   stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
 
-/* The fill under the line fades from the line color to transparent */
-.stop {
-  stop-color: light-dark(#6366f1, #818cf8);
+.lineBefore {
+  fill: none;
+  stroke: var(--orbit-text-3);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Annotation: an event pinned to its date, a flag on a hairline pole */
+.annotationLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid var(--orbit-line-strong);
+}
+
+.annotation {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 8px 0 6px;
+  border: 1px solid var(--orbit-line-strong);
+  border-radius: 0 6px 6px 0;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--orbit-text-2);
+  background: var(--orbit-card);
+}
+
+.annotationIcon {
+  composes: icon;
+  width: 12px;
+  height: 12px;
+  color: var(--orbit-text-3);
+}
+
+/* The hovered day: a crosshair, a dot on each line, ringed in the surface color */
+.crosshair {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid var(--orbit-text-3);
+}
+
+.dot,
+.dotBefore {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--orbit-card);
+  transform: translate(-50%, -50%);
+}
+
+.dot {
+  background: var(--orbit-accent);
+}
+
+.dotBefore {
+  border: 2px solid var(--orbit-text-3);
+  background: var(--orbit-card);
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 2;
+  bottom: 12px;
+  left: var(--x);
+  display: grid;
+  gap: 6px;
+  width: 172px;
+  padding: 9px 12px 10px;
+  border: 1px solid var(--orbit-line);
+  border-radius: 10px;
+  font-size: 12px;
+  background: var(--orbit-raised);
+  box-shadow:
+    0 12px 32px -12px light-dark(rgb(24 24 27 / 0.24), rgb(0 0 0 / 0.8)),
+    0 2px 6px light-dark(rgb(24 24 27 / 0.06), rgb(0 0 0 / 0.3));
+  transform: translateX(14px);
+}
+
+.tooltipHead {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--orbit-line);
+  font-weight: 600;
+}
+
+.tooltipChange {
+  font-variant-numeric: tabular-nums;
+  color: var(--orbit-good);
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tooltipLabel {
+  flex: 1;
+  color: var(--orbit-text-2);
+}
+
+.tooltipRow b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Breakdowns: bar lists */
+.split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* The list and its total fill the card, so the totals of side-by-side cards line up */
+.barBlock {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.barList {
+  display: grid;
+  gap: 4px;
+  padding: 12px 16px 12px;
+}
+
+.barRow,
+.barFoot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px 60px;
+  align-items: center;
+  gap: 12px;
+}
+
+.barRow {
+  height: 30px;
+}
+
+.barTrack {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  min-width: 0;
+}
+
+.bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 6px;
+  background: var(--orbit-accent-wash);
+}
+
+.barLabel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 8px 0 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* A name that doesn't fit ends in an ellipsis instead of running into the value */
+.barName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.newTag {
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 17px;
+  color: light-dark(#fff, #0b1530);
+  background: var(--orbit-accent);
+}
+
+.flag {
+  flex: none;
+  width: 16px;
+  height: 11px;
+  overflow: hidden;
+  border-radius: 2px;
+  outline: 1px solid rgb(0 0 0 / 0.08);
+  outline-offset: -1px;
+}
+
+.barValue {
+  font-weight: 500;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--orbit-text);
+}
+
+.changeUp,
+.changeDown,
+.share {
+  font-size: 12.5px;
+  font-weight: 500;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.changeUp {
+  color: var(--orbit-good);
+}
+
+.changeDown {
+  color: var(--orbit-bad);
+}
+
+.share {
+  font-weight: 400;
+  color: var(--orbit-text-3);
+}
+
+/* The footer lines up with the rows: label under the bars, then the same two columns */
+.barFoot {
+  padding-left: 26px;
+}
+
+/* A share in percent needs a narrower last column than a change in dollars */
+.withShare .barRow,
+.withShare .barFoot {
+  grid-template-columns: minmax(0, 1fr) 64px 48px;
 }
 
 /* Table */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-top: 1px;
+  font-weight: 500;
+  color: var(--orbit-accent-text);
+}
+
+.linkIcon {
+  composes: icon;
+  width: 14px;
+  height: 14px;
+}
+
 .table {
   width: 100%;
+  margin-top: 14px;
   border-collapse: collapse;
-  font-size: 13px;
 }
 
 .table th {
-  padding: 0 0 8px;
-  border-bottom: 1px solid light-dark(#e2e8f0, #1e293b);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  height: 34px;
+  padding: 0 12px;
+  border-block: 1px solid var(--orbit-line);
+  font-size: 12px;
+  font-weight: 500;
   text-align: left;
-  text-transform: uppercase;
-  color: light-dark(#64748b, #94a3b8);
+  color: var(--orbit-text-3);
+  background: var(--orbit-head);
 }
 
 .table td {
-  padding: 10px 0;
-  border-bottom: 1px solid light-dark(#f1f5f9, rgb(148 163 184 / 0.08));
+  height: 58px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--orbit-line);
 }
 
-.table tr:last-child td {
+.table th:first-child,
+.table td:first-child {
+  padding-left: 16px;
+}
+
+.table th:last-child,
+.table td:last-child {
+  padding-right: 16px;
+}
+
+.table tbody tr:last-child td {
   border-bottom: 0;
 }
 
 .table .num {
-  padding-right: 20px;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
 .customer {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 500;
+  min-width: 0;
 }
 
-.customer i {
+/* Company initials in a rounded square; people get circles, companies get squares */
+.logoTile {
   display: grid;
   flex: none;
   place-items: center;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--orbit-line);
   border-radius: 7px;
-  font-size: 9.5px;
-  font-style: normal;
-  font-weight: 700;
-  color: #fff;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--orbit-text-2);
+  background: var(--orbit-fill);
 }
 
+.stack {
+  display: grid;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.customerName {
+  overflow: hidden;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.secondary {
+  overflow: hidden;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--orbit-text-3);
+}
+
+.date {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--orbit-text-2);
+}
+
+.amount {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.cents {
+  color: var(--orbit-text-3);
+}
+
+/* Status pills: a tinted fill, a hairline ring in the same hue, a dot and the word */
 .pillPaid,
 .pillPending,
-.pillOverdue {
-  padding: 2px 8px;
+.pillFailed,
+.pillRefunded {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
   border-radius: 999px;
-  font-size: 11.5px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.pillPaid::before,
+.pillPending::before,
+.pillFailed::before,
+.pillRefunded::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 .pillPaid {
-  color: light-dark(#15803d, #4ade80);
-  background: light-dark(#dcfce7, rgb(34 197 94 / 0.14));
+  color: var(--orbit-good);
+  background: var(--orbit-good-wash);
 }
 
 .pillPending {
-  color: light-dark(#b45309, #fbbf24);
-  background: light-dark(#fef3c7, rgb(245 158 11 / 0.14));
+  color: var(--orbit-warn);
+  background: var(--orbit-warn-wash);
 }
 
-.pillOverdue {
-  color: light-dark(#b91c1c, #f87171);
-  background: light-dark(#fee2e2, rgb(239 68 68 / 0.14));
+.pillFailed {
+  color: var(--orbit-bad);
+  background: var(--orbit-bad-wash);
 }
 
-/* On narrow screens the sidebar collapses to icons */
-@container (width < 640px) {
+.pillRefunded {
+  color: var(--orbit-text-2);
+  background: var(--orbit-fill);
+}
+
+/* Narrower windows: the sidebar collapses to an icon rail */
+@container orbit (width < 1000px) {
   .app {
-    grid-template-columns: 60px minmax(0, 1fr);
+    grid-template-columns: 56px minmax(0, 1fr);
   }
 
-  .sidebar {
+  .sidebarInner {
     align-items: center;
     padding-inline: 8px;
   }
 
-  .label {
+  .label,
+  .navGroup {
     display: none;
   }
 
-  .brand,
+  .switcher {
+    padding: 0 8px;
+  }
+
   .navItem {
-    padding: 8px;
+    justify-content: center;
+    width: 36px;
+    padding: 0;
   }
 }
 
-@container (width < 560px) {
+/* Phones: the page fills the window, without the inset */
+@container orbit (width < 600px) {
+  .app {
+    grid-template-columns: 48px minmax(0, 1fr);
+    padding: 0;
+  }
+
+  .sidebarInner {
+    top: 0;
+    padding-top: 6px;
+  }
+
+  .panel {
+    border-width: 0 0 0 1px;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* The page adapts to its own width */
+@container panel (width < 760px) {
   .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .colDate,
+  .preset,
+  .tickWide {
+    display: none;
+  }
+}
+
+@container panel (width < 680px) {
+  .split {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .dateCell {
+  .compareDates {
+    display: none;
+  }
+}
+
+@container panel (width < 600px) {
+  .content {
+    padding: 20px 20px 24px;
+  }
+
+  .colPlan {
+    display: none;
+  }
+}
+
+@container panel (width < 520px) {
+  .topbar {
+    height: 48px;
+    padding: 0 8px 0 12px;
+  }
+
+  .kbd,
+  .helpButton,
+  .buttonText {
     display: none;
   }
 
-  .topbar,
   .content {
-    padding-inline: 14px;
+    gap: 12px;
+    padding: 16px 14px 20px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .button {
+    padding: 0 8px;
+  }
+
+  .compare {
+    gap: 6px;
+    padding: 0 9px;
+  }
+
+  .segmented {
+    margin-left: 0;
+    font-size: 12px;
+  }
+
+  .segmented span {
+    padding: 0 8px;
+  }
+
+  .stats {
+    gap: 8px;
+  }
+
+  .stat {
+    padding: 12px;
+  }
+
+  .statValue {
+    font-size: 21px;
+  }
+
+  .statFrom {
+    display: none;
+  }
+
+  .spark {
+    height: 28px;
+    margin-top: 12px;
+  }
+
+  .cardHeader {
+    padding: 12px 12px 0;
+  }
+
+  .cardFoot {
+    padding-inline: 12px;
+  }
+
+  .plot {
+    grid-template-columns: 38px minmax(0, 1fr);
+    grid-template-rows: 192px 28px;
+    padding: 16px 14px 2px 2px;
+  }
+
+  .yAxis span {
+    right: 8px;
+  }
+
+  .tickMedium {
+    display: none;
+  }
+
+  /* No room beside the crosshair: the readout sits at the plot's right edge */
+  .tooltip {
+    right: 0;
+    left: auto;
+    width: 156px;
+    transform: none;
+  }
+
+  .barList {
+    padding: 10px 12px;
+  }
+
+  .barRow,
+  .barFoot {
+    grid-template-columns: minmax(0, 1fr) 56px 52px;
+    gap: 6px;
+  }
+
+  .withShare .barRow,
+  .withShare .barFoot {
+    grid-template-columns: minmax(0, 1fr) 56px 40px;
+  }
+
+  .barFoot {
+    padding: 10px 12px 11px 20px;
+  }
+
+  .barLabel {
+    padding-left: 8px;
+  }
+
+  .flag {
+    width: 14px;
+    height: 10px;
+  }
+}
+
+/* Phones: each payment becomes a two-line row, customer on the left, amount and status on the right */
+@container panel (width < 480px) {
+  .table,
+  .table tbody {
+    display: block;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'customer amount'
+      'customer status';
+    align-items: center;
+    gap: 4px 12px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--orbit-line);
+  }
+
+  .table td,
+  .table td:first-child,
+  .table td:last-child {
+    display: block;
+    height: auto;
+    padding: 0;
+    border: 0;
+  }
+
+  .table .colPlan,
+  .table .colDate,
+  .footCount {
+    display: none;
+  }
+
+  .colCustomer {
+    grid-area: customer;
+    min-width: 0;
+  }
+
+  .colAmount {
+    grid-area: amount;
+  }
+
+  .colStatus {
+    grid-area: status;
+    justify-self: end;
+  }
+}
+
+@container panel (width < 400px) {
+  .updated {
+    display: none;
   }
 }
