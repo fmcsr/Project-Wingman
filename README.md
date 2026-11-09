@@ -11,27 +11,34 @@ understand. Next, it will write that brief from everyday descriptions like “th
 
 ## A look inside
 
-Hover anything in the examples to learn what it's called. Click to pin the full explanation: how it looks, how it
-behaves, and the exact CSS behind it. The examples switch to dark mode with the page (products that are dark by design
-stay dark), and the balloons show the values for the theme you're in.
+Each example is a before/after: drag the line to compare the AI slop a vague prompt produces with the same product
+built from a Wingman brief. Hover anything on the Wingman side to learn what it's called. Click to pin the full
+explanation: how it looks, how it behaves, and the exact CSS behind it. The examples switch to dark mode with the page
+(products that are dark by design stay dark), and the balloons show the values for the theme you're in.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/inspect-dark.png">
-  <img alt="The Acme example pinned in its scroll scene: its product screenshot passes under the frosted-glass navbar, whose explanation is open" src="docs/screenshots/inspect-light.png">
+  <img alt="The Acme example in its scroll scene, split by the before/after line: the AI slop version on the left, the Wingman version on the right with its frosted-glass navbar's explanation pinned" src="docs/screenshots/inspect-light.png">
 </picture>
 
-Three mobile apps side by side, with a preview of Muse's Liquid Glass navbar:
+Three mobile apps side by side, each split between its AI slop and Wingman versions, with a preview of Muse's Liquid
+Glass navbar:
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/phones-dark.png">
-  <img alt="The Wave, Muse and Stride phone examples in one row, with a balloon describing the Liquid Glass navbar" src="docs/screenshots/phones-light.png">
+  <img alt="The Wave, Muse and Stride phone examples in one row, each split down the middle between the AI slop version and the Wingman version, with a balloon describing Muse's Liquid Glass navbar" src="docs/screenshots/phones-light.png">
 </picture>
 
 ## Current status: landing page, sign-in, the library and the brief
 
-An English landing page with a sticky header (with a theme toggle), a hero, examples, feature cards, pricing and a
-footer. The examples section has five projects (a marketing site, an analytics dashboard and three mobile apps), and
-nearly every element shows its name on hover, a summary after a short pause and the full explanation on click.
+An English landing page with a sticky header (with a theme toggle), a hero, examples, feature cards, a support section
+and a footer. The examples section has five projects (a marketing site, an analytics dashboard and three mobile apps),
+each a before/after comparison with a line to drag: on the left, the AI slop a vague prompt produces; on the right, the
+same product built from a Wingman brief, where nearly every element shows its name on hover, a summary after a short
+pause and the full explanation on click.
+
+Wingman is free: an account opens the library and the brief builder. People who find it useful can sponsor it on
+GitHub (`SPONSOR_HREF` in `src/landing/links.ts`; GitHub Sponsors has to be set up on that account).
 
 Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to the library (`/app/mobile`, `/app/web`): mobile apps and
 websites in two tabs, each a fictional product built from the patterns of well-known ones (“inspired by” Spotify,
@@ -45,8 +52,8 @@ element list. The brief page (`/app/brief`) adds what you're building and a note
 Markdown to copy or download: each element's look and behavior with the terms and values to use, followed by acceptance
 criteria. The brief is put together from the element descriptions (no LLM yet) and kept in the browser.
 
-Out of scope for now (later phases): a real auth backend, payments and subscriptions (plan prices are placeholders),
-and a real LLM integration (writing the brief from a plain description).
+Out of scope for now (later phases): a real auth backend (sign-ups open once it exists) and a real LLM integration
+(writing the brief from a plain description).
 
 ## Before going live
 
@@ -86,12 +93,13 @@ setting (light or dark) and can be switched from the header. All visual decision
 
 ```
 src/
-  landing/     Landing page sections: header, theme toggle, hero, examples, feature cards, pricing, footer
+  landing/     Landing page sections: header, theme toggle, hero, examples, feature cards, support, footer
   auth/        Sign-in and sign-up pages, the session store (no backend yet) and the dev account
   workspace/   The signed-in area: the library's tabs, search and grids, and each example's page with its glossary
   brief/       The brief: its store (in localStorage), the Markdown writer, the Add to brief button and the brief page
   library/     The library: types, the registry, and one folder per example (mobile/<id>, web/<id>)
-  demos/       The landing page's five examples: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ StatusBar)
+  demos/       The landing page's five examples: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ StatusBar),
+               and in slop/ the AI slop version each one is compared with
   catalog/     Element descriptions (English, typed data) for those five, plus elements every phone shares
   inspector/   The “inspect element” layer: InspectSurface, explainer balloon, positioning
   showcase/    Frames and the interaction guide: the browser frame as a scroll scene (useScrollScene), a scalable phone

@@ -24,24 +24,30 @@ Last updated: 2026-10-28 · Status: Applied to the landing page
 ## Page structure (information architecture)
 
 ```
-Header        Logo · Examples · Features · Pricing ········ Theme · Sign in   (sticky)
-Hero          [ PROJECT WINGMAN ] · “Every PM needs a wingman.” · See examples / Get started
-[01] Examples Acme (marketing) · Orbit (analytics dashboard) · Wave (habits) · Muse (AI) · Stride (shopping)
+Header        Logo · Examples · Features · Support ········ Theme · Sign in   (sticky)
+Hero          [ PROJECT WINGMAN ] · “Every PM needs a wingman.” · See examples / Get started free
+[01] Examples Before/after: Acme (marketing) · Orbit (analytics dashboard) · Wave (habits) · Muse (AI) · Stride (shopping)
 [02] Features A slowly moving marquee (with a pause button)
-[03] Pricing  Free · Pro · Team (placeholder prices)
+[03] Support  A free account · Sponsor on GitHub
 Footer        Text links · Back to top
 ```
 
-Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the plans' buttons lead here) and the signed-in library: `/app/mobile`, `/app/web` and one page per example at `/app/<platform>/<id>`, plus the brief at `/app/brief`. Once signed in, Sign in becomes Workspace in the header and the footer. Under the landing page's examples, “Explore the library” leads in.
+Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the free-account buttons lead here) and the signed-in library: `/app/mobile`, `/app/web` and one page per example at `/app/<platform>/<id>`, plus the brief at `/app/brief`. Once signed in, Sign in becomes Workspace in the header and the footer. Under the landing page's examples, “Explore the library” leads in.
 
 - **The header isn't a bar, but it's sticky:** Fully transparent at the top of the page; as you scroll down it takes on a borderless frosted-glass background. Links go to sections, the logo goes back to the top, and the link of the section in view gets darker. Sections stop below the header thanks to `scroll-margin-top`.
 - **Footer:** Not a bar; text links sitting on the page background.
-- **The home page shows only five example projects:** The full library and the signed-in areas come in a later phase.
+- **The home page shows only five example projects:** The full library opens after sign-in.
 - **Example layout:**
   - Sites (Acme, Orbit): Each in its own scroll scene, full page width, one after another.
     - The window pins below the header. The scene grows by as much as the content overflows, and page scrolling is passed one to one into the window.
     - Users never scroll inside the window. Because the content really scrolls (`overflow: hidden` + `scrollTop`), Acme's sticky glass navbar keeps working.
   - Phones: All three in one row at every width. If they don't fit, they shrink together (`--phone-scale`; ~0.35 on a phone). In a narrow row, each heading keeps only the index and the name.
+- **Before/after:** every example is a comparison (`src/showcase/Compare.tsx`), the story of the product in one gesture.
+  - The AI slop version a vague prompt produces (`src/demos/slop/`) lies on top of the Wingman version and is cut at a vertical line. Drag the line right and the slop grows; drag it left and the Wingman version grows. It starts in the middle and sways once when it first comes into view (not with reduced motion).
+  - The line is white with a soft shadow, so it reads on any content. Its round knob is a slider: arrow keys move it by 5%, Page Up/Down by 20%, Home and End go to the edges. Small "AI slop" and "With Wingman" pills ride on each side of the knob, so they never cover an app's corners, and fade when their side gets narrow.
+  - Only the Wingman side is inspectable; the slop side is a picture, hidden from screen readers. In the sites both versions scroll together, and the line stays put over the window.
+  - Above each site (and under each phone), the vague prompt behind its slop side.
+- **Support:** Wingman is free with an account (the library and the brief builder); a second card asks people who find it useful to sponsor it on GitHub, one-time or monthly.
 
 ## Inspection interaction
 
@@ -55,7 +61,7 @@ The balloon is narrow in preview (name, summary, term chips) and wide when pinne
 
 In the scaled-down phones and in windows settling into place, the outline and the name tag are drawn at the inverse scale: the outline stays thin and the tag stays readable.
 
-**Animated demos pause while inspected.** Muse's dropdown opens and closes on its own when idle. It holds still while the pointer is over the example, keyboard focus is inside it or a balloon is open, so the menu itself can be inspected too. Demos read this state with `useInspectActivity()`.
+**Animated demos pause while inspected.** Motion that runs on its own (Chatter's typing dots, Flick's spinning sound disc) holds still while the pointer is over the example, keyboard focus is inside it or a balloon is open. Demos read this state with `useInspectActivity()`. Muse uses it the other way round: nothing there moves on its own, and pointing at (or tapping) the model name opens the model menu, which stays open until the inspection ends, so the menu itself can be inspected too.
 
 ## Library
 
@@ -89,16 +95,17 @@ In the scaled-down phones and in windows settling into place, the outline and th
 
 ## Mobile demos
 
-- **Wave:** The classic iOS language. Grouped background, list rows, toggle switches, a FAB and a bottom tab bar. In dark mode it uses iOS's dark system colors: black background, `#1c1c1e` cells, darker separators and the brighter `#30d158` switch.
-- **Muse:** A newer kind of app: an AI assistant in the Liquid Glass style. A glass navbar floating over a dark, colorful background, a glass dropdown that opens and closes on its own, chat bubbles, a typing indicator, glass suggestion chips, a glass composer and a voice button with a color ring.
-  - Liquid Glass recipe: `backdrop-filter: blur() saturate(180%)`, a translucent white background, a thin white border and a highlight along the top edge made with an inset shadow.
-- **Stride:** A shopping product page. A must-have in the collection, because it gathers the elements PMs most often look up by name on a single screen:
-  - Photo gallery and pagination dots.
-  - Count badge, favorite button, discount badge and struck-through price.
-  - Star rating, color and size pickers (including a sold-out size).
-  - Quantity stepper and a sticky buy bar.
-  - A toast that comes and goes on its own (stays visible while inspected).
-  - In dark mode: a warm dark gallery behind the coral shoe, a dark details panel, and the selections (size, color ring, Add to bag) flip to light.
+- **Wave:** A habit tracker's Today screen in the iOS idiom. A large title, a day/week segmented control, a summary card with a segmented progress ring and the streak, habit rows under two section headers, Tonight and Done (icon badge, week dots, check button), a glass tab bar and a FAB.
+  - iOS's grouped surfaces: a gray page with white cards in light mode, black with `#1c1c1e` cards in dark mode, in the iOS system font.
+  - The chrome stays neutral; color belongs to the habits. Each takes the color of its time of day, from dawn coral to night indigo: six OKLCH hues with the same lightness and chroma, so none shouts louder than another.
+- **Muse:** An AI assistant built like the best chat apps on the phone. A calm page, the user's message in a soft gray bubble, and the answer set as text without a bubble: a heading, a reasoning disclosure, a cited source, a small table, a checklist, then message actions and follow-up suggestions. A model menu, a composer and a voice button.
+  - The top bar follows iOS 26's Liquid Glass: no bar of its own, just round glass buttons floating over the conversation, which fades out beneath them. Recipe: `backdrop-filter: blur() saturate(180%)`, a translucent background, a thin border and a highlight along the top edge made with an inset shadow.
+  - One accent, saffron, belongs to Muse itself: its mark, the highlighted figure, the done checkbox and the voice button, always with near-black glyphs on it.
+- **Stride:** A sneaker's product page, laid out like the Nike app's. It gathers the elements PMs most often look up by name on a single screen:
+  - A full-width product photo on a pale gray studio backdrop with page dots, a navigation bar with back, share and search buttons, and a badge.
+  - The product title, the sale price with the struck-through original, photo swatches of the other colors and a size grid with sold-out sizes.
+  - A size-guide text link and two stacked pill buttons (Add to Bag, Favorite).
+  - Color comes from the photos; the one accent, a cobalt blue, marks the saving. The photo looks the same in both themes, so the page dots drawn on it stay dark in both.
 
 ## Color tokens
 
@@ -107,7 +114,7 @@ All of them live in `src/styles/tokens.css` and are defined with `light-dark(lig
 | Token | Light | Dark | Use |
 | --- | --- | --- | --- |
 | `--color-bg` | `#fcfcfc` | `#141414` | Page background |
-| `--color-surface` | `#ffffff` | `#1a1a1a` | Cards, plans |
+| `--color-surface` | `#ffffff` | `#1a1a1a` | Cards |
 | `--color-surface-2` | `#f5f5f5` | `#1c1c1c` | Feature cards, window title bar |
 | `--color-text` | `#171717` | `#fafafa` | Body text |
 | `--color-text-muted` | `#5c5c5c` | `#a3a3a3` | Supporting text |
@@ -150,7 +157,7 @@ Typefaces and metrics are taken one to one from LayerZero.
   - Features marquee: Two identical groups sit end to end and drift left by one group's width every 80 seconds (~25–30 px/s); the edges fade out softly. It stops under the pointer or with the button.
   - The inspection outline slides between elements in 120 ms.
   - Theme changes cross-fade smoothly with View Transitions where supported.
-  - With `prefers-reduced-motion`, the lines stay still and no shooting star appears, Muse's menu stays open, the Features marquee doesn't move (the cards sit in rows) and windows don't grow into place; other animations and smooth scrolling stop too. In the site scenes the content still moves with the page, at the same speed as normal scrolling.
+  - With `prefers-reduced-motion`, the lines stay still and no shooting star appears, the before/after line doesn't sway, the Features marquee doesn't move (the cards sit in rows) and windows don't grow into place; other animations and smooth scrolling stop too. In the site scenes the content still moves with the page, at the same speed as normal scrolling.
 
 ## Accessibility notes
 
