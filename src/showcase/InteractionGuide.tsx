@@ -29,7 +29,7 @@ function KeyboardIcon() {
 }
 
 const ITEMS: { label: string; icon: () => ReactNode; text: ReactNode }[] = [
-  { label: 'Mouse', icon: MouseIcon, text: 'Hover to name it · Click for details' },
+  { label: 'Mouse', icon: MouseIcon, text: 'Hover to name it · Wait for a summary · Click for details' },
   { label: 'Touch', icon: TouchIcon, text: 'Tap for details · Tap outside to close' },
   {
     label: 'Keyboard',

@@ -1,10 +1,10 @@
-import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, ReactNode, RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { catalogOf, getSpec } from '../catalog';
 import type { UiElementSpec } from '../catalog';
 import { Explainer } from './Explainer';
-import { InspectActivityContext } from './InspectActivity';
+import { InspectActivityContext, InspectFocusContext } from './InspectActivity';
 import { useInspectorLayer } from './InspectorLayer';
 import { useAnchorPosition } from './useAnchorPosition';
 import { TARGET_SELECTOR, useInspectSurface } from './useInspectSurface';
@@ -62,7 +62,7 @@ function useRelativeBox(element: Element | null, containerRef: RefObject<HTMLEle
   return element ? box : null;
 }
 
-/** Outline and name tag are drawn at the inverse scale, so they stay thin and legible in a shrunk example. */
+/** The outline is drawn at the inverse scale, so it stays thin in a shrunk example. */
 function boxStyle(box: Box) {
   return {
     transform: `translate(${box.left}px, ${box.top}px)`,
@@ -72,9 +72,80 @@ function boxStyle(box: Box) {
   } as CSSProperties;
 }
 
-/** If the name tag doesn't fit above the element (e.g. the topmost navbar), it goes below instead of covering it. */
-function tagPlacement(box: Box) {
-  return box.top * box.scale < 22 ? 'below' : 'above';
+/** Gap between an element and its name tag, and the closest the tag gets to the layer's sides. */
+const TAG_GAP = 4;
+const TAG_EDGE = 4;
+
+/**
+ * The top edge of the part of the frame you can see (a phone screen, a browser window): the lowest top among the
+ * clipping ancestors of the example. Clipping inside the demo (a card with rounded corners) doesn't count.
+ */
+function visibleTopOf(surface: Element) {
+  let top = -Infinity;
+  for (let node = surface.parentElement; node && node !== document.body; node = node.parentElement) {
+    const { overflowX, overflowY } = getComputedStyle(node);
+    if (overflowX !== 'visible' || overflowY !== 'visible') top = Math.max(top, node.getBoundingClientRect().top);
+  }
+  return top;
+}
+
+/**
+ * The element's name above its top-left corner, or below the element when there's no room above in the part of the
+ * frame you can see (a topmost navbar, say). It's drawn on the shared layer, not in the demo, so the phone screen or
+ * the browser window can't cut it off: a long name by the edge of a phone runs past the phone and stays readable.
+ */
+type NameTagProps = {
+  element: Element;
+  name: string;
+  layer: HTMLElement;
+  /** The example the element is in. */
+  surfaceRef: RefObject<HTMLElement | null>;
+};
+
+function NameTag({ element, name, layer, surfaceRef }: NameTagProps) {
+  const tagRef = useRef<HTMLSpanElement>(null);
+  const [place, setPlace] = useState<{ left: number; top: number } | null>(null);
+
+  useLayoutEffect(() => {
+    const tag = tagRef.current;
+    const surface = surfaceRef.current;
+    if (!tag || !surface) return;
+    const update = () => {
+      const rect = element.getBoundingClientRect();
+      const layerRect = layer.getBoundingClientRect();
+      const above = rect.top - TAG_GAP - tag.offsetHeight;
+      const top = above < visibleTopOf(surface) ? rect.bottom + TAG_GAP : above;
+      const left = Math.max(
+        layerRect.left + TAG_EDGE,
+        Math.min(rect.left - 1.5, layerRect.right - TAG_EDGE - tag.offsetWidth),
+      );
+      const next = { left: Math.round(left - layerRect.left), top: Math.round(top - layerRect.top) };
+      setPlace((prev) => (prev && prev.left === next.left && prev.top === next.top ? prev : next));
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    observer.observe(layer);
+    document.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
+    };
+  }, [element, layer, name, surfaceRef]);
+
+  return (
+    <span
+      ref={tagRef}
+      className={styles.nameTag}
+      data-placed={place ? '' : undefined}
+      style={place ? { transform: `translate(${place.left}px, ${place.top}px)` } : undefined}
+      aria-hidden="true"
+    >
+      {name}
+    </span>
+  );
 }
 
 type InspectSurfaceProps = {
@@ -121,6 +192,15 @@ export function InspectSurface({ label, onCount, fill = false, specs, renderActi
   const targetBox = useRelativeBox(open || keyboardActive ? target : null, surfaceRef);
   const hoverBox = useRelativeBox(hoverEl && hoverEl !== target ? hoverEl : null, surfaceRef);
   const announcement = keyboardActive && spec ? `${spec.name}. ${spec.summary}` : '';
+  const focus = useMemo(
+    () => ({ hover: hoverEl, target: open || keyboardActive ? target : null }),
+    [hoverEl, open, keyboardActive, target],
+  );
+  // One name tag: the hovered element's, else the active one's. A balloon above or over the active element would
+  // cover its tag, so the tag steps aside then (the balloon names the element anyway).
+  const tagElement = hoverBox ? hoverEl : targetBox ? target : null;
+  const tagName = hoverBox ? hoverSpec?.name : spec?.name;
+  const tagCovered = tagElement === target && open && position !== null && position.placement !== 'bottom';
 
   useEffect(() => {
     const surface = surfaceRef.current;
@@ -140,17 +220,13 @@ export function InspectSurface({ label, onCount, fill = false, specs, renderActi
         {...surfaceProps}
       >
         <div className={styles.content} aria-hidden="true">
-          <InspectActivityContext value={active}>{children}</InspectActivityContext>
+          <InspectActivityContext value={active}>
+            <InspectFocusContext value={focus}>{children}</InspectFocusContext>
+          </InspectActivityContext>
         </div>
 
         {hoverBox && (
-          <div className={styles.outline} data-kind="hover" style={boxStyle(hoverBox)} aria-hidden="true">
-            {hoverSpec && (
-              <span className={styles.tag} data-placement={tagPlacement(hoverBox)}>
-                {hoverSpec.name}
-              </span>
-            )}
-          </div>
+          <div className={styles.outline} data-kind="hover" style={boxStyle(hoverBox)} aria-hidden="true" />
         )}
         {targetBox && (
           <div
@@ -158,13 +234,7 @@ export function InspectSurface({ label, onCount, fill = false, specs, renderActi
             data-kind={mode === 'pinned' ? 'pinned' : 'active'}
             style={boxStyle(targetBox)}
             aria-hidden="true"
-          >
-            {spec && !hoverBox && (
-              <span className={styles.tag} data-placement={tagPlacement(targetBox)}>
-                {spec.name}
-              </span>
-            )}
-          </div>
+          />
         )}
       </div>
 
@@ -174,6 +244,12 @@ export function InspectSurface({ label, onCount, fill = false, specs, renderActi
       <p className="sr-only" aria-live="polite">
         {announcement}
       </p>
+
+      {layer &&
+        tagElement &&
+        tagName &&
+        !tagCovered &&
+        createPortal(<NameTag element={tagElement} name={tagName} layer={layer} surfaceRef={surfaceRef} />, layer)}
 
       {layer &&
         spec &&
