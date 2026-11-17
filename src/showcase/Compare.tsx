@@ -73,7 +73,7 @@ export function useCompareSplit(target: RefObject<HTMLElement | null>, enabled: 
 }
 
 type CompareLayersProps = {
-  /** The AI slop version. */
+  /** The AI slop version, usually an InspectSurface too. */
   before: ReactNode;
   /** Fill the parent's height (a phone screen) instead of growing with the content (a site). */
   fill?: boolean;
@@ -89,10 +89,7 @@ export function CompareLayers({ before, fill = false, children }: CompareLayersP
   return (
     <div className={fill ? `${styles.layers} ${styles.fill}` : styles.layers}>
       <div className={styles.after}>{children}</div>
-      {/* A picture for comparison only: it stays out of the accessibility tree and has nothing to inspect */}
-      <div className={styles.before} aria-hidden="true">
-        {before}
-      </div>
+      <div className={styles.before}>{before}</div>
     </div>
   );
 }

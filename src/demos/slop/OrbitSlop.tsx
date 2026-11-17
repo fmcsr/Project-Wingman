@@ -98,7 +98,8 @@ const STATUS = {
 /**
  * The AI slop version of Orbit: what "Build an analytics dashboard for my startup" tends to produce. A gradient
  * sidebar with emoji icons, rainbow stat cards with made-up numbers, a bar chart that only goes up, an "AI insights"
- * card and a table of placeholder customers. A picture for comparison only: nothing is focusable or inspectable.
+ * card and a table of placeholder customers. A picture for comparison only: nothing is focusable. Elements marked
+ * with `data-inspect` explain themselves on hover (catalog/slopSites.ts).
  */
 export function OrbitSlop() {
   return (
@@ -108,8 +109,8 @@ export function OrbitSlop() {
       <span className={`${styles.blob} ${styles.blobC}`} />
 
       <div className={styles.shell}>
-        <aside className={styles.sidebar}>
-          <div className={styles.brand}>
+        <aside className={styles.sidebar} data-inspect="sidebar">
+          <div className={styles.brand} data-inspect="logo">
             <span className={styles.logo}>🚀</span>
             <span className={styles.brandName}>Orbit</span>
             <span className={styles.brandBadge}>AI</span>
@@ -117,14 +118,18 @@ export function OrbitSlop() {
           <p className={styles.navLabel}>Main Menu</p>
           <ul className={styles.nav}>
             {NAV.map((item) => (
-              <li key={item.label} className={item.active ? styles.navItemActive : styles.navItem}>
+              <li
+                key={item.label}
+                className={item.active ? styles.navItemActive : styles.navItem}
+                data-inspect="nav-link"
+              >
                 <span className={styles.navEmoji}>{item.emoji}</span>
                 {item.label}
                 {item.label === 'Analytics' && <span className={styles.navNew}>New</span>}
               </li>
             ))}
           </ul>
-          <div className={styles.upgrade}>
+          <div className={styles.upgrade} data-inspect="upgrade-card">
             <span className={styles.upgradeEmoji}>✨</span>
             <p className={styles.upgradeTitle}>Upgrade to Pro</p>
             <p className={styles.upgradeText}>Unlock AI-powered insights and unlimited reports!</p>
@@ -134,12 +139,12 @@ export function OrbitSlop() {
 
         <div className={styles.main}>
           <div className={styles.topbar}>
-            <span className={styles.menu}>☰</span>
-            <span className={styles.mobileBrand}>
+            <span className={styles.menu} data-inspect="hamburger-menu">☰</span>
+            <span className={styles.mobileBrand} data-inspect="logo">
               <span className={styles.logo}>🚀</span>
               <span className={styles.brandName}>Orbit</span>
             </span>
-            <span className={styles.search}>
+            <span className={styles.search} data-inspect="search-field">
               <span>🔍</span>
               Search anything...
             </span>
@@ -150,7 +155,7 @@ export function OrbitSlop() {
                 <span className={styles.dot}>3</span>
               </span>
               <span className={styles.user}>
-                <span className={styles.avatar}>JD</span>
+                <span className={styles.avatar} data-inspect="avatar">JD</span>
                 <span className={styles.userText}>
                   <span className={styles.userName}>John Doe</span>
                   <span className={styles.userRole}>Admin</span>
@@ -162,28 +167,28 @@ export function OrbitSlop() {
           <div className={styles.content}>
             <div className={styles.welcome}>
               <div>
-                <span className={styles.aiBadge}>✨ AI-Powered Analytics</span>
-                <h3 className={styles.title}>
+                <span className={styles.aiBadge} data-inspect="badge">✨ AI-Powered Analytics</span>
+                <h3 className={styles.title} data-inspect="page-title">
                   <span className={styles.gradientText}>Welcome back, John!</span> 👋
                 </h3>
                 <p className={styles.subtitle}>Here's what's happening with your startup today. 🚀</p>
               </div>
               <div className={styles.welcomeActions}>
-                <span className={styles.ghostButton}>📅 Last 30 days</span>
+                <span className={styles.ghostButton} data-inspect="date-range-picker">📅 Last 30 days</span>
                 <span className={styles.gradientButton}>⬇️ Export Report</span>
               </div>
             </div>
 
             <div className={styles.stats}>
               {STATS.map((stat) => (
-                <div key={stat.label} className={`${styles.stat} ${stat.tone}`}>
+                <div key={stat.label} className={`${styles.stat} ${stat.tone}`} data-inspect="stat-card">
                   <div className={styles.statTop}>
                     <span className={styles.statLabel}>{stat.label}</span>
                     <span className={styles.statEmoji}>{stat.emoji}</span>
                   </div>
                   <span className={styles.statValue}>{stat.value}</span>
                   <span className={styles.statChange}>
-                    <span className={styles.statDelta}>↑ {stat.change}</span>
+                    <span className={styles.statDelta} data-inspect="delta-badge">↑ {stat.change}</span>
                     <span>vs last month</span>
                   </span>
                 </div>
@@ -191,7 +196,7 @@ export function OrbitSlop() {
             </div>
 
             <div className={styles.row}>
-              <div className={styles.card}>
+              <div className={styles.card} data-inspect="card">
                 <div className={styles.cardHeader}>
                   <div>
                     <p className={styles.cardTitle}>📈 Revenue Overview</p>
@@ -199,7 +204,7 @@ export function OrbitSlop() {
                   </div>
                   <span className={styles.pill}>This Year ▾</span>
                 </div>
-                <div className={styles.chart}>
+                <div className={styles.chart} data-inspect="bar-chart">
                   <div className={styles.bars}>
                     {BARS.map((height, index) => (
                       <span key={MONTHS[index]} className={styles.barSlot}>
@@ -215,7 +220,7 @@ export function OrbitSlop() {
                 </div>
               </div>
 
-              <div className={`${styles.card} ${styles.salesCard}`}>
+              <div className={`${styles.card} ${styles.salesCard}`} data-inspect="card">
                 <p className={styles.cardTitle}>🔥 Recent Sales</p>
                 <p className={styles.cardText}>You made 265 sales this month! 🎉</p>
                 <ul className={styles.sales}>
@@ -234,9 +239,9 @@ export function OrbitSlop() {
             </div>
 
             <div className={`${styles.row} ${styles.thirdRow}`}>
-              <div className={styles.card}>
+              <div className={styles.card} data-inspect="card">
                 <p className={styles.cardTitle}>🎯 Traffic Sources</p>
-                <div className={styles.donutRow}>
+                <div className={styles.donutRow} data-inspect="donut-chart">
                   <span className={styles.donut}>
                     <span className={styles.donutRing} />
                     <span className={styles.donutValue}>
@@ -256,7 +261,7 @@ export function OrbitSlop() {
                 </div>
               </div>
 
-              <div className={`${styles.card} ${styles.goalsCard}`}>
+              <div className={`${styles.card} ${styles.goalsCard}`} data-inspect="card">
                 <p className={styles.cardTitle}>🏆 Monthly Goals</p>
                 <ul className={styles.goals}>
                   {GOALS.map((goal) => (
@@ -275,7 +280,7 @@ export function OrbitSlop() {
                 </ul>
               </div>
 
-              <div className={styles.insight}>
+              <div className={styles.insight} data-inspect="insight-card">
                 <div className={styles.insightHead}>
                   <span className={styles.insightEmoji}>🤖</span>
                   <span className={styles.insightTitle}>AI Insights</span>
@@ -289,7 +294,7 @@ export function OrbitSlop() {
               </div>
             </div>
 
-            <div className={styles.card}>
+            <div className={styles.card} data-inspect="card">
               <div className={styles.cardHeader}>
                 <div>
                   <p className={styles.cardTitle}>📋 Recent Transactions</p>
@@ -297,7 +302,7 @@ export function OrbitSlop() {
                 </div>
                 <span className={styles.viewAll}>View All →</span>
               </div>
-              <table className={styles.table}>
+              <table className={styles.table} data-inspect="data-table">
                 <thead>
                   <tr>
                     <th>Customer</th>
@@ -321,7 +326,9 @@ export function OrbitSlop() {
                       </td>
                       <td className={styles.colProduct}>{row.product}</td>
                       <td className={styles.colStatus}>
-                        <span className={STATUS[row.status].className}>{STATUS[row.status].label}</span>
+                        <span className={STATUS[row.status].className} data-inspect="status-pill">
+                          {STATUS[row.status].label}
+                        </span>
                       </td>
                       <td className={styles.colDate}>{row.date}</td>
                       <td className={styles.colAmount}>{row.amount}</td>

@@ -318,12 +318,13 @@
   color: light-dark(#7c73a8, #a39cc8);
 }
 
+/* A short bottom padding keeps the page within the Wingman version's height (see the breakpoints at the end) */
 .content {
   display: flex;
   flex: 1;
   flex-direction: column;
   gap: 24px;
-  padding: 24px 28px 32px;
+  padding: 24px 28px 18px;
 }
 
 /* Welcome */

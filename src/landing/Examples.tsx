@@ -10,7 +10,7 @@ import { StrideSlop } from '../demos/slop/StrideSlop';
 import { WaveSlop } from '../demos/slop/WaveSlop';
 import { StrideApp } from '../demos/StrideApp';
 import { WaveApp } from '../demos/WaveApp';
-import { showcaseSpecs } from '../catalog';
+import { acmeSlopSpecs, museSlopSpecs, orbitSlopSpecs, showcaseSpecs, strideSlopSpecs, waveSlopSpecs } from '../catalog';
 import { InspectSurface } from '../inspector/InspectSurface';
 import { InspectorLayerHost } from '../inspector/InspectorLayer';
 import { BrowserFrame } from '../showcase/BrowserFrame';
@@ -78,8 +78,8 @@ function usePhoneScale() {
 
 /**
  * Demo on the home page: five example projects, each as a before/after comparison. On the left, the AI slop a vague
- * prompt produces; on the right, the same product built from a Wingman brief, with every element inspectable. The full
- * library opens after sign-in, so only a few projects are shown here. Sites scroll in their own windows as the page
+ * prompt produces; on the right, the same product built from a Wingman brief. Both sides are inspectable, so the same
+ * element can be seen done both ways. The full library opens after sign-in, so only a few projects are shown here. Sites scroll in their own windows as the page
  * scrolls; phones sit in one row. Balloons are drawn on a shared layer that covers all the frames.
  */
 export function Examples() {
@@ -105,7 +105,7 @@ export function Examples() {
           label="Examples"
           title="Same idea."
           muted="Better words."
-          description="Drag the line on each example. On the left, what an AI coding tool builds from a vague prompt. On the right, what it builds from a Wingman brief that names every element. Hover the right side to learn those names."
+          description="Drag the line on each example. On the left, what an AI coding tool builds from a vague prompt. On the right, what it builds from a Wingman brief that names every element. Hover either side to learn the names."
         />
         <InteractionGuide />
       </div>
@@ -116,7 +116,11 @@ export function Examples() {
             <BrowserFrame
               url="acme.app"
               label="Acme marketing site"
-              before={<AcmeSlop />}
+              before={
+                <InspectSurface specs={acmeSlopSpecs} label="Acme marketing site, AI slop version" fill>
+                  <AcmeSlop />
+                </InspectSurface>
+              }
               header={
                 <div className={styles.siteHeader}>
                   <ProjectMeta index="[01]" name="Acme" kind="Marketing site" count={counts.acme} />
@@ -132,7 +136,11 @@ export function Examples() {
             <BrowserFrame
               url="app.orbit.io"
               label="Orbit analytics dashboard"
-              before={<OrbitSlop />}
+              before={
+                <InspectSurface specs={orbitSlopSpecs} label="Orbit analytics dashboard, AI slop version" fill>
+                  <OrbitSlop />
+                </InspectSurface>
+              }
               header={
                 <div className={styles.siteHeader}>
                   <ProjectMeta index="[02]" name="Orbit" kind="Analytics dashboard" count={counts.orbit} />
@@ -148,7 +156,14 @@ export function Examples() {
             <div ref={rowRef} className={styles.phones} style={{ '--phone-scale': scale } as CSSProperties}>
               <div className={styles.phoneProject}>
                 <ProjectMeta index="[03]" name="Wave" kind="Habit tracker" count={counts.wave} />
-                <PhoneFrame before={<WaveSlop />} label="Wave habit tracker">
+                <PhoneFrame
+                  before={
+                    <InspectSurface specs={waveSlopSpecs} label="Wave habit tracker, AI slop version" fill>
+                      <WaveSlop />
+                    </InspectSurface>
+                  }
+                  label="Wave habit tracker"
+                >
                   <InspectSurface specs={showcaseSpecs} label="Wave habit tracker" onCount={onCount.wave} fill>
                     <WaveApp />
                   </InspectSurface>
@@ -158,7 +173,14 @@ export function Examples() {
 
               <div className={styles.phoneProject}>
                 <ProjectMeta index="[04]" name="Muse" kind="AI assistant" count={counts.muse} />
-                <PhoneFrame before={<MuseSlop />} label="Muse AI assistant">
+                <PhoneFrame
+                  before={
+                    <InspectSurface specs={museSlopSpecs} label="Muse AI assistant, AI slop version" fill>
+                      <MuseSlop />
+                    </InspectSurface>
+                  }
+                  label="Muse AI assistant"
+                >
                   <InspectSurface specs={showcaseSpecs} label="Muse AI assistant" onCount={onCount.muse} fill>
                     <MuseApp />
                   </InspectSurface>
@@ -168,7 +190,14 @@ export function Examples() {
 
               <div className={styles.phoneProject}>
                 <ProjectMeta index="[05]" name="Stride" kind="Shopping" count={counts.stride} />
-                <PhoneFrame before={<StrideSlop />} label="Stride shopping app">
+                <PhoneFrame
+                  before={
+                    <InspectSurface specs={strideSlopSpecs} label="Stride shopping app, AI slop version" fill>
+                      <StrideSlop />
+                    </InspectSurface>
+                  }
+                  label="Stride shopping app"
+                >
                   <InspectSurface specs={showcaseSpecs} label="Stride shopping app" onCount={onCount.stride} fill>
                     <StrideApp />
                   </InspectSurface>

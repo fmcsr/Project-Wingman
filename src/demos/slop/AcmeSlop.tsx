@@ -38,21 +38,22 @@ const PREVIEW_BARS = [38, 62, 48, 80, 58, 92, 70];
 /**
  * The AI slop version of Acme: what "Make a landing page for my product-planning SaaS" tends to produce. A glass
  * navbar over gradient blobs and a grid, an "AI-powered" badge, gradient text, a placeholder product preview, made-up
- * stats and emoji feature cards. A picture for comparison only: nothing is focusable or inspectable.
+ * stats and emoji feature cards. A picture for comparison only: nothing is focusable. Elements marked with
+ * `data-inspect` explain themselves on hover (catalog/slopSites.ts).
  */
 export function AcmeSlop() {
   return (
     <div className={styles.page}>
       <div className={styles.navSlot}>
-        <nav className={styles.navbar}>
-          <a className={styles.brand}>
+        <nav className={styles.navbar} data-inspect="navbar">
+          <a className={styles.brand} data-inspect="logo">
             <span className={styles.logo}>✨</span>
             Acme
           </a>
           <ul className={styles.links}>
             {LINKS.map((label, index) => (
               <li key={label}>
-                <a className={styles.link} aria-current={index === 0 ? 'page' : undefined}>
+                <a className={styles.link} data-inspect="nav-link" aria-current={index === 0 ? 'page' : undefined}>
                   {label}
                 </a>
               </li>
@@ -60,8 +61,8 @@ export function AcmeSlop() {
           </ul>
           <div className={styles.actions}>
             <a className={styles.signIn}>Sign in</a>
-            <a className={styles.cta}>Get Started 🚀</a>
-            <span className={styles.menu}>
+            <a className={styles.cta} data-inspect="button-cta">Get Started 🚀</a>
+            <span className={styles.menu} data-inspect="hamburger-menu">
               <svg viewBox="0 0 24 24" width="20" height="20">
                 <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
@@ -70,25 +71,25 @@ export function AcmeSlop() {
         </nav>
       </div>
 
-      <section className={styles.hero}>
+      <section className={styles.hero} data-inspect="hero">
         <span className={`${styles.shape} ${styles.shapeA}`} />
         <span className={`${styles.shape} ${styles.shapeB}`} />
         <span className={`${styles.shape} ${styles.shapeC}`} />
         <div className={styles.heroInner}>
-          <p className={styles.badge}>
+          <p className={styles.badge} data-inspect="badge">
             <span className={styles.badgeDot} />✨ AI-Powered Product Planning
           </p>
-          <h2 className={styles.heroTitle}>
+          <h2 className={styles.heroTitle} data-inspect="hero-heading">
             Plan Smarter, Ship <span className={styles.gradientText}>10x Faster</span>
           </h2>
           <p className={styles.heroText}>
             Transform your workflow with our all-in-one AI-powered platform and unlock your team's full potential.
           </p>
           <div className={styles.heroActions}>
-            <span className={styles.primary}>Get Started Free 🚀</span>
-            <span className={styles.secondary}>▶ Watch Demo</span>
+            <span className={styles.primary} data-inspect="button-primary">Get Started Free 🚀</span>
+            <span className={styles.secondary} data-inspect="button-secondary">▶ Watch Demo</span>
           </div>
-          <ul className={styles.trust}>
+          <ul className={styles.trust} data-inspect="trust-signals">
             {TRUST.map((item) => (
               <li key={item}>
                 <span className={styles.check}>✓</span>
@@ -99,7 +100,7 @@ export function AcmeSlop() {
 
           <div className={styles.previewWrap}>
             <span className={styles.previewGlow} />
-            <div className={styles.preview}>
+            <div className={styles.preview} data-inspect="product-shot">
               <div className={styles.previewBar}>
                 <span />
                 <span />
@@ -131,7 +132,7 @@ export function AcmeSlop() {
         </div>
       </section>
 
-      <section className={styles.logos}>
+      <section className={styles.logos} data-inspect="logo-cloud">
         <p className={styles.logosLabel}>Trusted by 10,000+ teams worldwide 🌍</p>
         <div className={styles.logoRow}>
           {LOGOS.map((logo) => (
@@ -142,7 +143,7 @@ export function AcmeSlop() {
 
       <section className={styles.stats}>
         {STATS.map((stat) => (
-          <div key={stat.label} className={styles.stat}>
+          <div key={stat.label} className={styles.stat} data-inspect="stat">
             <span className={styles.statValue}>{stat.value}</span>
             <span className={styles.statLabel}>{stat.label}</span>
           </div>
@@ -151,13 +152,13 @@ export function AcmeSlop() {
 
       <section className={styles.section}>
         <p className={styles.eyebrow}>⚡ Features</p>
-        <h3 className={styles.sectionTitle}>
+        <h3 className={styles.sectionTitle} data-inspect="section-heading">
           Everything you need to <span className={styles.gradientText}>succeed</span>
         </h3>
         <p className={styles.sectionText}>Powerful AI-driven tools designed to supercharge your product workflow.</p>
         <div className={styles.features}>
           {FEATURES.map((feature) => (
-            <article key={feature.title} className={styles.card}>
+            <article key={feature.title} className={styles.card} data-inspect="feature-card">
               <div className={`${styles.thumb} ${feature.thumb}`}>
                 <span className={styles.thumbEmoji}>{feature.emoji}</span>
                 <span />
@@ -174,7 +175,7 @@ export function AcmeSlop() {
       </section>
 
       <section className={styles.bannerSection}>
-        <div className={styles.banner}>
+        <div className={styles.banner} data-inspect="cta-banner">
           <p className={styles.bannerTitle}>Ready to transform your workflow? 🚀</p>
           <p className={styles.bannerText}>Join 10,000+ teams already shipping faster with Acme.</p>
           <span className={styles.bannerCta}>Get Started Free →</span>

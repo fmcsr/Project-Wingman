@@ -23,42 +23,42 @@ const TABS = [
 /**
  * The AI slop version of Wave: what "Make a habit tracker app" tends to produce. A gradient header with a glass
  * progress card, three stat tiles with emoji, emoji habit cards and a floating tab bar around a glowing plus button.
- * A picture for comparison only: nothing is focusable or inspectable.
+ * A picture for comparison: nothing is focusable, and its elements are explained in src/catalog/slopPhones.ts.
  */
 export function WaveSlop() {
   return (
     <div className={styles.app}>
-      <div className={styles.hero}>
+      <div className={styles.hero} data-inspect="gradient-header">
         <span className={`${styles.circle} ${styles.circleA}`} />
         <span className={`${styles.circle} ${styles.circleB}`} />
         <StatusBar className={styles.statusBar} />
 
         <div className={styles.greeting}>
-          <span className={styles.avatar}>
+          <span className={styles.avatar} data-inspect="avatar">
             A
             <span className={styles.avatarDot} />
           </span>
-          <div>
+          <div data-inspect="large-title">
             <p className={styles.hello}>Good morning, Alex! ☀️</p>
             <h3 className={styles.title}>Let's crush it! 💪</h3>
           </div>
         </div>
 
-        <div className={styles.progressCard}>
-          <span className={styles.ring}>
+        <div className={styles.progressCard} data-inspect="today-summary">
+          <span className={styles.ring} data-inspect="progress-ring">
             <span className={styles.ringValue}>75%</span>
           </span>
           <span className={styles.progressText}>
             <span className={styles.progressLabel}>✨ AI Daily Progress</span>
             <span className={styles.progressTitle}>3 of 4 habits done! 🎉</span>
-            <span className={styles.streak}>🔥 7 day streak!</span>
+            <span className={styles.streak} data-inspect="streak-count">🔥 7 day streak!</span>
           </span>
         </div>
       </div>
 
       <div className={styles.stats}>
         {STATS.map((stat) => (
-          <div key={stat.label} className={styles.stat}>
+          <div key={stat.label} className={styles.stat} data-inspect="stat-card">
             <span className={styles.statEmoji}>{stat.emoji}</span>
             <span className={styles.statValue}>{stat.value}</span>
             <span className={styles.statLabel}>{stat.label}</span>
@@ -66,15 +66,15 @@ export function WaveSlop() {
         ))}
       </div>
 
-      <div className={styles.sectionHead}>
+      <div className={styles.sectionHead} data-inspect="list-section-header">
         <p className={styles.sectionTitle}>Today's Habits ✨</p>
         <span className={styles.seeAll}>See all →</span>
       </div>
 
       <ul className={styles.habits}>
         {HABITS.map((habit) => (
-          <li key={habit.title} className={styles.habit}>
-            <span className={`${styles.habitEmoji} ${habit.tone}`}>{habit.emoji}</span>
+          <li key={habit.title} className={styles.habit} data-inspect="list-row">
+            <span className={`${styles.habitEmoji} ${habit.tone}`} data-inspect="habit-icon">{habit.emoji}</span>
             <span className={styles.habitText}>
               <span className={styles.habitTitle}>{habit.title}</span>
               <span className={styles.habitDetail}>{habit.detail}</span>
@@ -82,12 +82,14 @@ export function WaveSlop() {
                 <span className={styles.habitFill} style={{ width: `${habit.progress}%` }} />
               </span>
             </span>
-            <span className={habit.done ? styles.checkDone : styles.check}>{habit.done ? '✓' : ''}</span>
+            <span className={habit.done ? styles.checkDone : styles.check} data-inspect="habit-check">
+              {habit.done ? '✓' : ''}
+            </span>
           </li>
         ))}
       </ul>
 
-      <div className={styles.tabBar}>
+      <div className={styles.tabBar} data-inspect="tab-bar">
         {TABS.slice(0, 2).map((tab) => (
           <span key={tab.label} className={tab.active ? styles.tabActive : styles.tab}>
             <span className={styles.tabEmoji}>{tab.emoji}</span>
@@ -95,7 +97,7 @@ export function WaveSlop() {
           </span>
         ))}
         <span className={styles.fabSlot}>
-          <span className={styles.fab}>
+          <span className={styles.fab} data-inspect="fab">
             <svg viewBox="0 0 24 24" width="24" height="24">
               <path d="M12 5v14M5 12h14" />
             </svg>
@@ -109,7 +111,7 @@ export function WaveSlop() {
         ))}
       </div>
 
-      <span className={styles.homeIndicator} />
+      <span className={styles.homeIndicator} data-inspect="home-indicator" />
     </div>
   );
 }

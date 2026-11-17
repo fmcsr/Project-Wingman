@@ -31,4 +31,6 @@ export function valueFor(value: string | ThemedValue, theme: 'light' | 'dark') {
 }
 
 export { homeIndicator, statusBar } from './shared';
+export { museSlopSpecs, strideSlopSpecs, waveSlopSpecs } from './slopPhones';
+export { acmeSlopSpecs, orbitSlopSpecs } from './slopSites';
 export type { Concept, ConceptKind, ThemedValue, UiElementSpec } from './types';

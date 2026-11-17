@@ -26,7 +26,7 @@
   clip-path: inset(0 calc(100% - var(--split, 50%)) 0 0);
 }
 
-/* A shorter slop page still covers its whole side */
+/* A shorter slop page (or the InspectSurface around it) still covers its whole side */
 .before > * {
   min-height: 100%;
 }
