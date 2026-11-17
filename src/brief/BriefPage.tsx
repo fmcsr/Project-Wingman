@@ -68,6 +68,9 @@ function EmptyState() {
         <ButtonLink href="/app/web" size="sm">
           Browse websites
         </ButtonLink>
+        <ButtonLink href="/app/watch" size="sm">
+          Browse watch apps
+        </ButtonLink>
       </div>
     </div>
   );

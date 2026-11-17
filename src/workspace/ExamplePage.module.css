@@ -68,7 +68,7 @@
   gap: 72px;
 }
 
-/* Phone on the left stays in view while the element list scrolls by */
+/* The phone (or watch) on the left stays in view while the element list scrolls by */
 .mobileLayout {
   display: grid;
   grid-template-columns: 320px minmax(0, 1fr);
@@ -116,7 +116,7 @@
   color: var(--color-text-subtle);
 }
 
-/* Narrow screens: the phone sits on top, the element list below it */
+/* Narrow screens: the phone (or watch) sits on top, the element list below it */
 @media (max-width: 859px) {
   .mobileLayout {
     grid-template-columns: minmax(0, 1fr);

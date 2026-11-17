@@ -4,7 +4,7 @@ import { BrandMark } from '../brand/BrandMark';
 import { BriefPage } from '../brief/BriefPage';
 import { useBriefItems } from '../brief/briefStore';
 import { ThemeToggle } from '../landing/ThemeToggle';
-import { findExample } from '../library';
+import { findExample, isPlatform } from '../library';
 import { Link, navigate, Redirect } from '../router';
 import { ExamplePage } from './ExamplePage';
 import { Library } from './Library';
@@ -18,12 +18,12 @@ type WorkspaceProps = {
 };
 
 /**
- * The signed-in area: the library at /app/mobile and /app/web, each example at /app/<platform>/<id>, and the
- * brief at /app/brief.
+ * The signed-in area: the library at /app/mobile, /app/web and /app/watch, each example at /app/<platform>/<id>,
+ * and the brief at /app/brief.
  */
 export function Workspace({ user, platform, exampleId }: WorkspaceProps) {
   const briefCount = useBriefItems().length;
-  if (platform !== 'mobile' && platform !== 'web' && platform !== 'brief') return <Redirect to="/app/mobile" />;
+  if (platform !== 'brief' && !isPlatform(platform)) return <Redirect to="/app/mobile" />;
   const example = platform !== 'brief' && exampleId ? findExample(platform, exampleId) : undefined;
   if (exampleId && !example) return <Redirect to={`/app/${platform}`} />;
 

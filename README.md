@@ -42,10 +42,11 @@ gallery slides) and hold still while you inspect them.
 Wingman is free: an account opens the library and the brief builder. People who find it useful can sponsor it on
 GitHub (`SPONSOR_HREF` in `src/landing/links.ts`; GitHub Sponsors has to be set up on that account).
 
-Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to the library (`/app/mobile`, `/app/web`): mobile apps and
-websites in two tabs, each a fictional product built from the patterns of well-known ones (“inspired by” Spotify,
-Airbnb, Stripe, Notion, Figma, TikTok and others). Phones can be inspected right in the grid; every example also has
-its own page (`/app/<platform>/<id>`) with all of its elements written out. A search finds examples by name or by
+Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to the library (`/app/mobile`, `/app/web`, `/app/watch`):
+mobile apps, websites and Apple Watch apps in three tabs, each a fictional product built from the patterns of
+well-known ones (“inspired by” Spotify, Airbnb, Stripe, Notion, Figma, VS Code and others). Phones and watches can be
+inspected right in the grid; every example also has its own page (`/app/<platform>/<id>`) with all of its elements
+written out. A search finds examples by name or by
 element (“bottom sheet”, “toast”). There's no auth backend yet: email and password sign-in only works with the development
 account below, and Google sign-in and sign-ups show a “not connected yet” message.
 
@@ -119,7 +120,7 @@ docs/
 Create a folder; the library picks it up on its own (`import.meta.glob` in `src/library/index.ts`):
 
 ```
-src/library/<mobile|web>/<id>/
+src/library/<mobile|web|watch>/<id>/
   <Name>.tsx         the demo (a named export)
   <Name>.module.css  its styles
   specs.ts           a UiElementSpec for every data-inspect id the demo uses
@@ -127,11 +128,11 @@ src/library/<mobile|web>/<id>/
 ```
 
 - **The demo is a picture:** no real links, buttons or inputs (`<a>` without `href`, `<span>`), since it sits inside
-  one focusable region. Colors are `light-dark()` pairs so it follows the theme. Anything that moves on its own
-  pauses while inspected (`useInspectActivity()`).
+  one focusable region. Colors are `light-dark()` pairs so it follows the theme. Anything that moves holds still while
+  it's inspected and under reduced motion (`useDemoMotion()` in `src/demos/motion.ts`).
 - **Mobile** fills a 280 × 600 phone screen and starts with the shared `<StatusBar />`; reuse the `statusBar` and
-  `homeIndicator` specs from `src/catalog`. **Web** sets `container-type: inline-size` and works from about 340 px to
-  1150 px wide; it can be taller than the window.
+  `homeIndicator` specs from `src/catalog`. **Watch** fills a 208 × 248 Apple Watch screen (46 mm). **Web** sets
+  `container-type: inline-size` and works from about 340 px to 1150 px wide; it can be taller than the window.
 - **Names are fictional;** real products go in `inspiredBy`.
 - **Same design type, our own identity:** follow one familiar product's real screen closely (layout, type scale, color
   scheme, component shapes) so people recognize it, with our own name, logo, accent hue, copy and data. No real logos,
