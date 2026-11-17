@@ -12,7 +12,7 @@ understand. Next, it will write that brief from everyday descriptions like “th
 ## A look inside
 
 Each example is a before/after: drag the line to compare the AI slop a vague prompt produces with the same product
-built from a Wingman brief. Hover anything on the Wingman side to learn what it's called. Click to pin the full
+built from a Wingman brief. Hover anything on either side to learn what it's called. Click to pin the full
 explanation: how it looks, how it behaves, and the exact CSS behind it. The examples switch to dark mode with the page
 (products that are dark by design stay dark), and the balloons show the values for the theme you're in.
 
@@ -34,8 +34,10 @@ Glass navbar:
 An English landing page with a sticky header (with a theme toggle), a hero, examples, feature cards, a support section
 and a footer. The examples section has five projects (a marketing site, an analytics dashboard and three mobile apps),
 each a before/after comparison with a line to drag: on the left, the AI slop a vague prompt produces; on the right, the
-same product built from a Wingman brief, where nearly every element shows its name on hover, a summary after a short
-pause and the full explanation on click.
+same product built from a Wingman brief. On both sides nearly every element shows its name on hover, a summary after a
+two-second pause and the full explanation on click; on the slop side, the explanation says what makes it read as AI
+slop. The Wingman versions move like real products (charts draw in, payments arrive, the chat answer streams, the
+gallery slides) and hold still while you inspect them.
 
 Wingman is free: an account opens the library and the brief builder. People who find it useful can sponsor it on
 GitHub (`SPONSOR_HREF` in `src/landing/links.ts`; GitHub Sponsors has to be set up on that account).
@@ -99,7 +101,8 @@ src/
   brief/       The brief: its store (in localStorage), the Markdown writer, the Add to brief button and the brief page
   library/     The library: types, the registry, and one folder per example (mobile/<id>, web/<id>)
   demos/       The landing page's five examples: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ StatusBar),
-               and in slop/ the AI slop version each one is compared with
+               their motion (motion.ts: entrances, live parts that hold while inspected), and in slop/ the AI slop
+               version each one is compared with
   catalog/     Element descriptions (English, typed data) for those five, plus elements every phone shares
   inspector/   The “inspect element” layer: InspectSurface, explainer balloon, positioning
   showcase/    Frames and the interaction guide: the browser frame as a scroll scene (useScrollScene), a scalable phone
