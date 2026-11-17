@@ -412,11 +412,12 @@
   color: var(--orbit-text-2);
 }
 
-/* Large standalone numbers keep proportional figures; tabular ones are for columns */
+/* Tabular figures: every digit is as wide as the next, so the number doesn't jitter while it counts up */
 .statValue {
   margin-top: 6px;
   font-size: 26px;
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
   line-height: 1.15;
   letter-spacing: -0.025em;
 }
@@ -502,6 +503,31 @@
   background: var(--orbit-accent);
   box-shadow: 0 0 0 2px var(--orbit-card);
   transform: translate(50%, -50%);
+}
+
+/*
+ * Entrance, once the row is in view (data-started, a beat apart per card): the sparkline draws in from the left as
+ * its clip opens, the figure counts up meanwhile, and the end dot lands as the line reaches it. The clip reaches 4px
+ * past the box, so the round line caps aren't cut.
+ */
+.spark svg {
+  clip-path: inset(-4px);
+  transition: clip-path 800ms ease-out;
+}
+
+.sparkDot {
+  transition:
+    opacity 300ms var(--ease-out) 600ms,
+    transform 300ms var(--ease-out) 600ms;
+}
+
+.stat:not([data-started]) .spark svg {
+  clip-path: inset(-4px calc(100% + 4px) -4px -4px);
+}
+
+.stat:not([data-started]) .sparkDot {
+  opacity: 0;
+  transform: translate(50%, -50%) scale(0.5);
 }
 
 /* The washes under the lines fade from the accent to transparent */
@@ -791,6 +817,62 @@
   font-variant-numeric: tabular-nums;
 }
 
+/*
+ * Entrance, once the chart is in view (data-started): the lines and the fill draw in from the left as the chart's
+ * clip opens, the dashed line of the period before and the fill fading in just behind. The flag, the hovered day and
+ * the end dot appear as the line reaches them: with this easing it passes Oct 21 after about 230ms and Oct 29 after
+ * 430ms, and ends at 900ms. The clip reaches 6px past the box, so the line caps aren't cut.
+ */
+.chart {
+  clip-path: inset(-6px);
+  transition: clip-path 900ms ease-out;
+}
+
+.area {
+  transition: opacity 700ms var(--ease-out) 100ms;
+}
+
+.lineBefore {
+  transition: opacity 600ms var(--ease-out) 150ms;
+}
+
+.annotation,
+.annotationLine {
+  transition: opacity 400ms var(--ease-out) 250ms;
+}
+
+.crosshair,
+.hoverTick,
+.tooltip {
+  transition: opacity 400ms var(--ease-out) 450ms;
+}
+
+.dot,
+.dotBefore {
+  transition:
+    opacity 400ms var(--ease-out) 450ms,
+    transform 400ms var(--ease-out) 450ms;
+}
+
+/* The latest day's dot, at the end of the line */
+.endDot {
+  composes: dot;
+  transition-delay: 800ms;
+}
+
+.plot:not([data-started]) .chart {
+  clip-path: inset(-6px calc(100% + 6px) -6px -6px);
+}
+
+.plot:not([data-started]) :is(.area, .lineBefore, .annotation, .annotationLine, .crosshair, .hoverTick, .tooltip) {
+  opacity: 0;
+}
+
+.plot:not([data-started]) :is(.dot, .dotBefore) {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.5);
+}
+
 /* Breakdowns: bar lists */
 .split {
   display: grid;
@@ -838,6 +920,16 @@
   left: 0;
   border-radius: 6px;
   background: var(--orbit-accent-wash);
+}
+
+/* Entrance, once the list is in view (data-started): the bars grow from the left, a beat apart (--i is the row) */
+.bar {
+  transform-origin: left;
+  transition: transform 700ms var(--ease-out) calc(var(--i, 0) * 60ms);
+}
+
+.barBlock:not([data-started]) .bar {
+  transform: scaleX(0);
 }
 
 .barLabel {
@@ -934,13 +1026,18 @@
   height: 14px;
 }
 
+/* Rows sliding in and out (see Live rows) are cut at the table's edges */
 .table {
   width: 100%;
   margin-top: 14px;
   border-collapse: collapse;
+  clip-path: inset(0);
 }
 
+/* The header sits above the rows, so a new row slides in from under it */
 .table th {
+  position: relative;
+  z-index: 1;
   height: 34px;
   padding: 0 12px;
   border-block: 1px solid var(--orbit-line);
@@ -951,10 +1048,28 @@
   background: var(--orbit-head);
 }
 
+/*
+ * The opening payments again, in each header cell, invisible and flat: the columns size to them as they do when the
+ * page loads, so they keep their widths as payments come and go. Each copy gets a line of its own and the cells' type.
+ */
+.reserve {
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.reserve > span {
+  display: block;
+}
+
+/* The divider is a shadow inside the cells: collapsed borders are drawn by the table and wouldn't move with a row */
 .table td {
   height: 58px;
   padding: 0 12px;
-  border-bottom: 1px solid var(--orbit-line);
+  box-shadow: inset 0 -1px var(--orbit-line);
 }
 
 .table th:first-child,
@@ -968,7 +1083,7 @@
 }
 
 .table tbody tr:last-child td {
-  border-bottom: 0;
+  box-shadow: none;
 }
 
 .table .num {
@@ -1081,6 +1196,55 @@
 .pillRefunded {
   color: var(--orbit-text-2);
   background: var(--orbit-fill);
+}
+
+/*
+ * Live rows. When a payment comes in, the oldest row fades out first (data-leaving), taking the divider above it
+ * along: while it leaves, the row draws that divider itself, along its own top edge. Then a fresh set of rows starts
+ * one place up and moves down into place (data-arrived), so the new payment slides in at the top from under the
+ * header. data-paused holds the rows still while the table is inspected.
+ */
+.table tbody[data-leaving] tr:last-child {
+  animation: row-leave 240ms ease-out forwards;
+}
+
+.table tbody[data-leaving] tr:nth-last-child(2) td {
+  box-shadow: none;
+}
+
+.table tbody[data-leaving] tr:last-child td {
+  box-shadow: inset 0 1px var(--orbit-line);
+}
+
+.table tbody[data-arrived] tr {
+  animation: row-enter 600ms var(--ease-out) both;
+}
+
+.table tbody[data-arrived] tr:first-child {
+  animation-name: row-arrive;
+}
+
+.table[data-paused] tr {
+  animation-play-state: paused;
+}
+
+@keyframes row-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes row-enter {
+  from {
+    translate: 0 -100%;
+  }
+}
+
+@keyframes row-arrive {
+  from {
+    opacity: 0;
+    translate: 0 -100%;
+  }
 }
 
 /* Narrower windows: the sidebar collapses to an icon rail */
@@ -1310,7 +1474,12 @@
     display: block;
     height: auto;
     padding: 0;
-    border: 0;
+    box-shadow: none;
+  }
+
+  /* Each row has its own divider here (its top border), which fades out with it */
+  .table tbody[data-leaving] tr:last-child td {
+    box-shadow: none;
   }
 
   .table .colPlan,
@@ -1337,5 +1506,30 @@
 @container panel (width < 400px) {
   .updated {
     display: none;
+  }
+}
+
+/* Reduced motion: nothing moves. useDemoMotion shows the finished state from the start; this makes sure of it. */
+@media (prefers-reduced-motion: reduce) {
+  .spark svg,
+  .sparkDot,
+  .chart,
+  .area,
+  .lineBefore,
+  .annotation,
+  .annotationLine,
+  .crosshair,
+  .hoverTick,
+  .tooltip,
+  .dot,
+  .dotBefore,
+  .bar {
+    transition: none;
+  }
+
+  .table tbody[data-arrived] tr,
+  .table tbody[data-arrived] tr:first-child,
+  .table tbody[data-leaving] tr:last-child {
+    animation: none;
   }
 }

@@ -198,6 +198,13 @@ export const assistant: UiElementSpec[] = [
         plain:
           'The one number that matters most stands out: on white, a band like a marker stroke runs behind it; on black, the words themselves light up.',
       },
+      {
+        kind: 'behavior',
+        term: 'Streaming',
+        value: '~18 words/s · 240ms fade-in',
+        plain:
+          'The answer appears word by word as the model writes it, each new word fading in, so you can start reading right away. Table rows and checklist items arrive whole.',
+      },
     ],
   },
   {
@@ -300,6 +307,12 @@ export const assistant: UiElementSpec[] = [
         value: 'thumbs up / down',
         plain: 'One tap tells the team whether the answer helped.',
       },
+      {
+        kind: 'behavior',
+        term: 'Shown when complete',
+        value: 'after the last word · 320ms',
+        plain: 'The buttons appear only once the answer is finished: there is nothing to copy or rate while it is still being written.',
+      },
     ],
   },
   {
@@ -320,6 +333,12 @@ export const assistant: UiElementSpec[] = [
         term: 'Horizontal scroll',
         value: 'overflow-x: auto',
         plain: 'More suggestions slide in from the side instead of wrapping onto new lines; the cut-off chip hints at them.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Staggered entrance',
+        value: '80ms apart · 8px slide-in, 400ms',
+        plain: 'Once the answer is done, the chips slide in one after another, which leads the eye along the row.',
       },
     ],
   },

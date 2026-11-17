@@ -87,7 +87,15 @@ export const mobile: UiElementSpec[] = [
       {
         kind: 'behavior',
         term: 'Live summary',
-        plain: 'Check a habit off and the count, the list of what’s left and the ring all update at once.',
+        plain:
+          'Check a habit off and the card follows: its ring segment fills, the count goes up, and its line in the list of what’s left fades out.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Numeric text transition',
+        value: 'translateY(±0.5em) + opacity · 450ms',
+        plain:
+          'A number that changes rolls instead of jumping: the old one slides out as the new one slides in, so you notice the change without a flash.',
       },
     ],
   },
@@ -119,6 +127,19 @@ export const mobile: UiElementSpec[] = [
         term: 'Partial segment',
         value: '6 of 8 → 75%',
         plain: 'A habit counted in steps fills part of its segment, like water at 6 of 8 glasses. A pale track shows the rest.',
+      },
+      {
+        kind: 'behavior',
+        term: 'stroke-dashoffset',
+        value: '30.5 → 0 · 650ms, 140ms apart',
+        plain:
+          'When the card comes into view, the filled segments sweep in one after another, clockwise from the top. Each is pushed back along the circle and slides into place.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Count-up',
+        value: '0 → 4 · 1.2s ease-out',
+        plain: 'The number in the middle counts up while the ring draws in, so both arrive at the same answer.',
       },
     ],
   },
@@ -239,6 +260,12 @@ export const mobile: UiElementSpec[] = [
         value: '7 × 5px · gap: 3.5px',
         plain: 'Every row uses the same grid, so the dots line up into one column per day, like a small heatmap.',
       },
+      {
+        kind: 'behavior',
+        term: 'transition: background-color',
+        value: '400ms · 450ms delay',
+        plain: "When a habit is done, today's outlined dot fills in with its color a moment after the check button.",
+      },
     ],
   },
   {
@@ -267,6 +294,13 @@ export const mobile: UiElementSpec[] = [
         term: 'aria-checked',
         value: 'true · false · "mixed"',
         plain: 'Screen readers hear a checkbox; a habit that is partly done, like the water, is reported as mixed.',
+      },
+      {
+        kind: 'behavior',
+        term: 'stroke-dashoffset',
+        value: 'arc 6/8 → 8/8 · then fill + check',
+        plain:
+          'Each glass fills more of the arc. The last one closes the ring, then the circle fills with color and the check draws itself in.',
       },
     ],
   },
@@ -307,15 +341,15 @@ export const mobile: UiElementSpec[] = [
     concepts: [
       {
         kind: 'appearance',
-        term: 'Ink fill',
-        value: { light: 'background: #1c1c1e', dark: 'background: #fff' },
-        plain: 'Near-black in light mode and white in dark mode: the strongest contrast on the screen, saved for the main action.',
+        term: 'Liquid Glass',
+        value: 'backdrop-filter: blur(16px) saturate(180%)',
+        plain: 'The same glass as the tab bar, so the two read as one set of controls. The plus is drawn in ink, not color, so the button stays calm next to the colorful habits.',
       },
       {
         kind: 'appearance',
         term: 'Elevation',
-        value: 'box-shadow: 0 8px 20px',
-        plain: 'A soft shadow makes it look like it hovers above the page.',
+        value: 'box-shadow: 0 4px 14px',
+        plain: 'A light shadow lifts it just off the page, like the tab bar beside it.',
       },
       {
         kind: 'behavior',

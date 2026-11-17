@@ -1,4 +1,6 @@
-import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { useCountUp, useDemoMotion } from './motion';
 import { StatusBar } from './StatusBar';
 import styles from './WaveApp.module.css';
 
@@ -131,6 +133,62 @@ const DASH_DEGREES = (DASH / CIRCUMFERENCE) * 360;
 
 const done = DAY.filter((habit) => habit.progress === 1).length;
 
+/** Water is counted in glasses; the story starts from the data above (6 of 8). */
+const GLASSES = 8;
+const START_GLASSES = WATER.progress * GLASSES;
+
+/**
+ * One moment of the story, and how long it lasts: how many glasses the water row shows (`row`), and the summary
+ * card, which follows a beat later (`card`). `dip` fades the parts the story changes out, `instant` puts them back
+ * without transitions while they're hidden. Scenes that `wait` hold while the screen is inspected or out of view;
+ * the short beats in between always run to the end, so nothing is left hidden or half-updated.
+ */
+type Scene = { row: number; card: number; ms: number; wait?: boolean; dip?: boolean; instant?: boolean };
+
+/**
+ * The story the screen plays while it's in view: Drink water gets its last two glasses. Each glass fills more of the
+ * check button's arc and ticks the count up; the last closes the arc into a done check, grows the streak and fills
+ * today's dot. The summary card follows: the ring's water segment fills, 4 of 6 becomes 5 of 6, 2 to go becomes
+ * 1 to go and the water line fades out. After a hold, it all fades back to 6 of 8 and starts over. The row stays in
+ * its section, so nothing on the screen changes height.
+ */
+const STORY: Scene[] = [
+  { row: START_GLASSES, card: START_GLASSES, ms: 3000, wait: true },
+  { row: 7, card: START_GLASSES, ms: 300 },
+  { row: 7, card: 7, ms: 1600, wait: true },
+  { row: 8, card: 7, ms: 350 },
+  { row: 8, card: 8, ms: 4000, wait: true },
+  { row: 8, card: 8, ms: 450, dip: true },
+  { row: START_GLASSES, card: START_GLASSES, ms: 120, dip: true, instant: true },
+];
+
+/** Steps through the story while `playing`; stays on the first scene when `final`. */
+function useStory(playing: boolean, final: boolean) {
+  const [index, setIndex] = useState(0);
+  const scene = STORY[index];
+  const held = final || (scene.wait === true && !playing);
+
+  useEffect(() => {
+    if (held) return;
+    const id = window.setTimeout(() => setIndex((current) => (current + 1) % STORY.length), STORY[index].ms);
+    return () => window.clearTimeout(id);
+  }, [index, held]);
+
+  return scene;
+}
+
+/** Drink water after `glasses`: the last glass makes today a done day, so the streak runs on through today. */
+function waterAt(glasses: number): Habit {
+  const complete = glasses === GLASSES;
+  return {
+    ...WATER,
+    detail: `${glasses} of ${GLASSES} glasses`,
+    streak: complete ? WATER.streak + 1 : WATER.streak,
+    progress: glasses / GLASSES,
+    week: [...WATER.week.slice(0, -1), complete ? 'done' : 'partial'],
+  };
+}
+
 const TABS: { label: string; active?: boolean; icon: ReactNode }[] = [
   {
     label: 'Today',
@@ -161,38 +219,126 @@ function Flame() {
   );
 }
 
-/** Round check button: an empty ring to do, an arc while counting, a filled circle with a check when done. */
-function Check({ habit }: { habit: Habit }) {
-  if (habit.progress === 1) {
-    return (
-      <span className={styles.checkDone} data-inspect="habit-check">
-        <svg viewBox="0 0 24 24" width="15" height="15">
-          <path d="M6.5 12.5l3.5 3.5 7.5-8" />
-        </svg>
-      </span>
-    );
-  }
+type RollProps = {
+  value: number;
+  /** Every value it can show. */
+  values: number[];
+  format?: (n: number) => string;
+  /** Changes without rolling, as a count-up does. */
+  snap?: boolean;
+};
+
+/**
+ * Text that changes in place the way iOS animates numbers: the old value slides up and fades out as the new one comes
+ * in from below (down and from above when the value goes down). Every value sits in the same grid cell, so the text
+ * around it never moves. It's one of the parts the story fades out when it starts over.
+ */
+function Roll({ value, values, format = String, snap = false }: RollProps) {
   return (
-    <span className={styles.check} data-inspect="habit-check">
-      {habit.progress > 0 && (
+    <span className={styles.roll} data-story="" data-snap={snap || undefined}>
+      {values.map((n) => (
+        <span key={n} data-roll={n === value ? 'current' : n < value ? 'past' : 'next'}>
+          {format(n)}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/**
+ * Round check button: an empty ring to do, an arc while counting, a filled circle with a check when done. The row
+ * the story plays in (`live`) keeps its arc under the fill, so the last glass can close the ring before the circle
+ * fills and the check draws in.
+ */
+function Check({ habit, live }: { habit: Habit; live: boolean }) {
+  const counted = habit.progress > 0 && (habit.progress < 1 || live);
+  return (
+    <span
+      className={styles.check}
+      data-done={habit.progress === 1 || undefined}
+      data-story={live ? '' : undefined}
+      data-inspect="habit-check"
+      style={{ '--progress': habit.progress } as CSSProperties}
+    >
+      {counted && (
         <>
           {/* The arc rides on the gray track: radius 11.9 with a 2.2 stroke covers the track's outer 2.2px */}
           <svg className={styles.checkArc} viewBox="0 0 26 26">
-            <circle cx="13" cy="13" r="11.9" pathLength="100" strokeDasharray={`${habit.progress * 100} 100`} />
+            <circle cx="13" cy="13" r="11.9" pathLength="100" />
           </svg>
           <svg className={styles.checkPlus} viewBox="0 0 24 24" width="12" height="12">
             <path d="M12 6v12M6 12h12" />
           </svg>
         </>
       )}
+      <span className={styles.checkFill}>
+        <svg viewBox="0 0 24 24" width="15" height="15">
+          <path d="M6.5 12.5l3.5 3.5 7.5-8" pathLength="1" />
+        </svg>
+      </span>
     </span>
   );
 }
 
-/** Example project [03]: a habit tracker's Today screen in the iOS idiom. Not interactive; for inspection only. */
-export function WaveApp() {
+type RowProps = {
+  habit: Habit;
+  /** In the row the story plays in: the count in the detail line and the streak, as rolling numbers. */
+  detail?: ReactNode;
+  streak?: ReactNode;
+  /** Marks the row the story plays in: its check button and today's dot fade out and back when it starts over. */
+  rowRef?: (row: HTMLLIElement | null) => void;
+};
+
+function Row({ habit, detail, streak, rowRef }: RowProps) {
+  const live = rowRef !== undefined;
   return (
-    <div className={styles.app}>
+    <li ref={rowRef} className={`${styles.row} ${styles[habit.hue]}`} data-inspect="list-row">
+      <span className={styles.icon} data-inspect="habit-icon">
+        <svg viewBox="0 0 24 24" width="17" height="17">
+          {habit.icon}
+        </svg>
+      </span>
+      <span className={styles.text}>
+        <span className={styles.name}>{habit.name}</span>
+        <span className={styles.meta}>
+          {detail ?? habit.detail}
+          <span className={styles.streak} data-inspect="streak-count">
+            <Flame />
+            {streak ?? habit.streak}
+          </span>
+        </span>
+      </span>
+      <span className={styles.dots} data-inspect="streak-dots">
+        {habit.week.map((day, index) => (
+          <span
+            key={index}
+            className={styles[day]}
+            data-story={live && index === habit.week.length - 1 ? '' : undefined}
+          />
+        ))}
+      </span>
+      <Check habit={habit} live={live} />
+    </li>
+  );
+}
+
+/**
+ * Example project [03]: a habit tracker's Today screen in the iOS idiom. Not interactive; for inspection only.
+ * When the summary card comes into view, the ring's segments draw in one after another while the count rises to 4,
+ * and then the water story plays (see STORY). It holds while the card or the water row is inspected.
+ */
+export function WaveApp() {
+  const card = useDemoMotion<HTMLElement>();
+  const row = useDemoMotion<HTMLLIElement>();
+  const scene = useStory(card.playing && row.playing, card.final);
+  const count = useCountUp(done, card, 1200);
+  const water = waterAt(scene.row);
+  // The card's own view of the water, a beat behind the row
+  const cardDone = scene.card === GLASSES;
+  const doneNow = done + (cardDone ? 1 : 0);
+
+  return (
+    <div className={styles.app} data-dip={scene.dip || undefined} data-instant={scene.instant || undefined}>
       <StatusBar />
 
       <header className={styles.header}>
@@ -210,11 +356,17 @@ export function WaveApp() {
         <span className={styles.segment}>Week</span>
       </div>
 
-      <section className={styles.summary} data-inspect="today-summary">
-        <span className={styles.ring} data-inspect="progress-ring">
+      <section ref={card.ref} className={styles.summary} data-inspect="today-summary">
+        <span
+          className={styles.ring}
+          data-inspect="progress-ring"
+          data-waiting={!card.started || undefined}
+          data-started={(card.started && !card.final) || undefined}
+        >
           <svg viewBox="0 0 100 100">
             {DAY.map((habit, index) => {
               const rotate = -90 + (index + 0.5) * (360 / DAY.length) - DASH_DEGREES / 2;
+              const progress = habit === WATER ? scene.card / GLASSES : habit.progress;
               return (
                 <g key={habit.name} className={styles[habit.hue]} transform={`rotate(${rotate} 50 50)`}>
                   <circle
@@ -224,13 +376,17 @@ export function WaveApp() {
                     r={RADIUS}
                     strokeDasharray={`${DASH} ${CIRCUMFERENCE}`}
                   />
-                  {habit.progress > 0 && (
+                  {/* The filled part is the whole dash pushed back by what's left (stroke-dashoffset), so it can
+                      sweep in and fill up; the segments draw in clockwise, one after another */}
+                  {progress > 0 && (
                     <circle
                       className={styles.ringValue}
                       cx="50"
                       cy="50"
                       r={RADIUS}
-                      strokeDasharray={`${DASH * habit.progress} ${CIRCUMFERENCE}`}
+                      strokeDasharray={`${DASH} ${CIRCUMFERENCE}`}
+                      data-story={habit === WATER ? '' : undefined}
+                      style={{ '--dash': DASH, '--progress': progress, '--delay': `${index * 140}ms` } as CSSProperties}
                     />
                   )}
                 </g>
@@ -238,16 +394,29 @@ export function WaveApp() {
             })}
           </svg>
           <span className={styles.ringCount}>
-            {done}
+            <Roll
+              value={Math.round(count) + (cardDone ? 1 : 0)}
+              values={[0, 1, 2, 3, 4, 5, 6]}
+              snap={count !== done}
+            />
             <span className={styles.ringTotal}>of {DAY.length}</span>
           </span>
         </span>
 
         <div className={styles.summaryText}>
-          <p className={styles.summaryTitle}>2 to go</p>
+          <p className={styles.summaryTitle}>
+            <Roll value={DAY.length - doneNow} values={[1, 2]} /> to go
+          </p>
           <ul className={styles.legend}>
             <li className={styles.night}>Read at 10 PM</li>
-            <li className={styles.afternoon}>2 glasses of water</li>
+            {/* Once the last glass is in, water is no longer left to do: its line fades out but keeps its place */}
+            <li className={styles.afternoon} data-story="" data-gone={cardDone || undefined}>
+              <Roll
+                value={Math.max(1, GLASSES - scene.card)}
+                values={[1, 2]}
+                format={(n) => `${n} ${n === 1 ? 'glass' : 'glasses'} of water`}
+              />
+            </li>
           </ul>
           <span className={styles.streakChip} data-inspect="streak-count">
             <Flame />4 perfect days
@@ -272,31 +441,23 @@ export function WaveApp() {
             </div>
 
             <ul className={styles.list}>
-              {section.habits.map((habit) => (
-                <li key={habit.name} className={`${styles.row} ${styles[habit.hue]}`} data-inspect="list-row">
-                  <span className={styles.icon} data-inspect="habit-icon">
-                    <svg viewBox="0 0 24 24" width="17" height="17">
-                      {habit.icon}
-                    </svg>
-                  </span>
-                  <span className={styles.text}>
-                    <span className={styles.name}>{habit.name}</span>
-                    <span className={styles.meta}>
-                      {habit.detail}
-                      <span className={styles.streak} data-inspect="streak-count">
-                        <Flame />
-                        {habit.streak}
+              {section.habits.map((habit) =>
+                habit === WATER ? (
+                  <Row
+                    key={habit.name}
+                    habit={water}
+                    detail={
+                      <span>
+                        <Roll value={scene.row} values={[6, 7, 8]} /> of {GLASSES} glasses
                       </span>
-                    </span>
-                  </span>
-                  <span className={styles.dots} data-inspect="streak-dots">
-                    {habit.week.map((day, index) => (
-                      <span key={index} className={styles[day]} />
-                    ))}
-                  </span>
-                  <Check habit={habit} />
-                </li>
-              ))}
+                    }
+                    streak={<Roll value={water.streak} values={[WATER.streak, WATER.streak + 1]} />}
+                    rowRef={row.ref}
+                  />
+                ) : (
+                  <Row key={habit.name} habit={habit} />
+                ),
+              )}
             </ul>
           </section>
         ))}

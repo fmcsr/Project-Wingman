@@ -198,12 +198,21 @@
   stroke-linejoin: round;
 }
 
-/* The conversation */
+/* The conversation; it reaches down to the bottom of the screen, so the reply below can fill it while it streams in */
 .thread {
   position: absolute;
   top: 94px;
   inset-inline: 16px;
   display: flex;
+  flex-direction: column;
+  min-height: calc(100% - 94px);
+}
+
+/* Muse's reply: everything under the user's message. It fills the rest of the thread, so it keeps one size from the
+   first word to the last and counts as in view the same way all along (see Streaming below) */
+.reply {
+  display: flex;
+  flex-grow: 1;
   flex-direction: column;
 }
 
@@ -254,6 +263,14 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   margin-left: -2px;
+}
+
+/* Thinking: while the answer is on its way, a soft band of light sweeps across the gray label (see Streaming) */
+.thinking {
+  color: transparent;
+  background: linear-gradient(90deg, var(--text-2) 35%, var(--text) 50%, var(--text-2) 65%) 100% 0 / 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 /* The answer: plain text on the page, no bubble, in a three-step type scale */
@@ -540,4 +557,65 @@
   border-radius: 999px;
   background: var(--text);
   translate: -50% 0;
+}
+
+/*
+ * Streaming: the reply's pieces stay hidden until the stream reaches them (data-pending), so the answer grows into
+ * place and ends in the layout above. Each word fades in as it arrives, which softens the leading edge of the text;
+ * table rows, checklist items and the actions fade in whole; the suggestions slide in one after another. The reply
+ * holds still while it's inspected or out of view (data-paused). Only with motion allowed: with reduced motion
+ * everything simply shows, whatever the script does.
+ */
+.reply {
+  --play: running;
+}
+
+.reply[data-paused] {
+  --play: paused;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reply [data-pending] {
+    display: none;
+  }
+
+  .reply[data-motion] .thinking {
+    animation: shimmer 1.2s linear infinite;
+    animation-play-state: var(--play);
+  }
+
+  .reply[data-motion] :is(.label, .word, .citation) {
+    animation: fade-in 240ms var(--ease) backwards;
+    animation-play-state: var(--play);
+  }
+
+  .reply[data-motion] :is(.tableWrap, .table tbody tr, .step, .stepDone, .actions) {
+    animation: fade-in 320ms var(--ease) backwards;
+    animation-play-state: var(--play);
+  }
+
+  .reply[data-motion] .followUp {
+    animation: slide-in 400ms var(--ease) backwards;
+    animation-play-state: var(--play);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 0 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* From the side the row of suggestions runs off to; a rise would be cut by the row's clip */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    translate: 8px 0;
+  }
 }

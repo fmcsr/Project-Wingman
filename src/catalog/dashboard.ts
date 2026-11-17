@@ -203,6 +203,13 @@ export const dashboard: UiElementSpec[] = [
         value: 'repeat(4, minmax(0, 1fr))',
         plain: 'Four cards side by side on wide screens, two by two on narrow ones.',
       },
+      {
+        kind: 'behavior',
+        term: 'Count-up',
+        value: '0 → $84,210 · 900ms · tabular-nums',
+        plain:
+          "The first time the cards come into view, each number counts up from zero, a beat after the card before it. Every digit is equally wide, so the number doesn't jitter as it climbs.",
+      },
     ],
   },
   {
@@ -249,6 +256,13 @@ export const dashboard: UiElementSpec[] = [
         value: '7px',
         plain: 'A dot marks the latest value, the one the big number above shows.',
       },
+      {
+        kind: 'behavior',
+        term: 'Draw-in',
+        value: 'clip-path: inset() · 800ms · 70ms apart',
+        plain:
+          'Each line draws itself from left to right as its card comes into view, one card after the other, and the end dot lands when the line gets there.',
+      },
     ],
   },
   {
@@ -278,6 +292,13 @@ export const dashboard: UiElementSpec[] = [
         term: 'Gradient fill',
         value: '<linearGradient> 16% → 0%',
         plain: 'The fill fades from the line color to transparent toward the bottom.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Draw-in',
+        value: 'clip-path: inset() · 900ms ease-out',
+        plain:
+          'The first time the chart comes into view, the lines draw themselves from left to right with the fill underneath. The flag and the readout appear as the line reaches their day.',
       },
     ],
   },
@@ -356,6 +377,13 @@ export const dashboard: UiElementSpec[] = [
         value: 'Total $84,210',
         plain: 'A footer adds up the rows, so the breakdown visibly matches the headline number.',
       },
+      {
+        kind: 'behavior',
+        term: 'Grow-in',
+        value: 'transform: scaleX() · transform-origin: left',
+        plain:
+          'When the list comes into view, the bars grow from the left one after another, so the ranking builds from the top down.',
+      },
     ],
   },
   {
@@ -385,6 +413,13 @@ export const dashboard: UiElementSpec[] = [
         value: '@container panel (width < 480px)',
         plain:
           'On a phone each row becomes two lines, the customer on the left and the amount and status on the right, instead of squeezed columns.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Live rows',
+        value: 'a new payment every 6.5s · always 5 rows',
+        plain:
+          'New payments slide in at the top while the oldest fades out, so the table keeps its height, and the Collected total follows. Updates wait while you point at the table, so no row moves under your cursor.',
       },
     ],
   },

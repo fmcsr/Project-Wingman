@@ -107,9 +107,9 @@ export const commerce: UiElementSpec[] = [
   {
     id: 'image-carousel',
     name: 'Image carousel',
-    variant: 'Full-width product photos',
+    variant: 'Full-width product photos, one per color',
     summary:
-      'The big product photo at the top, edge to edge on a light gray backdrop. Swipe sideways to see the same shoe from other angles.',
+      'The big product photo at the top, edge to edge on a light gray backdrop. Swipe sideways to see the same shoe in its other colors.',
     aliases: ['photo slider', 'gallery', 'product images', 'the swipe-through pictures'],
     concepts: [
       {
@@ -129,6 +129,13 @@ export const commerce: UiElementSpec[] = [
         term: 'Swipe with snap',
         value: 'scroll-snap-type: x mandatory',
         plain: 'Each swipe settles exactly on the next photo instead of stopping halfway between two.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Autoplay',
+        value: 'every 5s · translateX(-100%) · 800ms',
+        plain:
+          'On its own, it slides on to the next photo every few seconds and loops from the last back to the first. It holds still while you point at it.',
       },
     ],
   },
@@ -169,8 +176,14 @@ export const commerce: UiElementSpec[] = [
       {
         kind: 'behavior',
         term: 'Accessible label',
-        value: 'aria-label="Photo 1 of 4"',
+        value: 'aria-label="Photo 1 of 5"',
         plain: 'Screen readers announce the position in words, because dots alone say nothing.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Follows the photo',
+        value: 'transition: background-color 500ms',
+        plain: 'As the photos slide, the dark dot moves on with them, so you always know which photo you are on.',
       },
     ],
   },
@@ -178,8 +191,9 @@ export const commerce: UiElementSpec[] = [
     id: 'product-title',
     name: 'Product title',
     htmlTag: '<h1>',
-    variant: 'Name over a category line',
-    summary: "The product's name, with the kind of product on the line under it. It's the first thing you read under the photo.",
+    variant: 'Name over category and color',
+    summary:
+      "The product's name, with the kind of product and the color you are looking at on the line under it. It's the first thing you read under the photo.",
     aliases: ['product name', 'heading', 'the name of the shoe'],
     concepts: [
       {
@@ -193,6 +207,12 @@ export const commerce: UiElementSpec[] = [
         term: 'One text color',
         value: { light: 'color: #111', dark: 'color: #fff' },
         plain: 'Both lines are in the plain text color. The page leaves color to the photos and the saving.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Cross-fade',
+        value: 'opacity · 200ms out, 400ms in',
+        plain: "The color's name changes with the photo: the old name fades out, then the new one fades in at the same spot.",
       },
     ],
   },
@@ -247,6 +267,13 @@ export const commerce: UiElementSpec[] = [
         term: 'Single choice',
         value: 'role="radiogroup"',
         plain: 'Only one color can be picked at a time. Picking another swaps the photos and the sizes in stock.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Synced with the photos',
+        value: 'ring cross-fades · 400ms',
+        plain:
+          'When the photos slide to another color, the ring moves to that swatch, so the picker and the photos always show the same shoe.',
       },
     ],
   },

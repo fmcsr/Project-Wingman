@@ -1,5 +1,6 @@
-import { useId } from 'react';
-import type { CSSProperties } from 'react';
+import { useEffect, useId, useState } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { useCountUp, useDemoMotion, useEvery } from './motion';
 import styles from './OrbitDashboard.module.css';
 
 /** Line icons on a 24 × 24 grid; stroke color and width come from the stylesheet. */
@@ -83,6 +84,22 @@ const STATS = [
   { label: 'Revenue churn', value: '2.9%', delta: '0.5 pts', up: false, good: true, from: '3.4%', data: CHURN },
 ];
 
+/**
+ * A figure as the page writes it ("$84,210", "2,148", "2.9%"): its number, and a way to write any value the same way
+ * (the same symbols, separators and decimals), for the values in between while it counts up.
+ */
+function figure(text: string) {
+  const [, before, digits, after] = /^(\D*)([\d,.]+)(\D*)$/.exec(text) ?? ['', '', text, ''];
+  const decimals = digits.split('.')[1]?.length ?? 0;
+  const format = new Intl.NumberFormat('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  return {
+    value: Number(digits.replace(/,/g, '')),
+    write: (value: number) => `${before}${format.format(value)}${after}`,
+  };
+}
+
+const FIGURES = STATS.map((stat) => figure(stat.value));
+
 /** A sparkline in a 100 × 32 box: the line, the wash under it, and where the last point sits (in % from the top). */
 function sparkline(values: readonly number[]) {
   const min = Math.min(...values);
@@ -146,66 +163,219 @@ const COUNTRIES: { code: FlagCode; name: string; value: string; amount: number; 
   { code: 'nl', name: 'Netherlands', value: '$4,130', amount: 4130, share: '4.9%' },
 ];
 
-/** Monthly invoices: seats × the plan's price per seat. Only the two paid ones count as collected ($5,320). */
-const PAYMENTS = [
+type Plan = 'Enterprise' | 'Teams' | 'Pro';
+type Status = 'Paid' | 'Pending' | 'Failed' | 'Refunded';
+type Payment = {
+  customer: string;
+  domain: string;
+  initials: string;
+  plan: Plan;
+  seats: number;
+  status: Status;
+  date: string;
+};
+
+/** Price per seat per month. */
+const PRICE: Record<Plan, number> = { Enterprise: 28, Teams: 20, Pro: 16 };
+const amountOf = (payment: Payment) => payment.seats * PRICE[payment.plan];
+const dollars = (value: number) => `$${Math.round(value).toLocaleString('en-US')}`;
+
+/**
+ * Monthly invoices, newest first: seats × the plan's price per seat. Collected adds up the paid ones in the table
+ * ($840 + $4,480 = $5,320 here).
+ */
+const PAYMENTS: Payment[] = [
   {
     customer: 'Marigold Dental',
     domain: 'marigolddental.com',
     initials: 'MD',
     plan: 'Teams',
-    seats: '42 seats × $20',
+    seats: 42,
     status: 'Paid',
     date: 'Nov 8, 09:41',
-    amount: '$840',
   },
   {
     customer: 'Pinecrest Freight',
     domain: 'pinecrestfreight.com',
     initials: 'PF',
     plan: 'Enterprise',
-    seats: '160 seats × $28',
+    seats: 160,
     status: 'Paid',
     date: 'Nov 8, 08:15',
-    amount: '$4,480',
   },
   {
     customer: 'Quarry Studio',
     domain: 'quarry.studio',
     initials: 'QS',
     plan: 'Pro',
-    seats: '9 seats × $16',
+    seats: 9,
     status: 'Failed',
     date: 'Nov 7, 17:02',
-    amount: '$144',
   },
   {
     customer: 'Juniper Schools',
     domain: 'juniperschools.org',
     initials: 'JS',
     plan: 'Teams',
-    seats: '28 seats × $20',
+    seats: 28,
     status: 'Pending',
     date: 'Nov 7, 14:30',
-    amount: '$560',
   },
   {
     customer: 'Sable & Finch',
     domain: 'sableandfinch.com',
     initials: 'SF',
     plan: 'Pro',
-    seats: '6 seats × $16',
+    seats: 6,
     status: 'Refunded',
     date: 'Nov 6, 11:58',
-    amount: '$96',
   },
-] as const;
+];
 
-const PILL = {
+/**
+ * Payments that come in while the table is in view, one every few seconds, in a loop: the same kinds of customers,
+ * plans and prices as above, mostly paid. Each comes a number of minutes after the one before (the first after
+ * 09:41), so the newest is always on top. Columns: customer, domain, initials, plan, seats, status, minutes.
+ */
+const INCOMING: [string, string, string, Plan, number, Status, number][] = [
+  ['Halden Robotics', 'haldenrobotics.com', 'HR', 'Enterprise', 85, 'Paid', 4],
+  ['Bayside Clinic', 'baysideclinic.com', 'BC', 'Teams', 18, 'Paid', 11],
+  ['Otter & Pine', 'otterandpine.co', 'OP', 'Pro', 4, 'Paid', 3],
+  ['Kestrel Analytics', 'kestrel.io', 'KA', 'Pro', 12, 'Pending', 7],
+  ['Larkspur Hotels', 'larkspurhotels.com', 'LH', 'Enterprise', 96, 'Paid', 12],
+  ['Fernhill Academy', 'fernhillacademy.org', 'FA', 'Teams', 35, 'Paid', 5],
+  ['Ridgeway Design', 'ridgeway.design', 'RD', 'Pro', 7, 'Failed', 9],
+  ['Harbor & Vine', 'harborandvine.com', 'HV', 'Teams', 24, 'Paid', 14],
+  ['Tidepool Games', 'tidepool.games', 'TG', 'Teams', 22, 'Paid', 3],
+  ['Ashgrove Legal', 'ashgrovelegal.com', 'AL', 'Enterprise', 48, 'Paid', 8],
+  ['Bluebell Bakery', 'bluebellbakery.com', 'BB', 'Pro', 3, 'Pending', 6],
+  ['Granite Health', 'granitehealth.co', 'GH', 'Teams', 56, 'Paid', 10],
+];
+
+const PILL: Record<Status, string> = {
   Paid: styles.pillPaid,
   Pending: styles.pillPending,
   Failed: styles.pillFailed,
   Refunded: styles.pillRefunded,
 };
+
+type Column = {
+  name: string;
+  /** Classes of the header and of the cells; the stylesheet hides some columns on narrow pages. */
+  head?: string;
+  cell: string;
+  /** A payment's cell content. `inspect` is off for the copies that hold the column's width (see the header). */
+  render: (row: Payment, inspect: boolean) => ReactNode;
+};
+
+const COLUMNS: Column[] = [
+  {
+    name: 'Customer',
+    cell: styles.colCustomer,
+    render: (row) => (
+      <span className={styles.customer}>
+        <span className={styles.logoTile}>{row.initials}</span>
+        <span className={styles.stack}>
+          <span className={styles.customerName}>{row.customer}</span>
+          <span className={styles.secondary}>{row.domain}</span>
+        </span>
+      </span>
+    ),
+  },
+  {
+    name: 'Plan',
+    head: styles.colPlan,
+    cell: styles.colPlan,
+    render: (row) => (
+      <span className={styles.stack}>
+        <span>{row.plan}</span>
+        <span className={styles.secondary}>{`${row.seats} seats × $${PRICE[row.plan]}`}</span>
+      </span>
+    ),
+  },
+  {
+    name: 'Status',
+    head: styles.colStatus,
+    cell: styles.colStatus,
+    render: (row, inspect) => (
+      <span className={PILL[row.status]} data-inspect={inspect ? 'status-pill' : undefined}>
+        {row.status}
+      </span>
+    ),
+  },
+  {
+    name: 'Date',
+    head: styles.colDate,
+    cell: `${styles.colDate} ${styles.date}`,
+    render: (row) => row.date,
+  },
+  {
+    name: 'Amount',
+    head: `${styles.colAmount} ${styles.num}`,
+    cell: `${styles.colAmount} ${styles.num} ${styles.amount}`,
+    render: (row) => (
+      <>
+        {dollars(amountOf(row))}
+        <span className={styles.cents}>.00</span>
+      </>
+    ),
+  },
+];
+
+/** A new payment comes in this often while the table is in view and not being inspected. */
+const ARRIVAL_MS = 6500;
+
+/** A time in minutes after midnight on Nov 8, as the table writes it, e.g. "Nov 8, 09:55". */
+function stamp(minutes: number) {
+  const time = minutes % 1440;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `Nov ${8 + Math.floor(minutes / 1440)}, ${pad(Math.floor(time / 60))}:${pad(time % 60)}`;
+}
+
+type Feed = { rows: Payment[]; next: number; clock: number; count: number; arrivals: number };
+
+/** The table as the page loads: the newest payment came in at 09:41, and there are 1,312 in the period. */
+const FEED: Feed = { rows: PAYMENTS, next: 0, clock: 9 * 60 + 41, count: 1312, arrivals: 0 };
+
+/** The next payment joins at the top and the oldest leaves, so there are always five rows. */
+function arrive(feed: Feed): Feed {
+  const [customer, domain, initials, plan, seats, status, minutes] = INCOMING[feed.next];
+  const clock = feed.clock + minutes;
+  return {
+    rows: [{ customer, domain, initials, plan, seats, status, date: stamp(clock) }, ...feed.rows.slice(0, -1)],
+    next: (feed.next + 1) % INCOMING.length,
+    clock,
+    count: feed.count + 1,
+    arrivals: feed.arrivals + 1,
+  };
+}
+
+/**
+ * Recent payments as a live feed. Every ARRIVAL_MS while `playing`, the oldest row starts to fade out (`leaving`);
+ * once it's gone (`onLeft`, at the end of that animation, so it holds when the table holds) the next payment comes
+ * in. `updated` is for the page's "Updated …" line: "just now" after a payment, back to "2 min ago" over two minutes.
+ */
+function usePaymentFeed(playing: boolean) {
+  const [feed, setFeed] = useState(FEED);
+  const [leaving, setLeaving] = useState(false);
+  const [minutesAgo, setMinutesAgo] = useState(2);
+
+  useEvery(ARRIVAL_MS, playing, () => setLeaving(true));
+
+  useEffect(() => {
+    if (minutesAgo >= 2) return;
+    const timer = window.setTimeout(() => setMinutesAgo(minutesAgo + 1), 60_000);
+    return () => window.clearTimeout(timer);
+  }, [minutesAgo, feed.arrivals]);
+
+  const onLeft = () => {
+    setFeed(arrive);
+    setLeaving(false);
+    setMinutesAgo(0);
+  };
+
+  return { ...feed, leaving, onLeft, updated: minutesAgo ? `${minutesAgo} min ago` : 'just now' };
+}
 
 /** Small flags drawn from their stripes (no emoji: those don't show on every system). */
 function Flag({ code, id }: { code: FlagCode; id: string }) {
@@ -252,12 +422,78 @@ function Flag({ code, id }: { code: FlagCode; id: string }) {
   );
 }
 
+type Entrance = { started: boolean; final: boolean };
+
+/** Holds `started` back by `delay` ms, so the parts of a row can come in one after another. At once when `final`. */
+function useDelayed({ started, final }: Entrance, delay: number): Entrance {
+  const [due, setDue] = useState(false);
+
+  useEffect(() => {
+    if (!started || final) return;
+    const timer = window.setTimeout(() => setDue(true), delay);
+    return () => window.clearTimeout(timer);
+  }, [started, final, delay]);
+
+  return { started: final || due, final };
+}
+
+/** The KPI cards come in one after another, this far apart. */
+const STAT_STAGGER_MS = 70;
+
+/**
+ * One KPI card. Once the row is in view, a beat after the card before it, the figure counts up while the sparkline
+ * draws in (data-started; the stylesheet has the draw-in).
+ */
+function StatCard({ index, uid, entrance }: { index: number; uid: string; entrance: Entrance }) {
+  const stat = STATS[index];
+  const card = useDelayed(entrance, index * STAT_STAGGER_MS);
+  const value = useCountUp(FIGURES[index].value, card);
+
+  return (
+    <div className={styles.stat} data-inspect="stat-card" data-started={card.started || undefined}>
+      <span className={styles.statLabel}>{stat.label}</span>
+      <span className={styles.statValue}>{FIGURES[index].write(value)}</span>
+      <span className={styles.statFoot}>
+        <span className={stat.good ? styles.deltaGood : styles.deltaBad} data-inspect="delta-badge">
+          <Icon d={stat.up ? ICON.arrowUp : ICON.arrowDown} className={styles.deltaIcon} />
+          {stat.delta}
+        </span>
+        <span className={styles.statFrom}>from {stat.from}</span>
+      </span>
+      <span className={styles.spark} data-inspect="sparkline">
+        <svg viewBox="0 0 100 32" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id={`${uid}-spark-${index}`} x1="0" y1="0" x2="0" y2="1">
+              <stop className={styles.accentStop} offset="0" stopOpacity="0.18" />
+              <stop className={styles.accentStop} offset="1" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={SPARKS[index].area} fill={`url(#${uid}-spark-${index})`} />
+          <path className={styles.sparkLine} d={SPARKS[index].line} />
+        </svg>
+        <i className={styles.sparkDot} style={{ top: `${SPARKS[index].end}%` }} />
+      </span>
+    </div>
+  );
+}
+
 /** Example project [02]: Orbit, a revenue analytics dashboard. Not interactive; for inspection only. */
 export function OrbitDashboard() {
   // SVG ids must be unique in the page, so they're derived from React's id for this instance
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const maxPlan = Math.max(...PLANS.map((plan) => plan.amount));
   const maxCountry = Math.max(...COUNTRIES.map((country) => country.amount));
+
+  // Entrances play once, as each part first comes into view; the payments go on arriving while that card plays
+  const stats = useDemoMotion<HTMLDivElement>();
+  const chart = useDemoMotion<HTMLDivElement>();
+  const plans = useDemoMotion<HTMLDivElement>();
+  const countries = useDemoMotion<HTMLDivElement>();
+  const payments = useDemoMotion<HTMLElement>();
+  const feed = usePaymentFeed(payments.playing);
+  // Collected is what the paid payments in the table add up to; it follows as they come and go
+  const paid = feed.rows.reduce((sum, row) => (row.status === 'Paid' ? sum + amountOf(row) : sum), 0);
+  const collected = useCountUp(paid, payments, 700);
 
   return (
     <div className={styles.root}>
@@ -322,7 +558,7 @@ export function OrbitDashboard() {
               <div className={styles.titleBlock}>
                 <h3 className={styles.title}>Revenue</h3>
                 <p className={styles.subtitle}>
-                  All plans · USD<span className={styles.updated}> · Updated 2 min ago</span>
+                  All plans · USD<span className={styles.updated}> · Updated {feed.updated}</span>
                 </p>
               </div>
               <span className={styles.button}>
@@ -356,32 +592,9 @@ export function OrbitDashboard() {
               </span>
             </div>
 
-            <div className={styles.stats}>
+            <div ref={stats.ref} className={styles.stats}>
               {STATS.map((stat, index) => (
-                <div key={stat.label} className={styles.stat} data-inspect="stat-card">
-                  <span className={styles.statLabel}>{stat.label}</span>
-                  <span className={styles.statValue}>{stat.value}</span>
-                  <span className={styles.statFoot}>
-                    <span className={stat.good ? styles.deltaGood : styles.deltaBad} data-inspect="delta-badge">
-                      <Icon d={stat.up ? ICON.arrowUp : ICON.arrowDown} className={styles.deltaIcon} />
-                      {stat.delta}
-                    </span>
-                    <span className={styles.statFrom}>from {stat.from}</span>
-                  </span>
-                  <span className={styles.spark} data-inspect="sparkline">
-                    <svg viewBox="0 0 100 32" preserveAspectRatio="none">
-                      <defs>
-                        <linearGradient id={`${uid}-spark-${index}`} x1="0" y1="0" x2="0" y2="1">
-                          <stop className={styles.accentStop} offset="0" stopOpacity="0.18" />
-                          <stop className={styles.accentStop} offset="1" stopOpacity="0" />
-                        </linearGradient>
-                      </defs>
-                      <path d={SPARKS[index].area} fill={`url(#${uid}-spark-${index})`} />
-                      <path className={styles.sparkLine} d={SPARKS[index].line} />
-                    </svg>
-                    <i className={styles.sparkDot} style={{ top: `${SPARKS[index].end}%` }} />
-                  </span>
-                </div>
+                <StatCard key={stat.label} index={index} uid={uid} entrance={stats} />
               ))}
             </div>
 
@@ -403,7 +616,12 @@ export function OrbitDashboard() {
                 </div>
               </header>
 
-              <div className={styles.plot} data-inspect="area-chart">
+              <div
+                ref={chart.ref}
+                className={styles.plot}
+                data-inspect="area-chart"
+                data-started={chart.started || undefined}
+              >
                 <div className={styles.yAxis} aria-hidden="true">
                   {Y_TICKS.map((tick) => (
                     <span key={tick} style={{ top: `${pctY(tick)}%` }}>
@@ -422,7 +640,7 @@ export function OrbitDashboard() {
                         <stop className={styles.accentStop} offset="1" stopOpacity="0" />
                       </linearGradient>
                     </defs>
-                    <path d={AREA} fill={`url(#${uid}-area)`} />
+                    <path className={styles.area} d={AREA} fill={`url(#${uid}-area)`} />
                     <path className={styles.lineBefore} d={LINE_BEFORE} />
                     <path className={styles.line} d={LINE} />
                   </svg>
@@ -444,7 +662,7 @@ export function OrbitDashboard() {
                     style={{ left: `${pctX(HOVER)}%`, top: `${pctY(MRR_BEFORE[HOVER])}%` }}
                   />
                   <i className={styles.dot} style={{ left: `${pctX(HOVER)}%`, top: `${pctY(MRR[HOVER])}%` }} />
-                  <i className={styles.dot} style={{ left: '100%', top: `${pctY(MRR[MRR.length - 1])}%` }} />
+                  <i className={styles.endDot} style={{ left: '100%', top: `${pctY(MRR[MRR.length - 1])}%` }} />
                   <div
                     className={styles.tooltip}
                     style={{ '--x': `${pctX(HOVER)}%` } as CSSProperties}
@@ -486,12 +704,20 @@ export function OrbitDashboard() {
                   <h4 className={styles.cardTitle}>MRR by plan</h4>
                   <span className={styles.cardMeta}>vs Oct 9</span>
                 </header>
-                <div className={styles.barBlock} data-inspect="bar-list">
+                <div
+                  ref={plans.ref}
+                  className={styles.barBlock}
+                  data-inspect="bar-list"
+                  data-started={plans.started || undefined}
+                >
                   <div className={styles.barList}>
-                    {PLANS.map((plan) => (
+                    {PLANS.map((plan, index) => (
                       <div key={plan.name} className={styles.barRow}>
                         <span className={styles.barTrack}>
-                          <span className={styles.bar} style={{ width: `${(plan.amount / maxPlan) * 100}%` }} />
+                          <span
+                            className={styles.bar}
+                            style={{ width: `${(plan.amount / maxPlan) * 100}%`, '--i': index } as CSSProperties}
+                          />
                           <span className={styles.barLabel}>
                             <span className={styles.barName}>{plan.name}</span>
                             {plan.isNew && <span className={styles.newTag}>New</span>}
@@ -515,12 +741,20 @@ export function OrbitDashboard() {
                   <h4 className={styles.cardTitle}>MRR by country</h4>
                   <span className={styles.cardMeta}>36 countries</span>
                 </header>
-                <div className={`${styles.barBlock} ${styles.withShare}`} data-inspect="bar-list">
+                <div
+                  ref={countries.ref}
+                  className={`${styles.barBlock} ${styles.withShare}`}
+                  data-inspect="bar-list"
+                  data-started={countries.started || undefined}
+                >
                   <div className={styles.barList}>
-                    {COUNTRIES.map((country) => (
+                    {COUNTRIES.map((country, index) => (
                       <div key={country.code} className={styles.barRow}>
                         <span className={styles.barTrack}>
-                          <span className={styles.bar} style={{ width: `${(country.amount / maxCountry) * 100}%` }} />
+                          <span
+                            className={styles.bar}
+                            style={{ width: `${(country.amount / maxCountry) * 100}%`, '--i': index } as CSSProperties}
+                          />
                           <span className={styles.barLabel}>
                             <Flag code={country.code} id={`${uid}-flag-${country.code}`} />
                             <span className={styles.barName}>{country.name}</span>
@@ -540,7 +774,7 @@ export function OrbitDashboard() {
               </section>
             </div>
 
-            <section className={styles.card}>
+            <section ref={payments.ref} className={styles.card}>
               <header className={styles.cardHeader}>
                 <div className={styles.headText}>
                   <h4 className={styles.cardTitle}>Recent payments</h4>
@@ -551,52 +785,49 @@ export function OrbitDashboard() {
                   <Icon d={ICON.arrowRight} className={styles.linkIcon} />
                 </a>
               </header>
-              <table className={styles.table} data-inspect="data-table">
+              <table className={styles.table} data-inspect="data-table" data-paused={!payments.playing || undefined}>
                 <thead>
                   <tr>
-                    <th>Customer</th>
-                    <th className={styles.colPlan}>Plan</th>
-                    <th className={styles.colStatus}>Status</th>
-                    <th className={styles.colDate}>Date</th>
-                    <th className={`${styles.colAmount} ${styles.num}`}>Amount</th>
+                    {COLUMNS.map((column) => (
+                      <th key={column.name} className={column.head}>
+                        {column.name}
+                        {/* The payments the page starts with, invisible and flat: the columns keep their widths
+                            as payments come and go, instead of shifting with each one */}
+                        <span className={styles.reserve}>
+                          {PAYMENTS.map((row) => (
+                            <span key={row.customer} className={column.cell}>
+                              {column.render(row, false)}
+                            </span>
+                          ))}
+                        </span>
+                      </th>
+                    ))}
                   </tr>
                 </thead>
-                <tbody>
-                  {PAYMENTS.map((row) => (
+                {/* A new set of rows for each payment, so the rows play their entrance from the start */}
+                <tbody
+                  key={feed.arrivals}
+                  data-arrived={feed.arrivals > 0 || undefined}
+                  data-leaving={feed.leaving || undefined}
+                  onAnimationEnd={(event) => {
+                    if (feed.leaving && event.target === event.currentTarget.lastElementChild) feed.onLeft();
+                  }}
+                >
+                  {feed.rows.map((row) => (
                     <tr key={row.customer}>
-                      <td className={styles.colCustomer}>
-                        <span className={styles.customer}>
-                          <span className={styles.logoTile}>{row.initials}</span>
-                          <span className={styles.stack}>
-                            <span className={styles.customerName}>{row.customer}</span>
-                            <span className={styles.secondary}>{row.domain}</span>
-                          </span>
-                        </span>
-                      </td>
-                      <td className={styles.colPlan}>
-                        <span className={styles.stack}>
-                          <span>{row.plan}</span>
-                          <span className={styles.secondary}>{row.seats}</span>
-                        </span>
-                      </td>
-                      <td className={styles.colStatus}>
-                        <span className={PILL[row.status]} data-inspect="status-pill">
-                          {row.status}
-                        </span>
-                      </td>
-                      <td className={`${styles.colDate} ${styles.date}`}>{row.date}</td>
-                      <td className={`${styles.colAmount} ${styles.num} ${styles.amount}`}>
-                        {row.amount}
-                        <span className={styles.cents}>.00</span>
-                      </td>
+                      {COLUMNS.map((column) => (
+                        <td key={column.name} className={column.cell}>
+                          {column.render(row, true)}
+                        </td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>
               </table>
               <footer className={styles.cardFoot}>
-                <span className={styles.footCount}>5 of 1,312 payments</span>
+                <span className={styles.footCount}>5 of {feed.count.toLocaleString('en-US')} payments</span>
                 <span className={styles.footValue}>
-                  Collected <b>$5,320.00</b>
+                  Collected <b>{`${dollars(collected)}.00`}</b>
                 </span>
               </footer>
             </section>

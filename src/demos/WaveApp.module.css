@@ -161,8 +161,33 @@
   stroke: color-mix(in oklab, var(--hue) 24%, var(--card));
 }
 
+/* The filled part: the whole dash, pushed back along the circle by the share still to do */
 .app .ringValue {
   stroke: var(--hue);
+  stroke-dashoffset: calc(var(--dash) * (1 - var(--progress)) * 1px);
+  transition:
+    stroke-dashoffset 700ms var(--ease-out),
+    opacity 450ms var(--ease-out);
+}
+
+/* Entrance: once the card is in view, each segment sweeps in from its start, one after another clockwise */
+.ring[data-waiting] .ringValue {
+  opacity: 0;
+}
+
+.ring[data-started] .ringValue {
+  animation: ring-sweep 650ms var(--ease-out) var(--delay) backwards;
+}
+
+@keyframes ring-sweep {
+  from {
+    opacity: 0;
+    stroke-dashoffset: calc(var(--dash) * 1px);
+  }
+
+  15% {
+    opacity: 1;
+  }
 }
 
 .ringCount {
@@ -222,6 +247,11 @@
   height: 6px;
   border-radius: 50%;
   background: var(--hue);
+}
+
+/* A habit that's no longer left to do fades out of the list but keeps its line, so the card doesn't shift */
+.legend [data-gone] {
+  opacity: 0;
 }
 
 .streakChip {
@@ -383,10 +413,15 @@
   padding: 7px 0;
 }
 
+/* Today's dot fills in a moment after its habit's check */
 .dots > span {
   width: 5px;
   height: 5px;
   border-radius: 50%;
+  transition:
+    background-color 400ms var(--ease-out) 450ms,
+    box-shadow 400ms var(--ease-out) 450ms,
+    opacity 450ms var(--ease-out);
 }
 
 .dots .done {
@@ -406,9 +441,13 @@
   box-shadow: inset 0 0 0 1.2px var(--hue);
 }
 
-/* Check button */
-.check,
-.checkDone {
+/*
+ * Check button: a gray ring to do. A habit counted in steps draws its progress as an arc on the ring (the whole
+ * circle, pushed back by the share still to do) with a plus for the next step. Done fills the circle with the habit's
+ * color and draws a check. When the last step comes in, the arc closes first, then the fill grows out to the ring
+ * and the check draws in.
+ */
+.check {
   position: relative;
   display: grid;
   flex: none;
@@ -416,19 +455,8 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-}
-
-.check {
   box-shadow: inset 0 0 0 2.2px light-dark(#d1d1d6, #48484a);
-}
-
-.checkDone {
-  color: var(--on-hue);
-  background: var(--hue);
-}
-
-.app .checkDone svg {
-  stroke-width: 2.8;
+  transition: opacity 450ms var(--ease-out);
 }
 
 .checkArc {
@@ -440,34 +468,150 @@
 .app .checkArc circle {
   stroke: var(--hue);
   stroke-width: 2.2;
+  stroke-dasharray: 100 100;
+  stroke-dashoffset: calc((1 - var(--progress)) * 100px);
+  transition: stroke-dashoffset 500ms var(--ease-out);
 }
 
 .checkPlus {
   color: var(--hue);
+  transition: opacity 200ms var(--ease-out) 250ms;
 }
 
 .app .checkPlus {
   stroke-width: 2.4;
 }
 
-/* Floating tab bar: a glass capsule with a pill behind the selected tab */
-.tabBar {
+.checkFill {
   position: absolute;
-  bottom: 22px;
-  left: 14px;
-  z-index: 2;
+  inset: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  width: 194px;
-  height: 52px;
-  padding: 4px;
-  border-radius: 999px;
-  background: light-dark(rgb(255 255 255 / 0.72), rgb(40 40 42 / 0.72));
+  place-items: center;
+  border-radius: 50%;
+  color: var(--on-hue);
+  background: var(--hue);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 250ms var(--ease-out) 350ms,
+    transform 400ms var(--ease-out) 350ms;
+}
+
+.app .checkFill svg {
+  stroke-width: 2.8;
+}
+
+.app .checkFill path {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1px;
+  transition: stroke-dashoffset 300ms var(--ease-out) 600ms;
+}
+
+/* The fill covers the gray track; dropping it once the arc has closed keeps the fill's edge clean */
+.check[data-done] {
+  box-shadow: inset 0 0 0 2.2px transparent;
+  transition:
+    opacity 450ms var(--ease-out),
+    box-shadow 0s linear 500ms;
+}
+
+.check[data-done] .checkPlus {
+  opacity: 0;
+}
+
+.check[data-done] .checkFill {
+  opacity: 1;
+  transform: none;
+}
+
+.app .check[data-done] .checkFill path {
+  stroke-dashoffset: 0;
+}
+
+/*
+ * Numbers that roll (Roll in WaveApp.tsx): every value in one grid cell, the current one in place, the ones it rolled
+ * past above, the ones still to come below.
+ */
+.roll {
+  display: inline-grid;
+  justify-items: center;
+}
+
+.legend .roll {
+  justify-items: start;
+}
+
+/* The new value fades in a little after the old one starts to leave, so the two barely overlap */
+.roll > span {
+  grid-area: 1 / 1;
+  transition:
+    transform 450ms var(--ease-out),
+    opacity 300ms var(--ease-out) 80ms;
+}
+
+.roll > [data-roll='past'],
+.roll > [data-roll='next'] {
+  opacity: 0;
+  transition:
+    transform 450ms var(--ease-out),
+    opacity 180ms var(--ease-out);
+}
+
+.roll > [data-roll='past'] {
+  transform: translateY(-0.5em);
+}
+
+.roll > [data-roll='next'] {
+  transform: translateY(0.5em);
+}
+
+/* A count-up steps through its values too quickly to roll each one */
+.roll[data-snap] > [data-roll] {
+  transition: none;
+}
+
+/*
+ * When the story starts over, the parts it changed fade out (`data-dip`), are put back while hidden with no
+ * transitions (`data-instant`), and fade back in. Parts with transitions of their own list opacity among them.
+ */
+:where(.app [data-story]) {
+  transition: opacity 450ms var(--ease-out);
+}
+
+.app[data-dip] [data-story] {
+  opacity: 0;
+}
+
+.app[data-instant] [data-story],
+.app[data-instant] [data-story] * {
+  transition: none !important;
+}
+
+/*
+ * The floating bars: a glass tab bar with a pill behind the selected tab, and the add button beside it in the same
+ * glass. Both stay quiet (ink on glass, a light shadow) so the habits keep the color and the attention.
+ */
+.tabBar,
+.fab {
+  position: absolute;
+  bottom: 24px;
+  z-index: 2;
+  height: 46px;
+  background: light-dark(rgb(255 255 255 / 0.72), rgb(44 44 46 / 0.72));
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   backdrop-filter: blur(16px) saturate(180%);
   box-shadow:
-    0 8px 24px light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.5)),
-    inset 0 0 0 0.5px light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.14));
+    0 4px 14px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.35)),
+    inset 0 0 0 0.5px light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.12));
+}
+
+.tabBar {
+  left: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 180px;
+  padding: 3px;
+  border-radius: 999px;
 }
 
 .tab,
@@ -486,24 +630,16 @@
   background: var(--fill);
 }
 
-/* Floating add button, beside the tab bar */
 .fab {
-  position: absolute;
   right: 14px;
-  bottom: 23px;
-  z-index: 2;
   display: grid;
   place-items: center;
-  width: 50px;
-  height: 50px;
+  width: 46px;
   border-radius: 50%;
-  color: light-dark(#fff, #000);
-  background: light-dark(#1c1c1e, #fff);
-  box-shadow: 0 8px 20px light-dark(rgb(0 0 0 / 0.25), rgb(0 0 0 / 0.6));
 }
 
 .app .fab svg {
-  stroke-width: 2.4;
+  stroke-width: 2.2;
 }
 
 /* Scroll edge under the floating bars: content that scrolls beneath them blurs and fades into the page, as in iOS 26 */
@@ -533,4 +669,25 @@
   border-radius: 999px;
   background: light-dark(#000, #fff);
   transform: translateX(-50%);
+}
+
+/* Reduced motion: the story doesn't play and the ring starts out drawn (see useDemoMotion); nothing animates either */
+@media (prefers-reduced-motion: reduce) {
+  .ring[data-started] .ringValue {
+    animation: none;
+  }
+
+  .app .ringValue,
+  .app .checkArc circle,
+  .app .checkFill path,
+  .check,
+  .check[data-done],
+  .checkPlus,
+  .checkFill,
+  .dots > span,
+  .legend li,
+  .roll,
+  .roll > [data-roll] {
+    transition: none;
+  }
 }

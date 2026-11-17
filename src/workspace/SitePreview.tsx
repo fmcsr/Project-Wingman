@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import type { ComponentType } from 'react';
+import { StillContext } from '../demos/motion';
 import styles from './SitePreview.module.css';
 
 /** Sites are drawn at a desktop width and scaled down, so the thumbnail shows their desktop layout. */
@@ -23,7 +24,9 @@ export function SitePreview({ Component }: { Component: ComponentType }) {
   return (
     <div ref={ref} className={styles.preview} aria-hidden="true" inert>
       <div className={styles.page} style={{ transform: `scale(${scale})` }}>
-        <Component />
+        <StillContext value>
+          <Component />
+        </StillContext>
       </div>
     </div>
   );
