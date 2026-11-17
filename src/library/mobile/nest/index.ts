@@ -8,9 +8,9 @@ export const nest: LibraryExample = {
   name: 'Nest',
   kind: 'Home rentals',
   category: 'Travel',
-  inspiredBy: ['Airbnb', 'Booking.com', 'Vrbo'],
+  inspiredBy: ['Airbnb'],
   description:
-    'An explore feed: a search pill, scrolling category tabs, a listing card with a photo carousel and a floating Map button.',
+    'A home-rental Explore screen: a search pill with a filter button, scrolling category tabs with an underlined active tab, a listing card with a photo carousel, badge, heart and page dots, the rating, gray details and a discounted total, a floating Map button and a tab bar with a notification dot.',
   Component: NestApp,
   specs: nestSpecs,
 };

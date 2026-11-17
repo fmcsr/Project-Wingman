@@ -8,9 +8,9 @@ export const shelf: LibraryExample = {
   name: 'Shelf',
   kind: 'Online store',
   category: 'Commerce',
-  inspiredBy: ['Amazon', 'Best Buy', 'Shopify stores'],
+  inspiredBy: ['Amazon'],
   description:
-    'A category page: a scoped search bar, filters with counts, a two-thumb price slider and “& up” ratings, removable filter chips, sorting, and product cards with clamped titles, badges and sale prices.',
+    'Search results in a big online store: a delivery location, a search bar with a department menu, a cart badge, a filter sidebar with a range slider, sorting, and product cards with sponsored labels, badges, star ratings, deal prices, delivery promises and an Add to cart pill.',
   url: 'shelf.store',
   Component: ShelfSite,
   specs: shelfSpecs,
