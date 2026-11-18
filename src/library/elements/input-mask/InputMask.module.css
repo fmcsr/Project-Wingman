@@ -1,0 +1,246 @@
+/*
+ * The phone step of a sign-up on a white page (near-black in dark mode), in zinc neutrals: the focused field has an
+ * ink border with a soft gray ring, and green is kept for the valid number. The number is set in tabular digits, and
+ * every slot is one digit wide (1ch), so the line never shifts as placeholders turn into digits.
+ */
+.tile {
+  --page: light-dark(#fff, #111113);
+  --ink: light-dark(#18181b, #fafafa);
+  --muted: light-dark(#71717a, #a1a1aa);
+  --faint: light-dark(#a1a1aa, #5c5c66);
+  --field: light-dark(#fff, #18181b);
+  --chip: light-dark(#f4f4f5, #26262a);
+  --ring: light-dark(rgb(24 24 27 / 0.08), rgb(250 250 250 / 0.12));
+  --success: light-dark(#16a34a, #22c55e);
+
+  display: grid;
+  place-items: center;
+  height: 100%;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--page);
+}
+
+.tile svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: min(100cqw - 20px, 340px);
+}
+
+.label {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+/*
+ * Focused while typing: an ink border and a 3px gray ring. On the narrowest tiles everything is a little tighter, so
+ * the chip, all fourteen characters and the check fit in a 210px field.
+ */
+.field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 10px 0 4px;
+  border: 1px solid var(--ink);
+  border-radius: 10px;
+  background: var(--field);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* The country code: a gray chip with a chevron, the menu of countries behind it */
+.country {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  height: 34px;
+  padding: 0 3px 0 7px;
+  border-radius: 7px;
+  font-size: 15px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  background: var(--chip);
+}
+
+.country svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2;
+  color: var(--muted);
+}
+
+.number {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 22px;
+  white-space: pre;
+  font-variant-numeric: tabular-nums;
+  transition: opacity 220ms var(--ease-out);
+}
+
+.tile[data-dip] .number {
+  opacity: 0;
+}
+
+/* Each slot is one digit wide; a digit lands with a short rise, its placeholder gone */
+.digit,
+.placeholder {
+  display: inline-block;
+  width: 1ch;
+  text-align: center;
+}
+
+.digit {
+  animation: land 160ms var(--ease-out);
+}
+
+.tile[data-still] .digit {
+  animation: none;
+}
+
+@keyframes land {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+}
+
+.placeholder {
+  color: var(--faint);
+}
+
+/* A separator waits in placeholder gray and turns to text by itself once the group before it is in */
+.separator {
+  color: var(--faint);
+  transition: color 150ms var(--ease-out);
+}
+
+.separator[data-in] {
+  color: var(--ink);
+}
+
+/* Solid while digits go in, blinking at rest; it holds when the tile does */
+.caret {
+  display: inline-block;
+  flex: none;
+  width: 1.5px;
+  height: 20px;
+  margin: 0 -0.75px;
+  background: var(--ink);
+  animation: caret 1060ms steps(1) infinite;
+}
+
+.tile[data-typing] .caret,
+.tile[data-still] .caret {
+  animation: none;
+}
+
+.tile[data-paused] .caret {
+  animation-play-state: paused;
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Valid: a green check pops in at the end of the field */
+.valid {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--success);
+  stroke-width: 1.75;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.valid path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 220ms var(--ease-out) 120ms;
+}
+
+.tile[data-valid] .valid {
+  opacity: 1;
+  transform: none;
+}
+
+.tile[data-valid] .valid path {
+  stroke-dashoffset: 0;
+}
+
+.helper {
+  margin-top: 8px;
+  font-size: 12.5px;
+  line-height: 17px;
+  color: var(--muted);
+}
+
+/* Off until the number is complete, then the ink button */
+.button {
+  display: grid;
+  place-items: center;
+  height: 38px;
+  margin-top: 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--faint);
+  background: var(--chip);
+  transition:
+    background-color 200ms var(--ease-out),
+    color 200ms var(--ease-out);
+}
+
+.tile[data-valid] .button {
+  color: var(--page);
+  background: var(--ink);
+}
+
+@container (min-width: 260px) {
+  .form {
+    width: min(100cqw - 24px, 340px);
+  }
+
+  .field {
+    gap: 10px;
+    padding: 0 12px 0 6px;
+  }
+
+  .country {
+    padding: 0 5px 0 9px;
+  }
+
+  .country svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .number {
+    font-size: 16px;
+  }
+
+  .valid {
+    width: 18px;
+    height: 18px;
+  }
+}

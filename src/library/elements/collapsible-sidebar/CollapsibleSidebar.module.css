@@ -1,0 +1,727 @@
+/*
+ * An issue tracker in the idiom of today's work apps: the sidebar on the window's gray, 13px medium labels with 16px
+ * line icons, gray section headings with a small triangle, and the list in a white inset panel (near-black in dark
+ * mode) with a hairline and rounded corners. The active item is a neutral fill; the workspace's coral marks the logo
+ * and the unread count. Tooltips are dark in both themes.
+ */
+.tile {
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+}
+
+.app {
+  --app: light-dark(#f4f4f5, #0e0f11);
+  --panel: light-dark(#ffffff, #17181b);
+  --group: light-dark(#f8f8f9, #1b1c20);
+  --line: light-dark(#e5e5e8, #27282d);
+  --row-line: light-dark(#f0f0f2, #1f2024);
+  --text: light-dark(#1f2023, #e6e7ea);
+  --text-2: light-dark(#5d5f67, #a4a7af);
+  --text-3: light-dark(#8a8c94, #6e717a);
+  --hover: light-dark(#e9e9ec, #1e1f23);
+  --active: light-dark(#e3e3e7, #25262b);
+  --press: light-dark(#dadade, #2d2e34);
+  --accent: light-dark(#e2553d, #ff7259);
+  --in-progress: light-dark(#d29a0d, #f2c94c);
+  --tip: light-dark(#1f2023, #2f3035);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* The sidebar's width open (wider on wider tiles) and as a rail; --w is the one in use */
+  --side: clamp(176px, 20cqw + 110px, 232px);
+  --rail: 52px;
+  --w: var(--side);
+  /* Rows, and where the nav and the Favorites heading start: the pointer and the tooltips are placed with them */
+  --row: 28px;
+  --nav-top: 48px;
+  --nav-rows: 4;
+  --fav-top: calc(var(--nav-top) + var(--nav-rows) * var(--row) + 16px);
+
+  position: absolute;
+  inset: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text);
+  background: var(--app);
+}
+
+.tile[data-collapsed] .app {
+  --w: var(--rail);
+}
+
+.icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/*
+ * The sidebar: its width is what changes (a 200ms transition), so the panel beside it reflows into the room, as in
+ * the real thing. Icons sit 26px from the left edge open or folded, so they stay put while the labels fade.
+ */
+.sidebar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--w);
+  padding: 8px;
+  overflow: hidden;
+  transition: width 200ms var(--ease);
+}
+
+/* Labels, counts and extra buttons fade out quickly as it folds, and back in once it has opened */
+.label,
+.count,
+.badge,
+.headerTools {
+  transition: opacity 150ms var(--ease) 90ms;
+}
+
+.tile[data-collapsed] :is(.label, .count, .badge, .headerTools) {
+  opacity: 0;
+  transition-duration: 100ms;
+  transition-delay: 0s;
+}
+
+.workspace {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  margin-bottom: 8px;
+  padding-left: 8px;
+  white-space: nowrap;
+}
+
+.logo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+}
+
+.workspace > .label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 600;
+}
+
+.caret {
+  width: 13px;
+  height: 13px;
+  color: var(--text-3);
+}
+
+.headerTools {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+  padding-right: 6px;
+  color: var(--text-2);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  height: var(--row);
+  padding: 0 10px;
+  border-radius: 6px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--text-2);
+  transition: background-color 120ms;
+}
+
+.row > .label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The active item: a neutral fill and the full text color, open or folded */
+.row[aria-current='page'] {
+  color: var(--text);
+  background: var(--active);
+}
+
+.count {
+  font-size: 12px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+}
+
+/* On the rail the unread count becomes a dot on the icon */
+.iconSlot {
+  position: relative;
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.dot {
+  position: absolute;
+  top: -2px;
+  right: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--app);
+  opacity: 0;
+  transition: opacity 150ms var(--ease);
+}
+
+.tile[data-collapsed] .dot {
+  opacity: 1;
+}
+
+.tile[data-hover='inbox'] .inbox {
+  color: var(--text);
+  background: var(--hover);
+}
+
+/* Section headings: gray, smaller, with the triangle after the label; on the rail a short line takes their place */
+.section,
+.teams {
+  margin-top: 16px;
+}
+
+.heading {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--text-3);
+  transition: background-color 120ms;
+}
+
+.heading > .label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.heading::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  width: 16px;
+  height: 1px;
+  background: var(--line);
+  opacity: 0;
+  transition: opacity 150ms var(--ease);
+}
+
+.tile[data-collapsed] .heading::before {
+  opacity: 1;
+}
+
+.tile[data-hover='favorites'] .section .heading {
+  color: var(--text-2);
+  background: var(--hover);
+}
+
+.tile[data-hover='favorites'][data-press] .section .heading,
+.tile[data-hover='inbox'][data-press] .inbox {
+  background: var(--press);
+}
+
+/* Open, the triangle points down; folded, it turns back to point right */
+.disclosure {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  fill: currentColor;
+  transform: rotate(90deg);
+  transition: transform 150ms var(--ease);
+}
+
+.heading[aria-expanded='false'] .disclosure,
+.teams .disclosure {
+  transform: none;
+}
+
+/* The section's items: folding fades them out with a small lift, and the teams below move up into their place */
+.items {
+  display: flex;
+  flex-direction: column;
+  transition:
+    opacity 150ms var(--ease),
+    transform 200ms var(--ease),
+    visibility 150ms;
+}
+
+.tile[data-folded] .items {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+}
+
+.project {
+  color: var(--accent);
+}
+
+/* Nested pages sit 20px further in; on the rail they step out, and the rows below close the gap */
+.nested {
+  padding-left: 30px;
+  transition:
+    opacity 100ms var(--ease),
+    visibility 100ms;
+}
+
+.afterNested,
+.teams {
+  transition: transform 200ms var(--ease);
+}
+
+.tile[data-collapsed] .nested {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.tile[data-collapsed] :is(.afterNested, .teams) {
+  transform: translateY(calc(-2 * var(--row)));
+}
+
+.tile[data-folded] .teams {
+  transform: translateY(calc(-4 * var(--row)));
+}
+
+/* The person signed in, at the bottom */
+.me {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 32px;
+  padding: 0 7px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--text-2);
+}
+
+.face {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* The icon column: what's left once the sidebar folds. Transparent; it's there to be pointed at */
+.rail {
+  position: absolute;
+  top: var(--nav-top);
+  bottom: 0;
+  left: 0;
+  width: var(--rail);
+}
+
+/* The list, in an inset panel that starts where the sidebar ends */
+.main {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  bottom: 8px;
+  left: var(--w);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: 0 1px 3px light-dark(rgb(0 0 0 / 0.05), rgb(0 0 0 / 0.3));
+  transition: left 200ms var(--ease);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 14px 0 10px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+/* The collapse toggle: a sidebar icon in a 28px button, gray until the pointer is on it */
+.toggle {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--text-2);
+  transition: background-color 120ms;
+}
+
+.tile[data-hover='toggle'] .toggle {
+  color: var(--text);
+  background: var(--hover);
+}
+
+.tile[data-hover='toggle'][data-press] .toggle {
+  background: var(--press);
+}
+
+.title {
+  font-weight: 500;
+}
+
+.tools {
+  display: flex;
+  gap: 14px;
+  margin-left: auto;
+  color: var(--text-2);
+}
+
+/* View tabs: one line; a tab that doesn't fit wraps out of sight instead of being cut */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 4px;
+  height: 40px;
+  padding: 7px 12px 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 9px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.tab[aria-selected='true'] {
+  border-color: var(--line);
+  color: var(--text);
+  background: var(--group);
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--line);
+  font-weight: 500;
+  white-space: nowrap;
+  background: var(--group);
+}
+
+.groupCount {
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.issue {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--row-line);
+  white-space: nowrap;
+}
+
+.issueId {
+  flex: none;
+  width: 52px;
+  font-size: 12px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.issueTitle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+}
+
+.chip {
+  display: none;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.chip .icon {
+  width: 12px;
+  height: 12px;
+  color: var(--accent);
+}
+
+.due {
+  flex: none;
+  font-size: 12px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.status {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.status path {
+  fill: currentColor;
+  stroke: none;
+}
+
+.status[data-status='progress'] {
+  color: var(--in-progress);
+}
+
+.status[data-status='todo'] {
+  color: var(--text-3);
+}
+
+.status[data-status='backlog'] {
+  color: var(--text-3);
+  stroke-dasharray: 2.4 2;
+}
+
+.priority {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+.priority rect {
+  fill: light-dark(#d6d6db, #3a3b41);
+}
+
+.priority rect[data-on] {
+  fill: var(--text-2);
+}
+
+.priority[data-urgent] rect {
+  fill: var(--text-2);
+}
+
+.priority[data-urgent] path {
+  fill: none;
+  stroke: var(--panel);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+/* Tooltips: dark, 12px, with the shortcut in key caps; they fade in after a moment on the pointer and go at a click */
+.tooltip {
+  position: absolute;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--tip);
+  box-shadow: 0 4px 14px light-dark(rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.5));
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 100ms,
+    visibility 100ms,
+    left 200ms var(--ease);
+}
+
+.tooltip[data-shown] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 150ms var(--ease),
+    visibility 0s,
+    left 200ms var(--ease);
+}
+
+/* Under the toggle, lined up with its left edge (shifted left if that would cross the tile's edge); it moves with the panel */
+.collapseTip,
+.expandTip {
+  top: 50px;
+  left: calc(var(--w) + 11px);
+  translate: min(0px, calc(100cqw - var(--w) - 19px - 100%)) 0;
+}
+
+/* Beside the rail's Inbox icon */
+.railTip {
+  top: calc(var(--nav-top) + 1px);
+  left: calc(var(--rail) + 6px);
+}
+
+.keys {
+  display: flex;
+  gap: 2px;
+}
+
+.keys kbd {
+  display: grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1;
+  color: rgb(255 255 255 / 0.75);
+  background: rgb(255 255 255 / 0.14);
+}
+
+.tipCount {
+  color: rgb(255 255 255 / 0.6);
+}
+
+/* The pointer: a plain arrow, moving the way a hand moves a mouse */
+.pointer {
+  --px: calc(var(--side) + (100cqw - var(--side)) * 0.6);
+  --py: calc(100cqh - 120px);
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 7;
+  width: 14px;
+  height: 20px;
+  fill: #1d1d1f;
+  stroke: #fff;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.3));
+  pointer-events: none;
+  transform: translate(var(--px), var(--py));
+  transition: transform 450ms cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.tile[data-at='favorites'] .pointer {
+  --px: 70px;
+  --py: calc(var(--fav-top) + 12px);
+}
+
+.tile[data-at='toggleOpen'] .pointer {
+  --px: calc(var(--side) + 21px);
+  --py: 25px;
+}
+
+.tile[data-at='toggleRail'] .pointer {
+  --px: calc(var(--rail) + 21px);
+  --py: 25px;
+}
+
+.tile[data-at='inbox'] .pointer {
+  --px: 29px;
+  --py: calc(var(--nav-top) + 15px);
+}
+
+/* Phones: no Views item (so everything fits 374px), fewer columns and buttons */
+@container (height < 420px) {
+  .app {
+    --nav-rows: 3;
+  }
+
+  .views {
+    display: none;
+  }
+}
+
+/* Desktop: no issue ids or priorities, so the titles keep their room beside the open sidebar */
+@container (width < 520px) {
+  .issueId,
+  .priority {
+    display: none;
+  }
+}
+
+/* Phones: a status and a title, which takes two lines while the sidebar is open */
+@container (width < 460px) {
+  .search,
+  .tools,
+  .due {
+    display: none;
+  }
+
+  .issue {
+    height: 46px;
+  }
+
+  .issueTitle {
+    display: -webkit-box;
+    line-height: 17px;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
+
+/* Wide tablets: each issue's project as a chip */
+@container (width >= 700px) {
+  .chip {
+    display: flex;
+  }
+}

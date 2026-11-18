@@ -1,0 +1,213 @@
+/*
+ * A brokerage app's portfolio card: white (near-black in dark mode), the value in large tabular figures, the day's
+ * change in a green pill and a green sparkline. Green is for gains; red only flashes when a tick goes down.
+ */
+.tile {
+  --card: light-dark(#fff, #111113);
+  --line: light-dark(#ececee, #232327);
+  --ink: light-dark(#111113, #f4f4f5);
+  --muted: light-dark(#6b6b72, #9d9da6);
+  --up: light-dark(#0b8a45, #2fd27a);
+  --down: light-dark(#d4381f, #ff6a4d);
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--card);
+}
+
+/* The tile is the card: its figures centered in the space above the footer */
+.card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  padding: 12px 16px 0;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--muted);
+}
+
+/*
+ * The value: every character on the same 1.2em line, so the digit columns and the $ , . between them share one
+ * baseline
+ */
+.value {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 2px;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * A digit column: a window one line tall onto a strip of digits. The window reaches 0.2em past the line above and
+ * below (just short of the neighboring digits), faded out by a mask, so a digit rolling in or out fades at the edge
+ * instead of being cut.
+ */
+.column {
+  box-sizing: content-box;
+  height: 1.2em;
+  padding-block: 0.2em;
+  margin-block: -0.2em;
+  overflow: hidden;
+  mask-image: linear-gradient(transparent, #000 0.2em, #000 calc(100% - 0.2em), transparent);
+}
+
+/* The strip moves a whole number of lines: the more digits a column passes, the faster it spins */
+.strip {
+  display: block;
+  white-space: pre;
+  transform: translateY(calc(var(--strip) * -1.2em));
+  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.today {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* The change pill: green text on a green tint, in figures that keep their width */
+.pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  height: 24px;
+  padding-inline: 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--up);
+  background: color-mix(in oklab, var(--up) 13%, var(--card));
+}
+
+/*
+ * The flash: a stronger tint over the pill's own, green on a rise and red on a fall. It lights up at once with the
+ * tick and fades over 900ms.
+ */
+.flash {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 900ms ease-out,
+    visibility 0s linear 900ms;
+}
+
+.pill[data-trend='up'] .flash {
+  background: color-mix(in oklab, var(--up) 34%, var(--card));
+}
+
+.pill[data-trend='down'] .flash {
+  background: color-mix(in oklab, var(--down) 28%, var(--card));
+}
+
+.pill[data-flash] .flash {
+  opacity: 1;
+  visibility: visible;
+  transition: none;
+}
+
+/* The still picture catches the flash a third of the way through its fade */
+.tile[data-final] .flash {
+  opacity: 0.65;
+}
+
+.change {
+  position: relative;
+}
+
+/* "Today" joins the row where there's room */
+.when {
+  display: none;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* The sparkline: the day's line in green over yesterday's close, dotted */
+.spark {
+  flex: none;
+  width: 56px;
+  height: 24px;
+  margin-left: auto;
+  overflow: visible;
+}
+
+.close {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 1 2.5;
+  stroke-linecap: round;
+}
+
+.line {
+  fill: none;
+  stroke: var(--up);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.now {
+  fill: var(--up);
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 16px;
+  padding: 10px 0 12px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--muted);
+}
+
+.power {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+@container (min-width: 290px) {
+  .value {
+    font-size: 38px;
+  }
+
+  .when {
+    display: inline;
+  }
+
+  .spark {
+    width: 72px;
+    height: 28px;
+  }
+}
+
+@container (min-width: 420px) {
+  .value {
+    font-size: 42px;
+  }
+
+  .pill {
+    font-size: 12.5px;
+  }
+}

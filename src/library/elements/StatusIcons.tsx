@@ -2,7 +2,8 @@ import styles from './StatusIcons.module.css';
 
 /**
  * The right side of an iPhone's status bar: cellular signal, Wi-Fi and battery, in the color of the text around
- * them. Both iPhone screens in the gallery (the Dynamic Island and the bottom sheet) place them beside the island.
+ * them. The elements with an iPhone screen (the Dynamic Island, the bottom sheet and pull to refresh) place them
+ * beside the island.
  */
 export function StatusIcons({ className }: { className: string }) {
   return (

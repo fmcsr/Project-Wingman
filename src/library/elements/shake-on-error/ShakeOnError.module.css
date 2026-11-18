@@ -1,0 +1,376 @@
+/*
+ * A web sign-in card in zinc neutrals on a gray page: white fields with hairline borders, a near-black button. Red is
+ * the color of the error, green of the success.
+ */
+.tile {
+  --ink: light-dark(#18181b, #fafafa);
+  --muted: light-dark(#71717a, #a1a1aa);
+  --card: light-dark(#fff, #18181b);
+  --card-border: light-dark(#e4e4e7, #27272a);
+  --box: light-dark(#fff, #09090b);
+  --box-border: light-dark(#d4d4d8, #3f3f46);
+  --focus: light-dark(#a1a1aa, #71717a);
+  --focus-ring: light-dark(rgb(24 24 27 / 0.08), rgb(250 250 250 / 0.1));
+  --error: light-dark(#dc2626, #ef4444);
+  --error-ring: light-dark(rgb(220 38 38 / 0.15), rgb(239 68 68 / 0.25));
+  --error-text: light-dark(#dc2626, #f87171);
+  --success: #15803d;
+
+  display: grid;
+  place-items: center;
+  height: 100%;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: light-dark(#f4f4f5, #09090b);
+}
+
+.tile svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.card {
+  width: min(100cqw - 20px, 340px);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow:
+    0 1px 2px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3)),
+    0 4px 14px light-dark(rgb(0 0 0 / 0.05), rgb(0 0 0 / 0.35));
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  transition: opacity 300ms ease;
+}
+
+/* Starting over: the card's content fades out and back */
+.tile[data-dip] .content {
+  opacity: 0;
+  transition-duration: 200ms;
+}
+
+/* The fields: 34px tall, a hairline border, 8px corners */
+.field,
+.password {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding-inline: 10px;
+  border: 1px solid var(--box-border);
+  border-radius: 8px;
+  background: var(--box);
+  font-size: 13px;
+  transition:
+    border-color 150ms var(--ease-out),
+    box-shadow 150ms var(--ease-out);
+}
+
+.value {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.password {
+  margin-top: 8px;
+}
+
+/* Focused: a darker border and a soft 3px ring */
+.password[data-focused] {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.bullets {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  transition: opacity 150ms ease;
+}
+
+/* While the password is checked the field can't be edited: it dims and the caret goes */
+.password[data-busy] .bullets {
+  opacity: 0.45;
+}
+
+.bullet {
+  display: none;
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.bullet[data-typed] {
+  display: block;
+}
+
+/* A drawn caret after the last character, blinking while the field has focus */
+.caret {
+  flex: none;
+  width: 1.5px;
+  height: 16px;
+  margin-left: 1px;
+  background: var(--ink);
+  opacity: 0;
+}
+
+.password[data-focused]:not([data-busy]) .caret {
+  opacity: 1;
+}
+
+.eye {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  color: var(--muted);
+}
+
+/*
+ * The error border: a ring laid over the field's own border, a 1px red line with a 3px red halo outside it. Only the
+ * ring itself catches the pointer; inside it the field does.
+ */
+.ring {
+  position: absolute;
+  inset: -4px;
+  border: 3px solid var(--error-ring);
+  border-radius: 11px;
+  box-shadow: inset 0 0 0 1px var(--error);
+  clip-path: polygon(
+    evenodd,
+    0 0,
+    100% 0,
+    100% 100%,
+    0 100%,
+    0 0,
+    4px 4px,
+    4px calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 4px,
+    4px 4px
+  );
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 150ms var(--ease-out),
+    visibility 0s linear 150ms;
+}
+
+.tile[data-error] .ring {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* In the error state the red ring takes the place of the focus ring */
+.tile[data-error] .password {
+  box-shadow: none;
+}
+
+/*
+ * The shake: side to side, each swing smaller than the last, over 400ms. It runs once as the field turns red, and
+ * holds still with the tile.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .tile[data-error] .password {
+    animation: shake 400ms ease-in-out;
+  }
+
+  .tile[data-paused] .password {
+    animation-play-state: paused;
+  }
+
+  .tile[data-button='loading'] .spinner {
+    animation: spin 700ms linear infinite;
+  }
+
+  .tile[data-paused] .spinner {
+    animation-play-state: paused;
+  }
+
+  .password[data-focused]:not([data-busy]) .caret {
+    animation: blink 1.1s steps(1) infinite;
+  }
+
+  .tile[data-paused] .caret {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes shake {
+  10% {
+    translate: -10px 0;
+  }
+
+  25% {
+    translate: 8px 0;
+  }
+
+  40% {
+    translate: -6px 0;
+  }
+
+  55% {
+    translate: 4px 0;
+  }
+
+  70% {
+    translate: -2px 0;
+  }
+
+  85% {
+    translate: 1px 0;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* The message under the field: what went wrong, and the way out. Its two lines are kept, so nothing moves */
+.message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 32px;
+  margin-top: 6px;
+  font-size: 11.5px;
+  line-height: 16px;
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 -2px;
+  transition:
+    opacity 150ms var(--ease-out),
+    translate 150ms var(--ease-out),
+    visibility 0s linear 150ms;
+}
+
+.tile[data-error] .message {
+  opacity: 1;
+  visibility: visible;
+  translate: none;
+  transition-delay: 0s;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--error-text);
+}
+
+/* The alert icon comes in where the message has room for it; the link lines up with the text after it */
+.error svg {
+  display: none;
+  flex: none;
+  width: 13px;
+  height: 13px;
+  stroke-width: 2;
+}
+
+.forgot {
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--focus);
+  text-underline-offset: 2px;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+/* The button: label, spinner and success stacked in one place, one showing at a time */
+.button {
+  display: grid;
+  place-items: center;
+  height: 34px;
+  margin-top: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--card);
+  background: var(--ink);
+  transition: background-color 200ms var(--ease-out);
+}
+
+.button > * {
+  grid-area: 1 / 1;
+  transition: opacity 150ms var(--ease-out);
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 1.75px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.done {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  opacity: 0;
+}
+
+.done svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.25;
+}
+
+.tile[data-button='loading'] .label,
+.tile[data-button='success'] .label {
+  opacity: 0;
+}
+
+.tile[data-button='loading'] .spinner,
+.tile[data-button='success'] .done {
+  opacity: 1;
+}
+
+.tile[data-button='success'] .button {
+  background: var(--success);
+}
+
+@container (min-width: 260px) {
+  .message {
+    font-size: 12px;
+  }
+
+  .error svg {
+    display: block;
+  }
+
+  .forgot {
+    margin-left: 18px;
+  }
+}
+
+@container (min-width: 300px) {
+  .content {
+    padding-inline: 16px;
+  }
+}

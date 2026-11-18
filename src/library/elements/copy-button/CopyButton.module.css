@@ -1,0 +1,299 @@
+/*
+ * A developer docs page in the clean neutral style of the platform docs: a numbered step, a gray code field with the
+ * command in monospace and a ghost icon button at its end, and an inverted tooltip. Green only marks success.
+ */
+.tile {
+  --page: light-dark(#fff, #0a0a0a);
+  --ink: light-dark(#171717, #ededed);
+  --muted: light-dark(#666, #a1a1a1);
+  --field: light-dark(#fafafa, #111);
+  --field-line: light-dark(#eaeaea, #2e2e2e);
+  --hover: light-dark(#ebebeb, #262626);
+  --press: light-dark(#dedede, #333);
+  --success: light-dark(#16a34a, #22c55e);
+  --tip: light-dark(#171717, #ededed);
+  --on-tip: light-dark(#fff, #0a0a0a);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  display: grid;
+  align-items: center;
+  height: 100%;
+  padding: 0 16px;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--page);
+}
+
+.tile svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+  width: 100%;
+  max-width: 440px;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+}
+
+/* The step number in a hairline circle, as docs number their setup steps */
+.number {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--field-line);
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.lead {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--muted);
+}
+
+/* The code block: package manager tabs over a one-line body, the whole of it in a hairline box */
+.field {
+  margin-top: 14px;
+  border: 1px solid var(--field-line);
+  border-radius: 8px;
+  background: var(--field);
+}
+
+.tabs {
+  display: flex;
+  gap: 16px;
+  height: 34px;
+  padding-inline: 12px;
+  border-bottom: 1px solid var(--field-line);
+  font-size: 12.5px;
+  line-height: 33px;
+}
+
+.tab {
+  color: var(--muted);
+}
+
+/* The narrowest fields keep three tabs, clear of the tooltip */
+.last {
+  display: none;
+}
+
+/* The chosen manager: full ink and a 1.5px line that sits on the header's hairline */
+.tab[data-current] {
+  font-weight: 500;
+  color: var(--ink);
+  box-shadow: inset 0 -1.5px var(--ink);
+}
+
+.line {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 7px 0 12px;
+}
+
+.command {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 12.5px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+/* npm's short form where the field is narrow, the full word where it fits */
+.long {
+  display: none;
+}
+
+/* The copy button: a 28px ghost button that only shows its square on hover */
+.copy {
+  position: relative;
+  flex: none;
+  margin-left: 8px;
+}
+
+.button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--muted);
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    transform 100ms var(--ease);
+}
+
+.button[data-hover] {
+  color: var(--ink);
+  background: var(--hover);
+}
+
+.button[data-press] {
+  background: var(--press);
+  transform: scale(0.92);
+}
+
+/*
+ * The icon morph: the copy icon shrinks away as the check grows in and draws itself, and the reverse two seconds
+ * later
+ */
+.copyIcon,
+.check {
+  grid-area: 1 / 1;
+  width: 16px;
+  height: 16px;
+  transition:
+    opacity 150ms ease,
+    transform 200ms var(--ease),
+    visibility 0s;
+}
+
+.check {
+  color: var(--success);
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.6);
+  transition:
+    opacity 150ms ease,
+    transform 200ms var(--ease),
+    visibility 0s linear 150ms;
+}
+
+.tile .check {
+  stroke-width: 2;
+}
+
+.check path {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  transition: stroke-dashoffset 250ms var(--ease);
+}
+
+.button[data-copied] .copyIcon {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.button[data-copied] .check {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+
+.button[data-copied] .check path {
+  stroke-dashoffset: 0;
+  transition-delay: 60ms;
+}
+
+/* The tooltip: inverted, centered above the button with its arrow pointing down at it */
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+  color: var(--on-tip);
+  background: var(--tip);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, 4px) scale(0.96);
+  transform-origin: 50% 100%;
+  transition:
+    opacity 150ms ease,
+    transform 150ms var(--ease),
+    visibility 0s linear 150ms;
+}
+
+.tooltip::after {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border: 5px solid transparent;
+  border-top-color: var(--tip);
+  content: '';
+}
+
+.tooltip[data-shown] {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+  transition-delay: 0s;
+}
+
+/*
+ * The pointer: a black arrow with a white rim. On the button its tip rests in the lower left of the icon, so the
+ * check stays in view; away, it waits below and to the left of the field.
+ */
+.tile .pointer {
+  position: absolute;
+  z-index: 1;
+  top: calc(50% + 5px - 1.2px);
+  left: calc(100% - 7px - 28px + 9px - 1.2px);
+  width: 14px;
+  height: 20px;
+  fill: #1d1d1f;
+  stroke: #fff;
+  stroke-width: 1.4;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.3));
+  pointer-events: none;
+  transform: translate(-96px, 34px);
+  transition: transform 600ms cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+.tile[data-pointer] .pointer {
+  transform: none;
+}
+
+@container (min-width: 230px) {
+  .last {
+    display: inline;
+  }
+}
+
+@container (min-width: 300px) {
+  .short {
+    display: none;
+  }
+
+  .long {
+    display: inline;
+  }
+
+  .command {
+    font-size: 13px;
+  }
+}

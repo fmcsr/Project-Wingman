@@ -1,0 +1,400 @@
+/*
+ * A desktop file manager's list view: 13px system type, 22px rows on faint alternating stripes, gray secondary
+ * columns. The menu is the system's own material: a translucent, blurred panel with a hairline edge, 10px corners and
+ * a soft shadow; items highlight in the system blue, shortcuts sit right-aligned in gray, and Delete is red. The
+ * menu's geometry is fixed (22px items, 5px padding, 11px separators), so the pointer's stops come from the same
+ * numbers.
+ */
+.tile {
+  --page: light-dark(#ffffff, #1e1e1e);
+  --stripe: light-dark(#f4f5f5, #242424);
+  --ink: light-dark(rgb(0 0 0 / 0.85), rgb(255 255 255 / 0.86));
+  --ink-2: light-dark(rgb(0 0 0 / 0.5), rgb(255 255 255 / 0.55));
+  --ink-3: light-dark(rgb(0 0 0 / 0.36), rgb(255 255 255 / 0.4));
+  --line: light-dark(#e4e4e4, #343434);
+  --material: light-dark(rgb(246 246 246 / 0.84), rgb(44 44 46 / 0.84));
+  --edge: light-dark(rgb(0 0 0 / 0.16), rgb(255 255 255 / 0.15));
+  --separator: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.12));
+  --accent: light-dark(#1772f0, #1b6fe0);
+  --red: light-dark(#e0352b, #ff5d52);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --head-h: 22px;
+  --row-h: 22px;
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--page);
+}
+
+/* The list: Name, then whichever of Date Modified, Size and Kind fit */
+.list {
+  position: absolute;
+  inset: 0;
+  --cols: minmax(0, 1fr) 58px;
+}
+
+.head,
+.row {
+  display: grid;
+  grid-template-columns: var(--cols);
+  align-items: center;
+  column-gap: 12px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.head {
+  height: var(--head-h);
+  border-bottom: 1px solid var(--line);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.row {
+  position: relative;
+  height: var(--row-h);
+}
+
+.row:nth-child(odd) {
+  background: var(--stripe);
+}
+
+/* The file under a right-click gets a ring in the accent, for as long as its menu is open */
+.row[data-target]::after {
+  content: '';
+  position: absolute;
+  inset: 1px 5px;
+  border: 2px solid var(--accent);
+  border-radius: 5px;
+  opacity: 0;
+}
+
+.tile[data-open] .row[data-target]::after {
+  opacity: 1;
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.date,
+.kind {
+  display: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink-2);
+}
+
+.size {
+  text-align: right;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.fileIcon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.folderBack {
+  fill: light-dark(#4f9fe6, #3a8ad0);
+}
+
+.folderFront {
+  fill: light-dark(#7ec0f7, #5eaaea);
+}
+
+.page {
+  fill: light-dark(#ffffff, #e9e9ea);
+  stroke: light-dark(rgb(0 0 0 / 0.28), rgb(0 0 0 / 0.5));
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+}
+
+.fold {
+  fill: none;
+  stroke: light-dark(rgb(0 0 0 / 0.28), rgb(0 0 0 / 0.5));
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+}
+
+/* File types keep their own colors in both themes: red PDF, violet image, gray text, orange movie */
+.fileIcon[data-kind='pdf'] .band {
+  fill: #e5534b;
+}
+
+.fileIcon[data-kind='image'] .band {
+  fill: #8f6cf0;
+}
+
+.fileIcon[data-kind='doc'] .band {
+  fill: #8d97a7;
+}
+
+.fileIcon[data-kind='video'] .band {
+  fill: #f08a2c;
+}
+
+/*
+ * The menu: opens with its top-left corner at the pointer, scaling up from that corner. Items are 22px, the panel's
+ * padding 5px and a separator 11px, so the Share item's top (--share) follows from them. The submenu opens beside it,
+ * level with Share, and moves left or up as far as it must to stay inside the window.
+ */
+.scene {
+  --menu-x: 10px;
+  /* The right-click lands low on the file's row, so its name stays readable above the menu */
+  --menu-y: calc(var(--head-h) + 2 * var(--row-h) - 3px);
+  --menu-w: 152px;
+  --sub-w: 116px;
+  --item-h: 22px;
+  --pad: 5px;
+  --share: calc(var(--menu-y) + var(--pad) + 3 * var(--item-h) + 11px);
+
+  position: absolute;
+  inset: 0;
+}
+
+.menu,
+.submenu {
+  position: absolute;
+  z-index: 2;
+  padding: var(--pad);
+  border-radius: 10px;
+  background: var(--material);
+  backdrop-filter: blur(24px) saturate(180%);
+  box-shadow:
+    0 0 0 0.5px var(--edge),
+    0 2px 6px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.3)),
+    0 14px 36px -6px light-dark(rgb(0 0 0 / 0.28), rgb(0 0 0 / 0.6));
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.95);
+  transform-origin: 0 0;
+  transition:
+    opacity 180ms ease,
+    transform 180ms var(--ease),
+    visibility 180ms;
+}
+
+.menu {
+  top: var(--menu-y);
+  left: var(--menu-x);
+  width: var(--menu-w);
+}
+
+.submenu {
+  top: min(var(--share) - var(--pad), 100cqh - 6px - 2 * var(--pad) - 3 * var(--item-h));
+  left: min(var(--menu-x) + var(--menu-w) - 3px, 100cqw - 6px - var(--sub-w));
+  width: var(--sub-w);
+}
+
+.tile[data-open] .menu,
+.tile[data-submenu] .submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-duration: 130ms;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: var(--item-h);
+  padding: 0 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.icon {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.85;
+}
+
+.label {
+  min-width: 0;
+}
+
+/* The highlighted item: a blue fill with white text, icon and shortcut */
+.item[data-active] {
+  color: #fff;
+  background: var(--accent);
+}
+
+.item[data-active] .icon {
+  opacity: 1;
+}
+
+.keys {
+  margin-left: auto;
+  padding-left: 14px;
+  font-family: inherit;
+  font-size: 12.5px;
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+}
+
+.item[data-active] .keys {
+  color: rgb(255 255 255 / 0.8);
+}
+
+.more {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-left: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.6;
+}
+
+.item[data-active] .more {
+  opacity: 1;
+}
+
+.item[data-destructive] {
+  color: var(--red);
+}
+
+/* A separator: 11px tall, so it can be pointed at; the line is the 1px in its middle */
+.separator {
+  display: block;
+  height: 11px;
+  margin: 0 6px;
+}
+
+.separator::after {
+  content: '';
+  display: block;
+  height: 1px;
+  margin-top: 5px;
+  background: var(--separator);
+}
+
+/*
+ * The pointer: resting on the list, at the spot it right-clicks, then over each item in turn and into the submenu.
+ * A hop between items is quick, as the highlight follows it; a long move takes longer. It dips when it clicks.
+ */
+.pointer {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 20px;
+  fill: #1d1d1f;
+  stroke: #fff;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.3));
+  transform-origin: 0 0;
+  translate: var(--px) var(--py);
+  transition:
+    translate var(--move, 160ms) cubic-bezier(0.45, 0, 0.25, 1),
+    scale 120ms var(--ease);
+}
+
+.tile[data-click] .pointer {
+  scale: 0.88;
+}
+
+.tile[data-pointer='rest'] .scene {
+  --px: 66cqw;
+  --py: calc(100cqh - 46px);
+  --move: 480ms;
+}
+
+.tile[data-pointer='file'] .scene {
+  --px: calc(var(--menu-x) - 1px);
+  --py: calc(var(--menu-y) - 1px);
+  --move: 480ms;
+}
+
+.tile:is([data-pointer='Open'], [data-pointer='Rename'], [data-pointer='Duplicate']) .scene {
+  --px: calc(var(--menu-x) + 58px);
+}
+
+.tile[data-pointer='Open'] .scene {
+  --py: calc(var(--menu-y) + var(--pad) + 8px);
+  --move: 220ms;
+}
+
+.tile[data-pointer='Rename'] .scene {
+  --py: calc(var(--menu-y) + var(--pad) + var(--item-h) + 8px);
+}
+
+.tile[data-pointer='Duplicate'] .scene {
+  --py: calc(var(--menu-y) + var(--pad) + 2 * var(--item-h) + 8px);
+}
+
+.tile[data-pointer='Share'] .scene {
+  --px: calc(var(--menu-x) + 62px);
+  --py: calc(var(--share) + 8px);
+}
+
+.tile[data-pointer='Copy Link'] .scene {
+  --px: calc(min(var(--menu-x) + var(--menu-w) - 3px, 100cqw - 6px - var(--sub-w)) + 46px);
+  --py: calc(min(var(--share) - var(--pad), 100cqh - 6px - 2 * var(--pad) - 3 * var(--item-h)) + var(--pad) + 8px);
+  --move: 300ms;
+}
+
+/* Wider tiles: the date column, then size and kind; the menu opens a little further in, as on a wider window */
+@container (width >= 300px) {
+  .list {
+    --cols: minmax(0, 1fr) 160px;
+  }
+
+  .date {
+    display: block;
+  }
+
+  .size {
+    display: none;
+  }
+}
+
+@container (width >= 420px) {
+  .scene {
+    --menu-x: 34px;
+  }
+
+  .list {
+    --cols: minmax(0, 1fr) 160px 58px;
+  }
+
+  .size {
+    display: block;
+  }
+}
+
+@container (width >= 540px) {
+  .list {
+    --cols: minmax(0, 1fr) 160px 58px 92px;
+  }
+
+  .kind {
+    display: block;
+  }
+}

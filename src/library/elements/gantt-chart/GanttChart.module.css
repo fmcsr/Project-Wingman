@@ -1,0 +1,457 @@
+/*
+ * A roadmap tool's timeline view: a white page with gray hairlines (a near-black one in dark mode), the task list on
+ * the left and the weeks on the right with weekends shaded. Bars are one blue, a pale track filled from the left with
+ * the share done; red is kept for today, and the launch diamond is ink.
+ */
+.tile {
+  --page: light-dark(#fff, #16171b);
+  --ink: light-dark(#1c2024, #eceef2);
+  --muted: light-dark(#697077, #9aa0aa);
+  --line: light-dark(#e9ebee, #26292f);
+  --weekend: light-dark(#f7f8f9, #1a1c20);
+  --track: light-dark(oklch(0.93 0.035 255), oklch(0.32 0.06 258));
+  --fill: light-dark(oklch(0.6 0.15 255), oklch(0.62 0.14 255));
+  --link: light-dark(#9ba1aa, #646a74);
+  --today: light-dark(oklch(0.6 0.2 25), oklch(0.66 0.18 25));
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--page);
+}
+
+/* The header's height and the task list's width; the list widens with the tile */
+.chart {
+  --header: 34px;
+  --panel: 112px;
+
+  display: flex;
+  height: 100%;
+}
+
+/* The task list: a row per task, as tall as the timeline's rows (the body under the header, in five) */
+.panel {
+  flex: none;
+  width: var(--panel);
+  border-right: 1px solid var(--line);
+}
+
+.project {
+  height: var(--header);
+  padding-inline: 10px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: var(--header);
+  white-space: nowrap;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: calc((100cqh - var(--header)) / 5);
+  padding-inline: 10px 8px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.percent {
+  display: none;
+  margin-left: auto;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  transition: opacity 160ms var(--ease);
+}
+
+.status {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  overflow: visible;
+}
+
+.ring {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+/* The pie: a circle with a stroke as wide as itself, dashed to the share done, from 12 o'clock */
+.pie {
+  fill: none;
+  stroke: var(--fill);
+  stroke-width: 5.2;
+  transform: rotate(-90deg);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    stroke-dasharray 400ms var(--ease),
+    opacity 200ms var(--ease);
+}
+
+.check {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+
+.status[data-done] .ring {
+  fill: var(--fill);
+  stroke: var(--fill);
+}
+
+.status[data-done] .pie {
+  opacity: 0;
+}
+
+.status[data-done] .check {
+  opacity: 1;
+}
+
+.timeline {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Mondays: a hairline through the header and the rows, the week's date beside it */
+.gridline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+
+.axis {
+  position: relative;
+  flex: none;
+  height: var(--header);
+  border-bottom: 1px solid var(--line);
+}
+
+.week {
+  position: absolute;
+  top: 3px;
+  padding-left: 6px;
+  font-size: 11px;
+  line-height: 15px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.body {
+  position: relative;
+  flex: 1;
+}
+
+.weekend {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--weekend);
+}
+
+/* The dependency arrows sit under the bars; only their lines (with a wider, invisible edge) can be pointed at */
+.links {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.link {
+  transition:
+    transform 160ms var(--ease),
+    opacity 200ms var(--ease);
+}
+
+.hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 12;
+  pointer-events: stroke;
+}
+
+.line {
+  fill: none;
+  stroke: var(--link);
+  stroke-width: 1.5;
+}
+
+.head {
+  fill: var(--link);
+  stroke: var(--link);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  pointer-events: visiblePainted;
+}
+
+/* A bar: a pale track, the share done filled in from the left, the assignee's photo at its start */
+.bar {
+  position: absolute;
+  height: 20px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--track);
+  transition:
+    width 140ms var(--ease),
+    transform 160ms var(--ease),
+    box-shadow 160ms var(--ease);
+}
+
+/* Undone, the two bars slide back together, a little slower than a drag */
+.tile[data-undo] .bar,
+.tile[data-undo] .link {
+  transition-duration: 360ms;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  background: var(--fill);
+  transform-origin: left;
+  transition:
+    transform 500ms var(--ease),
+    opacity 200ms var(--ease);
+}
+
+.avatar {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 1.5px var(--page);
+}
+
+/* Under the pointer the bar shows a grip at its end; held, it lifts a little */
+.handle {
+  position: absolute;
+  top: 5px;
+  right: 3px;
+  width: 4px;
+  height: 10px;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.18);
+  opacity: 0;
+  transition: opacity 150ms var(--ease);
+}
+
+.bar[data-hovered] .handle {
+  opacity: 1;
+}
+
+.bar[data-held] {
+  box-shadow: 0 3px 10px light-dark(rgb(16 24 40 / 0.18), rgb(0 0 0 / 0.5));
+}
+
+/* The launch: an ink diamond on its day, the date before it */
+.milestone {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+}
+
+.diamond {
+  position: absolute;
+  inset: 3px;
+  border-radius: 2px;
+  background: var(--ink);
+  transform: rotate(45deg);
+}
+
+.due {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 2px);
+  font-size: 11px;
+  line-height: 14px;
+  white-space: nowrap;
+  color: var(--muted);
+  transform: translateY(-50%);
+}
+
+/* While the end is dragged, the new end date floats over it */
+.dates {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 14px;
+  white-space: nowrap;
+  color: #fff;
+  background: light-dark(#1c2024, #3a3e46);
+  opacity: 0;
+  visibility: hidden;
+  translate: -50% calc(-100% - 6px);
+  pointer-events: none;
+  transition:
+    transform 140ms var(--ease),
+    opacity 150ms var(--ease),
+    visibility 0s linear 150ms;
+}
+
+.dates[data-shown] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    transform 140ms var(--ease),
+    opacity 150ms var(--ease),
+    visibility 0s;
+}
+
+/* Today: a red line through the rows from a pill under the week dates, on the middle of the day */
+.today {
+  position: absolute;
+  top: 18px;
+  bottom: 0;
+  left: 0;
+  width: 9px;
+  margin-left: -4.5px;
+  transition:
+    transform 600ms cubic-bezier(0.45, 0, 0.2, 1),
+    opacity 200ms var(--ease);
+}
+
+.today::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 3.75px;
+  width: 1.5px;
+  background: var(--today);
+}
+
+.todayLabel {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 50%;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+  color: #fff;
+  background: var(--today);
+  transform: translateX(-50%);
+}
+
+/* Back to Wednesday: today and the flow design's progress fade out, go back unseen and fade in again */
+.tile[data-dip] [data-changes] :is(.pie, .percent),
+.tile[data-dip] .fill[data-changes],
+.tile[data-dip] .today {
+  opacity: 0;
+}
+
+/*
+ * The pointer: an arrow while it travels, a two-way resize cursor on the bar's end. Black with a white rim, as on a
+ * Mac in either theme.
+ */
+.pointer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  transition: transform 700ms cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+/* Holding the end, it follows the bar a day at a time, as fast as the bar snaps */
+.pointer[data-held] {
+  transition: transform 140ms var(--ease);
+}
+
+.arrow,
+.resize {
+  position: absolute;
+  fill: #000;
+  stroke: #fff;
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.25));
+  transition: opacity 100ms;
+}
+
+.arrow {
+  top: 0;
+  left: 0;
+  width: 13px;
+  height: 18px;
+}
+
+.resize {
+  top: -8px;
+  left: -11px;
+  width: 22px;
+  height: 16px;
+  opacity: 0;
+}
+
+.pointer[data-on] .arrow {
+  opacity: 0;
+}
+
+.pointer[data-on] .resize {
+  opacity: 1;
+}
+
+@container (min-width: 420px) {
+  .chart {
+    --panel: 132px;
+  }
+
+  .project {
+    padding-inline: 12px;
+  }
+
+  .task {
+    padding-inline: 12px 10px;
+  }
+}
+
+/* Room for each task's progress beside its name */
+@container (min-width: 520px) {
+  .chart {
+    --panel: 168px;
+  }
+
+  .percent {
+    display: inline;
+  }
+}
+
+@container (min-width: 760px) {
+  .chart {
+    --panel: 200px;
+  }
+
+  .project,
+  .task {
+    font-size: 13px;
+  }
+}

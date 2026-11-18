@@ -1,0 +1,543 @@
+/*
+ * How far the finger has dragged, in px. Registered as a number so it can transition: the finger, the list's stretch
+ * and the spinner's spokes all follow this one value, so they move as one. A registration applies to the whole page,
+ * so the property carries the element's name.
+ */
+@property --pull-to-refresh {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+/*
+ * An inbox in iOS Mail's style, in iOS's light and dark colors: a white or black screen, bold senders over gray
+ * previews, the system blue for controls and unread mail. The screen fills a picture shaped like a phone; a squarer
+ * or wider picture shows a phone up to 360px wide instead, cropped at the bottom, with its black border and band.
+ */
+.tile {
+  --label: light-dark(#000, #fff);
+  --secondary: light-dark(rgb(60 60 67 / 0.6), rgb(235 235 245 / 0.6));
+  --tertiary: light-dark(rgb(60 60 67 / 0.3), rgb(235 235 245 / 0.3));
+  --separator: light-dark(rgb(60 60 67 / 0.2), rgb(84 84 88 / 0.65));
+  --background: light-dark(#fff, #000);
+  --blue: light-dark(#007aff, #0a84ff);
+  --band: light-dark(#c7c7cc, #48484a);
+  --ios: cubic-bezier(0.32, 0.72, 0, 1);
+  /* A message row: sender, subject and two lines of preview */
+  --row: 92px;
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container: pull-to-refresh-tile / size;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  color: var(--label);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The finger's drag eases in, keeps pace and slows to a stop; letting go springs the list back */
+.tile[data-motion='drag'] {
+  transition: --pull-to-refresh 1100ms cubic-bezier(0.45, 0.05, 0.25, 1);
+}
+
+.tile[data-motion='spring'] {
+  transition: --pull-to-refresh 450ms var(--ios);
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container: pull-to-refresh-screen / size;
+  background: var(--background);
+}
+
+@container pull-to-refresh-tile (aspect-ratio > 0.75) {
+  .screen {
+    top: 14px;
+    width: min(360px, 100cqw - 48px);
+    margin-inline: auto;
+    border-radius: 44px 44px 0 0;
+    box-shadow:
+      0 0 0 5px #000,
+      0 0 0 7.5px var(--band);
+  }
+}
+
+/*
+ * The app, laid out from the top: the status bar and the navigation bar stay put, the large title and the list move
+ * down with the pull. The status bar is drawn at an iPhone's 402pt width and scaled to the screen.
+ */
+.app {
+  /* The screen's size against a 402pt-wide iPhone (tan(atan2(a, b)) is a ÷ b as a number) */
+  --s: tan(atan2(100cqw, 402px));
+  --top: calc(54px * var(--s));
+  /* The navigation bar's bottom edge, where the gap opens */
+  --nav: calc(var(--top) + 44px);
+  /* The home indicator's strip under the toolbar */
+  --home: calc(34px * var(--s));
+  /*
+   * Rubber band: the list moves less than the finger, and less the further it goes, as a scroll view does past its
+   * edge (offset = (1 − 1 ∕ (0.55 × pull ∕ 480 + 1)) × 480, about half the finger's travel here)
+   */
+  --offset: calc((1 - 1 / (var(--pull-to-refresh) * 0.55 / 480 + 1)) * 480px);
+
+  position: absolute;
+  inset: 0;
+}
+
+@container pull-to-refresh-tile (aspect-ratio > 0.75) {
+  .app {
+    --home: 0px;
+  }
+
+  .homeIndicator {
+    display: none;
+  }
+}
+
+/* The refresh control: behind the list, so it shows as the gap opens above the large title */
+.refresh {
+  position: absolute;
+  top: var(--nav);
+  right: 0;
+  left: 0;
+  height: 70px;
+  visibility: hidden;
+  transition: visibility 0s linear 300ms;
+}
+
+/* Put away once the spinner has shrunk and the gap has closed */
+.tile:not([data-finger='away']) .refresh,
+.tile[data-spinner='spinning'] .refresh {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/*
+ * The activity indicator: eight spokes around a 24px circle. It rides in the middle of the gap, and once the gap is
+ * past 56px it stays 28px below the navigation bar.
+ */
+.spinner {
+  position: absolute;
+  top: calc(min(var(--offset), 56px) / 2);
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  transition:
+    opacity 200ms ease,
+    scale 300ms var(--ios);
+}
+
+.spokes {
+  position: absolute;
+  inset: 0;
+}
+
+/* Each spoke appears over 6px of pull, 13px after the one before it: the eighth is in at 133px, the threshold at 134 */
+.spoke {
+  position: absolute;
+  top: 0;
+  left: 10.625px;
+  width: 2.75px;
+  height: 7px;
+  border-radius: 1.375px;
+  background: light-dark(#78787d, #aeaeb2);
+  opacity: clamp(0, (var(--pull-to-refresh) - 36 - var(--i) * 13) / 6, 1);
+  rotate: calc(var(--i) * 45deg);
+  transform-origin: 1.375px 12px;
+}
+
+/* Spinning: the spokes fade from the head round to the tail, and the whole turns a spoke at a time */
+.tile:is([data-spinner='spinning'], [data-spinner='gone']) .spoke {
+  opacity: var(--tail);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tile[data-spinner='spinning'] .spokes {
+    animation: spin 1s steps(8) infinite;
+  }
+
+  .tile[data-paused] .spokes {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* Done: the spinner shrinks away as the list closes the gap */
+.tile[data-spinner='gone'] .spinner {
+  opacity: 0;
+  scale: 0.5;
+}
+
+.content {
+  position: absolute;
+  inset: var(--nav) 0 0;
+  background: var(--background);
+  translate: 0 var(--offset);
+}
+
+/* The large title grows a little as the list is pulled past its top, anchored at its leading edge */
+.largeTitle {
+  display: block;
+  height: 52px;
+  padding: 1px 16px 0;
+  font-family: -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 41px;
+  letter-spacing: 0.01em;
+  scale: calc(1 + var(--pull-to-refresh) / 150 * 0.05);
+  transform-origin: 16px 50%;
+}
+
+/* The list's top edge clips the new row until it slides in */
+.listClip {
+  position: absolute;
+  inset: 52px 0 0;
+  overflow: hidden;
+  transition: opacity 300ms ease;
+}
+
+.tile[data-dip] .listClip {
+  opacity: 0;
+  transition-duration: 200ms;
+}
+
+/* The list starts a row higher, the new message hidden above it; when the message arrives the rows move down */
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  translate: 0 calc(var(--row) * -1);
+  transition: translate 450ms var(--ios) 200ms;
+}
+
+.tile[data-arrived] .list {
+  translate: none;
+}
+
+.row {
+  position: relative;
+  display: grid;
+  align-content: start;
+  height: var(--row);
+  padding: 9px 16px 0 28px;
+  isolation: isolate;
+}
+
+/* Inset separator: from where the text starts to the edge */
+.row::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 28px;
+  height: 1px;
+  background: var(--separator);
+  transform: scaleY(0.5);
+  transform-origin: bottom;
+}
+
+.row[data-new] {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 250ms ease,
+    visibility 0s linear 250ms;
+}
+
+.tile[data-arrived] .row[data-new] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 300ms ease 200ms;
+}
+
+/* The new message's tint: on as it lands, then fading out over 900ms */
+.highlight {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: light-dark(rgb(0 122 255 / 0.1), rgb(10 132 255 / 0.2));
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+.tile[data-highlight] .highlight {
+  opacity: 1;
+  transition: none;
+}
+
+/* Starting over happens out of sight, at once */
+.tile[data-motion='none'] :is(.list, .row[data-new]) {
+  transition: none;
+}
+
+.dot {
+  position: absolute;
+  top: 14px;
+  left: 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.sender {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.time {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--secondary);
+}
+
+.time svg {
+  width: 7px;
+  height: 11px;
+  fill: none;
+  stroke: var(--tertiary);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.subject {
+  overflow: hidden;
+  font-size: 14.5px;
+  line-height: 18px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Two lines of preview, cut with an ellipsis */
+.preview {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 14.5px;
+  line-height: 18px;
+  color: var(--secondary);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* The navigation bar: Back to the mailboxes and Edit, in the system blue */
+.navBar {
+  position: absolute;
+  top: var(--top);
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 16px 0 8px;
+  font-size: 17px;
+  line-height: 22px;
+  color: var(--blue);
+  background: var(--background);
+}
+
+.back {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.back svg {
+  width: 11px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.statusBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 402px;
+  height: 54px;
+  font-size: 17px;
+  font-weight: 600;
+  transform: scale(var(--s));
+  transform-origin: 0 0;
+}
+
+/* The time and the icons, each centered in the 132pt nearest its edge, level with the island's middle */
+.clock,
+.indicators {
+  position: absolute;
+  width: 132px;
+}
+
+.clock {
+  top: 19px;
+  left: 0;
+  line-height: 21px;
+  letter-spacing: -0.02em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.indicators {
+  top: 23.5px;
+  right: 0;
+}
+
+.island {
+  position: absolute;
+  top: 11px;
+  left: 138px;
+  width: 126px;
+  height: 37px;
+  border-radius: 18.5px;
+  background: #000;
+}
+
+/* The toolbar: Filter, the mailbox's status, Compose; translucent over the list, with a hairline on top */
+.toolbar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 24px;
+  column-gap: 8px;
+  align-items: center;
+  height: calc(44px + var(--home));
+  padding: 0 14px var(--home);
+  background: light-dark(rgb(249 249 249 / 0.94), rgb(22 22 22 / 0.94));
+  box-shadow: 0 -0.5px 0 light-dark(rgb(0 0 0 / 0.3), rgb(255 255 255 / 0.15));
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+.toolIcon {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The status: when the mailbox last checked for mail over the unread count, one version at a time */
+.status {
+  display: grid;
+  justify-self: center;
+  text-align: center;
+  white-space: nowrap;
+  transition: opacity 300ms ease;
+}
+
+.tile[data-dip] .status {
+  opacity: 0;
+  transition-duration: 200ms;
+}
+
+.statusLine {
+  display: grid;
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 200ms ease,
+    visibility 0s linear 200ms;
+}
+
+.statusLine[data-shown] {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.updated {
+  font-size: 12px;
+  line-height: 15px;
+}
+
+.unread {
+  font-size: 11px;
+  line-height: 13px;
+  color: var(--secondary);
+}
+
+.homeIndicator {
+  position: absolute;
+  bottom: calc(8px * var(--s));
+  left: 50%;
+  width: calc(134px * var(--s));
+  height: calc(5px * var(--s));
+  border-radius: 3px;
+  background: var(--label);
+  translate: -50% 0;
+}
+
+/*
+ * The finger: a gray touch with a light rim, as a screen recording shows it. It lands on the list, follows the pull
+ * and lifts off where the drag ended (at 150px).
+ */
+.finger {
+  position: absolute;
+  top: min(var(--nav) + 52px + var(--row) / 2, 100cqh - 44px - var(--home) - 178px);
+  left: 62%;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border: 1.5px solid light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.55));
+  border-radius: 50%;
+  background: light-dark(rgb(60 60 67 / 0.22), rgb(235 235 245 / 0.3));
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
+  opacity: 0;
+  visibility: hidden;
+  scale: 0.8;
+  translate: 0 calc(var(--pull-to-refresh) * 1px);
+  pointer-events: none;
+  transition:
+    opacity 180ms ease,
+    scale 220ms ease,
+    visibility 0s linear 220ms;
+}
+
+.tile[data-finger='down'] .finger {
+  opacity: 1;
+  visibility: visible;
+  scale: 1;
+  transition:
+    opacity 120ms ease,
+    scale 160ms var(--ios),
+    visibility 0s;
+}
+
+.tile[data-finger='lifted'] .finger {
+  scale: 1.15;
+  translate: 0 150px;
+}

@@ -34,8 +34,9 @@ page (products that are dark by design stay dark), and the balloons show the val
 
 Behind sign-in, the library holds more than thirty apps, sites and watch apps, each modeled on a product people use
 every day: the same layout and component shapes, with its own name, colors, copy and real photos. An Elements tab adds
-single elements, starting with the gallery's fifteen. Every element can be inspected the same way and added to a brief.
-Here Lanes, a board in the style of Jira, explains its WIP limit:
+single elements: the gallery's fifteen and forty more, from forms, navigation, charts and micro-interactions. Every
+element can be inspected the same way and added to a brief. Here Lanes, a board in the style of Jira, explains its WIP
+limit:
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/inspect-dark.png">
@@ -64,6 +65,14 @@ Playing:
   <img alt="Six Apple Watch examples: Almanac (an analog face with complications, like Infograph), Glance (the Smart Stack of widgets), Kinetic (activity rings), Nudge (a notification's Long Look with its actions), Encore (Now Playing) and Pace (a running workout)" src="docs/screenshots/library-watch-light.png">
 </picture>
 
+And single elements: the Elements tab holds fifty-five, filtered by family (data, forms, iOS, micro-interactions,
+navigation, productivity), each live in the gallery's bento grid and with its own page listing its parts:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/library-elements-dark.png">
+  <img alt="The library's Elements tab: the Mobile, Web, Watch and Elements tabs, family chips and a bento grid of live elements: activity rings, a bottom sheet, breadcrumbs with their overflow menu open, a bubble chart, a calendar heatmap, a candlestick chart, a character counter and a context menu with its submenu" src="docs/screenshots/library-elements-light.png">
+</picture>
+
 ## Current status: landing page, sign-in, the library and the brief
 
 An English landing page with a sticky header (with a theme toggle), a hero, an element gallery, examples, feature cards,
@@ -83,7 +92,7 @@ GitHub (`SPONSOR_HREF` in `src/landing/links.ts`; GitHub Sponsors has to be set 
 Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to the library (`/app/mobile`, `/app/web`, `/app/watch`,
 `/app/elements`): mobile apps, websites and Apple Watch apps in three tabs, each a fictional product built from the
 patterns of well-known ones (“inspired by” Spotify, Airbnb, Stripe, Notion, Figma, VS Code and others), and a fourth tab
-of single elements in the gallery's bento grid, filtered by family (data, iOS, micro-interactions,
+of single elements in the gallery's bento grid, filtered by family (forms, navigation, data, micro-interactions, iOS,
 productivity). Phones, watches and elements can be inspected right in the grid; every example also has its own page
 (`/app/<platform>/<id>`) with all of its elements written out. A search finds examples by name or by element (“bottom
 sheet”, “toast”). There's no auth backend yet: email and password sign-in only works with the development account below,
@@ -214,8 +223,8 @@ src/library/<mobile|web|watch|elements>/<id>/
 
 ### Adding an element
 
-An element is a library example with `platform: 'elements'`, its family as the `category` (Data, iOS,
-Micro-interactions, Productivity) and a `size` that says how much of the bento grid its tile takes. The
+An element is a library example with `platform: 'elements'`, its family as the `category` (Data, Forms, iOS,
+Micro-interactions, Navigation, Productivity) and a `size` that says how much of the bento grid its tile takes. The
 grid is the same on the landing page and in the library, so a tile must look right across these picture sizes (CSS
 px); its own page shows it at the desktop size, or full width on a phone:
 

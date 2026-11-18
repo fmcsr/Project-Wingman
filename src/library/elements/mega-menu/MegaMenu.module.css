@@ -1,0 +1,765 @@
+/*
+ * A payments company's marketing site in the fintech idiom: a white page (deep navy in dark mode) with navy ink, a
+ * bold, tightly set headline and one accent, a lava orange, for the logo, the main button and the menu's icons. The
+ * dropdown is a white card with 12px corners and the long, soft two-layer shadow such sites use, with a small arrow
+ * on its top edge. The geometry the panel follows (--products-x, --products-w, …) is measured by the component.
+ */
+.tile {
+  --page: light-dark(#ffffff, #0b0f17);
+  --ink: light-dark(#0d1b2e, #eef1f6);
+  --ink-2: light-dark(#475569, #a6b0bf);
+  --ink-3: light-dark(#7b8698, #6f7a8b);
+  --line: light-dark(#e7eaf0, #232a36);
+  --fill: light-dark(#eef1f5, #1c2330);
+  --panel: light-dark(#ffffff, #141a24);
+  --panel-line: light-dark(rgb(13 27 46 / 0.07), rgb(255 255 255 / 0.08));
+  --footer: light-dark(#f7f8fa, #10151e);
+  --card: light-dark(#f4f6f9, #1a212d);
+  --accent: light-dark(#e2531f, #ff7a4d);
+  --accent-text: light-dark(#c2410c, #ff8a5f);
+  --accent-soft: light-dark(#fdeee7, #33201a);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* The panel morphs a little slower than a hover state, so the eye can follow it */
+  --morph: 260ms;
+  --header-h: 60px;
+  --gutter: 12px;
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--page);
+}
+
+.icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.site {
+  position: absolute;
+  inset: 0;
+}
+
+/* Which trigger the dropdown hangs from and which panel's size it takes */
+.tile[data-menu='products'] .site {
+  --anchor: var(--products-x, 0px);
+  --w: var(--products-w, 0px);
+  --h: var(--products-h, 0px);
+}
+
+.tile[data-menu='solutions'] .site {
+  --anchor: var(--solutions-x, 0px);
+  --w: var(--solutions-w, 0px);
+  --h: var(--solutions-h, 0px);
+}
+
+/* The header: logo, the four links, Sign in. Transparent over the page, as on the real sites */
+.header {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: var(--header-h);
+  padding: 0 14px 0 20px;
+  white-space: nowrap;
+}
+
+.logo {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.mark {
+  width: 20px;
+  height: 20px;
+  fill: var(--accent);
+}
+
+.wordmark {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.trigger,
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  transition: background-color 150ms var(--ease);
+}
+
+/* The open trigger sits in a soft pill, and its chevron turns up */
+.trigger[data-open] {
+  background: var(--fill);
+}
+
+.chevron {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: rotate 200ms var(--ease);
+}
+
+.trigger[data-open] .chevron {
+  rotate: 180deg;
+}
+
+.developers {
+  display: contents;
+}
+
+.signIn {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.signInChevron,
+.ctaChevron {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  rotate: -90deg;
+}
+
+/* The page under the header: a big headline, a lead and two calls to action */
+.hero {
+  position: absolute;
+  top: calc(var(--header-h) + 34px);
+  right: 20px;
+  left: 20px;
+}
+
+.headline {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+}
+
+.lead {
+  max-width: 34ch;
+  margin: 16px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.ctas {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.primary {
+  height: 34px;
+  padding: 0 12px 0 16px;
+  border-radius: 999px;
+  color: #fff;
+  background: light-dark(#d9481a, #f0602f);
+}
+
+/* A card from the dashboard, the hero's product shot */
+.preview {
+  margin-top: 30px;
+  padding: 14px 16px 0;
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow:
+    0 0 0 1px var(--line),
+    0 14px 32px -14px light-dark(rgb(13 27 46 / 0.2), rgb(0 0 0 / 0.6));
+}
+
+.previewHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.previewBadge {
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.previewFigure {
+  display: block;
+  margin-top: 3px;
+  font-size: 22px;
+  font-weight: 650;
+  line-height: 28px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  height: 72px;
+  margin-top: 8px;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.chart path {
+  vector-effect: non-scaling-stroke;
+}
+
+/* The page curtain: a light veil with a blur over everything below the header while a menu is open */
+.curtain {
+  position: absolute;
+  inset: var(--header-h) 0 0;
+  background: light-dark(rgb(255 255 255 / 0.6), rgb(11 15 23 / 0.6));
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 250ms var(--ease),
+    visibility 250ms;
+}
+
+.tile[data-open] .curtain {
+  opacity: 1;
+  visibility: visible;
+}
+
+/*
+ * The dropdown: the arrow and the panel, under the header. It opens by swinging down from the top as it fades in
+ * (250ms) and closes a little faster.
+ */
+.dropdown {
+  position: absolute;
+  top: calc(var(--header-h) - 2px);
+  left: 0;
+  transform-origin: var(--anchor) 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: perspective(1200px) rotateX(-14deg);
+  transition:
+    opacity 180ms var(--ease),
+    transform 180ms var(--ease),
+    visibility 180ms;
+}
+
+.tile[data-open] .dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-duration: 250ms;
+}
+
+/* A 12px square turned 45°: its top half pokes out of the panel's top edge, under the open trigger */
+.arrow {
+  position: absolute;
+  z-index: 1;
+  top: -6px;
+  left: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px 0 0;
+  background: var(--panel);
+  box-shadow: -1px -1px 0 var(--panel-line);
+  translate: var(--anchor) 0;
+  rotate: 45deg;
+}
+
+.panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--w);
+  height: var(--h);
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow:
+    0 0 0 1px var(--panel-line),
+    0 50px 100px -20px light-dark(rgb(50 50 93 / 0.25), rgb(0 0 0 / 0.6)),
+    0 30px 60px -30px light-dark(rgb(0 0 0 / 0.3), rgb(0 0 0 / 0.5));
+  translate: clamp(var(--gutter), calc(var(--anchor) - var(--w) / 2), calc(100cqw - var(--gutter) - var(--w))) 0;
+}
+
+/* Morphing: the panel resizes and slides to the new trigger while the arrow glides along */
+.site[data-ready] .panel {
+  transition:
+    width var(--morph) var(--ease),
+    height var(--morph) var(--ease),
+    translate var(--morph) var(--ease);
+}
+
+.site[data-ready] .arrow {
+  transition: translate var(--morph) var(--ease);
+}
+
+/*
+ * Each panel's content keeps its own width, so its text never reflows while the panel changes size around it. The
+ * old content slides out toward the side it came from as the new one slides in from the other.
+ */
+.content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition:
+    opacity var(--morph) var(--ease),
+    translate var(--morph) var(--ease),
+    visibility var(--morph);
+}
+
+.content:not([data-shown]) {
+  opacity: 0;
+  visibility: hidden;
+}
+
+[data-content='products'] {
+  width: min(560px, 100cqw - 2 * var(--gutter));
+}
+
+[data-content='products']:not([data-shown]) {
+  translate: -48px 0;
+}
+
+[data-content='solutions'] {
+  width: min(408px, 100cqw - 2 * var(--gutter));
+}
+
+[data-content='solutions']:not([data-shown]) {
+  translate: 48px 0;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  padding: 18px 22px 16px;
+}
+
+[data-content='products'] .columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) 148px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.heading {
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* An item: an icon tile, the title and a one-line description under it */
+.item {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  column-gap: 10px;
+  align-items: center;
+  margin: 0 -8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+
+.itemIcon {
+  display: grid;
+  grid-row: span 2;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.itemTitle {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.itemText {
+  font-size: 12.5px;
+  line-height: 16px;
+  color: var(--ink-2);
+}
+
+/* The featured card: a promo at the side, on a soft gray with its own little picture */
+.featured {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 8px 8px 10px;
+  border-radius: 10px;
+  background: var(--card);
+}
+
+.featuredArt {
+  display: grid;
+  flex: none;
+  place-items: center;
+  height: 62px;
+  border-radius: 7px;
+  background: var(--accent-soft);
+}
+
+.payout {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px 5px 5px;
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow:
+    0 1px 2px light-dark(rgb(13 27 46 / 0.08), rgb(0 0 0 / 0.4)),
+    0 6px 14px -4px light-dark(rgb(13 27 46 / 0.16), rgb(0 0 0 / 0.5));
+}
+
+.payoutCheck {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--accent);
+}
+
+.payoutCheck .icon {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.75;
+}
+
+.payoutText {
+  display: flex;
+  flex-direction: column;
+}
+
+.payoutTitle {
+  font-size: 9.5px;
+  line-height: 12px;
+  color: var(--ink-2);
+}
+
+.payoutAmount {
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.featuredLabel {
+  margin: 10px 2px 0;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.featuredTitle {
+  margin: 1px 2px 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.featuredText {
+  margin: 1px 2px 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-2);
+}
+
+.featuredLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: auto 2px 0;
+  padding-top: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent-text);
+}
+
+.featuredLink .icon {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.25;
+}
+
+/* The footer row: a gray band of links across the bottom of the panel */
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 44px;
+  padding: 0 22px;
+  border-top: 1px solid var(--line);
+  white-space: nowrap;
+  background: var(--footer);
+}
+
+.footerLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.footerLink .icon {
+  width: 15px;
+  height: 15px;
+  color: var(--ink-3);
+}
+
+/*
+ * The pointer: on a trigger, or out on the page below the panel. A short hop between triggers, a longer glide to
+ * and from the page.
+ */
+.pointer {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 20px;
+  fill: #1d1d1f;
+  stroke: #fff;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.3));
+  translate: var(--px, -40px) var(--py, 0);
+}
+
+.site[data-ready] .pointer {
+  transition: translate var(--move, 300ms) cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.tile[data-pointer='products'] .site {
+  --px: calc(var(--products-x, 0px) + 4px);
+  --py: calc(var(--header-h) / 2 + 2px);
+  --move: 520ms;
+}
+
+.tile[data-pointer='solutions'] .site {
+  --px: calc(var(--solutions-x, 0px) - 2px);
+  --py: calc(var(--header-h) / 2 + 4px);
+  --move: 300ms;
+}
+
+.tile[data-pointer='away'] .site {
+  --px: calc(100cqw - 92px);
+  --py: calc(100cqh - 46px);
+  --move: 420ms;
+}
+
+/* Under 520px the featured card doesn't fit beside the columns; it moves under them */
+@container (width < 520px) {
+  [data-content='products'] .columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .featured {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: 112px minmax(0, 1fr);
+    column-gap: 12px;
+    align-items: center;
+    padding: 8px 12px 8px 8px;
+  }
+
+  .featuredArt {
+    grid-row: span 4;
+    height: 58px;
+  }
+
+  .featuredLabel {
+    margin-top: 0;
+  }
+
+  .featuredText {
+    display: none;
+  }
+
+  .featuredLink {
+    padding-top: 2px;
+  }
+
+  .signIn {
+    display: none;
+  }
+
+  .header {
+    gap: 8px;
+  }
+
+  .headline {
+    font-size: 34px;
+  }
+}
+
+/* Short and narrow: no room for the strip either */
+@container (width < 520px) and (height < 420px) {
+  .featured {
+    display: none;
+  }
+}
+
+/* Phones: one column of products and no featured card; the header keeps the two triggers the loop uses */
+@container (width < 460px) {
+  .site {
+    --header-h: 52px;
+  }
+
+  .header {
+    gap: 8px;
+    padding: 0 10px 0 14px;
+  }
+
+  .developers {
+    display: none;
+  }
+
+  .trigger,
+  .link {
+    padding: 0 8px;
+    font-size: 13.5px;
+  }
+
+  [data-content='products'] .columns,
+  [data-content='solutions'] .columns {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px 18px 14px;
+  }
+
+  [data-content='solutions'] {
+    width: min(272px, 100cqw - 2 * var(--gutter));
+  }
+
+  .group + .group,
+  .featured {
+    display: none;
+  }
+
+  .footer {
+    gap: 16px;
+    padding: 0 18px;
+  }
+
+  .hero {
+    top: calc(var(--header-h) + 26px);
+    right: 16px;
+    left: 16px;
+  }
+
+  .headline {
+    font-size: 30px;
+  }
+
+  .lead {
+    font-size: 14px;
+  }
+}
+
+@container (width < 400px) {
+  .link {
+    display: none;
+  }
+}
+
+/* Wide tablets: the panel and the page get more room */
+@container (width >= 720px) {
+  .header {
+    gap: 24px;
+    padding: 0 24px 0 28px;
+  }
+
+  .hero {
+    top: calc(var(--header-h) + 48px);
+    left: 28px;
+  }
+
+  .headline {
+    font-size: 52px;
+  }
+
+  [data-content='products'] {
+    width: 600px;
+  }
+
+  [data-content='products'] .columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) 164px;
+    gap: 24px;
+    padding: 22px 24px 18px;
+  }
+
+  [data-content='solutions'] {
+    width: 440px;
+  }
+}

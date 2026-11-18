@@ -1,0 +1,299 @@
+/*
+ * A trading platform's price chart: white (near-black in dark mode) with faint gridlines, a price axis 56px wide on
+ * the right and a time axis 22px tall below. Up and down are one green and one red in both themes, each at least
+ * 3.6:1 on either background; text in those colors takes a deeper or lighter shade to stay readable.
+ */
+.tile {
+  --page: light-dark(#fff, #12151b);
+  --ink: light-dark(#131722, #e8eaef);
+  --muted: light-dark(#666d79, #8d93a0);
+  --grid: light-dark(#f0f2f5, #1b1f27);
+  --edge: light-dark(#e1e4e9, #2a2f39);
+  --up: #009871;
+  --down: #de3b3d;
+  --up-text: light-dark(#007a5a, #2fc08c);
+  --down-text: light-dark(#c62f30, #f2605e);
+  --cross: light-dark(#8f96a3, #6c7280);
+  --tag: light-dark(#2a2f3a, #3a404c);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  height: 100%;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--page);
+}
+
+.chart {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 22px;
+  grid-template-columns: minmax(0, 1fr) 56px;
+  height: 100%;
+}
+
+.plot {
+  position: relative;
+  overflow: hidden;
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.grid {
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.candle {
+  color: var(--down);
+}
+
+.candle[data-up] {
+  color: var(--up);
+}
+
+.wick {
+  stroke: currentColor;
+  stroke-width: 1;
+}
+
+/* A wider, invisible stroke along the wick, so a 1px line can be pointed at */
+.wickHit {
+  stroke: transparent;
+  stroke-width: 7;
+}
+
+.body {
+  fill: currentColor;
+}
+
+.volume rect {
+  fill: var(--down);
+  fill-opacity: 0.32;
+}
+
+.volume rect[data-up] {
+  fill: var(--up);
+}
+
+/* The live price across the chart, dotted */
+.priceLine {
+  stroke: var(--down);
+  stroke-width: 1;
+  stroke-dasharray: 1 3;
+}
+
+.priceLine[data-up] {
+  stroke: var(--up);
+}
+
+/* The symbol, its interval, its last price and today's change, over the top left of the chart */
+.legend {
+  position: absolute;
+  top: 7px;
+  left: 10px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.legend b {
+  font-weight: 600;
+}
+
+.interval {
+  color: var(--muted);
+}
+
+.last {
+  margin-left: 4px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.change {
+  font-variant-numeric: tabular-nums;
+  color: var(--down-text);
+}
+
+.change[data-up] {
+  color: var(--up-text);
+}
+
+.axis {
+  position: relative;
+  border-left: 1px solid var(--edge);
+}
+
+.tick,
+.priceTag {
+  position: absolute;
+  top: 0;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tick {
+  left: 7px;
+  margin-top: -7px;
+  line-height: 14px;
+  color: var(--muted);
+}
+
+.tick[data-covered] {
+  visibility: hidden;
+}
+
+/* The live price's tag: the axis's full width in the live candle's color */
+.priceTag {
+  left: 0;
+  display: flex;
+  align-items: center;
+  width: 56px;
+  height: 18px;
+  margin-top: -9px;
+  padding-left: 6px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--down);
+}
+
+.priceTag[data-up] {
+  background: var(--up);
+}
+
+.times {
+  position: relative;
+  border-top: 1px solid var(--edge);
+}
+
+.time {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  font-size: 11px;
+  line-height: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  translate: -50% 0;
+}
+
+/*
+ * The crosshair: a dashed line down and one across, each 1px in the middle of a 5px strip that can be pointed at,
+ * and dark tags with its time and price on the axes. It snaps from candle to candle.
+ */
+.crosshair {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 150ms var(--ease),
+    visibility 0s linear 150ms;
+}
+
+.crosshair[data-shown] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 150ms var(--ease);
+}
+
+.crosshair > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: auto;
+  transition: transform 220ms var(--ease);
+}
+
+.crossDown {
+  left: -2px;
+  width: 5px;
+  background: repeating-linear-gradient(to bottom, var(--cross) 0 4px, transparent 4px 8px) center / 1px 100%
+    no-repeat;
+}
+
+.crossAcross {
+  top: -2px;
+  height: 5px;
+  background: repeating-linear-gradient(to right, var(--cross) 0 4px, transparent 4px 8px) center / 100% 1px
+    no-repeat;
+}
+
+.crossPrice,
+.crossTime {
+  display: flex;
+  align-items: center;
+  height: 18px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  background: var(--tag);
+}
+
+.crossPrice {
+  width: 56px;
+  margin-top: -9px;
+  padding-left: 6px;
+}
+
+.crossTime {
+  margin-top: 2px;
+  padding-inline: 6px;
+  border-radius: 2px;
+  translate: -50% 0;
+}
+
+/* Open, high, low and close of the candle under the crosshair, two by two, beside it */
+.tooltip {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(2, auto auto);
+  gap: 2px 6px;
+  padding: 5px 8px;
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 14px;
+  white-space: nowrap;
+  color: var(--muted);
+  background: var(--page);
+  box-shadow: 0 4px 14px light-dark(rgb(19 23 34 / 0.12), rgb(0 0 0 / 0.45));
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 150ms var(--ease),
+    transform 220ms var(--ease),
+    visibility 0s linear 150ms;
+}
+
+.tooltip[data-shown] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 150ms var(--ease),
+    transform 220ms var(--ease);
+}
+
+.tooltip b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* A little more room between the two pairs on each row */
+.tooltip b:nth-of-type(odd) {
+  margin-right: 4px;
+}

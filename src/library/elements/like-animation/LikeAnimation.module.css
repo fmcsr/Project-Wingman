@@ -1,0 +1,427 @@
+/*
+ * A post on its own page in the idiom of the big social feeds: white (black in dark mode), a bold name over a gray
+ * handle, 15px text, and gray action icons with their counts in a row between hairlines. The like's red is the only
+ * color.
+ */
+.tile {
+  --bg: light-dark(#fff, #000);
+  --ink: light-dark(#0f1419, #e7e9ea);
+  --muted: light-dark(#536471, #71767b);
+  --line: light-dark(#eff3f4, #2f3336);
+  --like: light-dark(#e11d48, #fb3a5d);
+  /* The burst's first bloom: the red, paled toward the background */
+  --bloom: color-mix(in oklab, var(--like) 40%, var(--bg));
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 0 14px;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.name {
+  font-weight: 700;
+}
+
+.handle {
+  color: var(--muted);
+}
+
+.more {
+  flex: none;
+  align-self: flex-start;
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0 auto;
+  fill: var(--muted);
+}
+
+.text {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 20px;
+  text-wrap: pretty;
+}
+
+.meta {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 18px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+/* The views only fit beside the date from 330px */
+.views {
+  display: none;
+}
+
+.views b {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/*
+ * The row spreads its actions across the post, between two hairlines, as on a post's own page. Narrow tiles use the
+ * feed's smaller icons, and the burst shrinks with them, so it keeps clear of the counts beside it.
+ */
+.row {
+  --icon: 18px;
+  --burst: 0.9;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: none;
+  height: 44px;
+  margin-top: 12px;
+  border-block: 1px solid var(--line);
+}
+
+.action,
+.like {
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+}
+
+/* The bookmark joins the row from 330px */
+.bookmark {
+  display: none;
+}
+
+/*
+ * Each icon sits in the circle its hover tint would fill, 14px wider than the icon; the negative margin keeps that
+ * circle out of the layout, so the first icon lines up with the text.
+ */
+.icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: calc(var(--icon) + 14px);
+  height: calc(var(--icon) + 14px);
+  margin: -7px;
+}
+
+/* Positioned, so the hearts paint over the burst (which is absolutely positioned) and take the pointer there */
+.icon svg {
+  position: relative;
+  grid-area: 1 / 1;
+  width: var(--icon);
+  height: var(--icon);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.count,
+.likes {
+  margin-left: 4px;
+  font-size: 13px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pressed, the empty heart turns red and squashes: wider and flatter, 130ms */
+.outline {
+  transition:
+    transform 130ms var(--ease),
+    color 130ms var(--ease),
+    opacity 150ms ease;
+}
+
+.like[data-press] .outline {
+  color: var(--like);
+  transform: scale(0.86, 0.72);
+}
+
+.like[data-liked] .outline {
+  opacity: 0;
+  visibility: hidden;
+  transition: none;
+}
+
+/* The filled heart takes its place at once (the pop below grows it in); unliked, it fades and shrinks in 150ms */
+.icon .filled {
+  fill: var(--like);
+  stroke: var(--like);
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.7);
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease,
+    visibility 0s linear 150ms;
+}
+
+.like[data-liked] .filled {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: none;
+}
+
+/*
+ * The burst, centered on the heart and drawn behind it: a ring that blooms from a small disc and thins out to
+ * nothing, and six dots that fly out from its edge and shrink away. It only shows while it plays.
+ */
+.burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+  border-radius: 50%;
+  visibility: hidden;
+  transform: scale(var(--burst));
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  border: 18px solid var(--like);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: var(--like);
+  opacity: 0;
+  transform: rotate(var(--angle)) translateY(-12px);
+}
+
+/* The count rolls one digit: up when liked, the new 5 rising from below, and back down when unliked */
+.likes {
+  display: flex;
+  color: var(--muted);
+  transition: color 150ms ease;
+}
+
+.like[data-liked] .likes {
+  color: var(--like);
+}
+
+.digit {
+  height: 16px;
+  overflow: hidden;
+}
+
+.strip {
+  display: flex;
+  flex-direction: column;
+  transition: transform 300ms var(--ease) 40ms;
+}
+
+.like[data-liked] .strip {
+  transform: translateY(-16px);
+}
+
+.before,
+.after {
+  transition: opacity 300ms var(--ease) 40ms;
+}
+
+.after,
+.like[data-liked] .before {
+  opacity: 0;
+}
+
+.like[data-liked] .after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .like[data-burst] .burst {
+    animation: burst 600ms linear both;
+  }
+
+  .like[data-burst] .ring {
+    animation: ring 420ms linear both;
+  }
+
+  /* No backwards fill: the dots stay hidden until they leave, 120ms in */
+  .like[data-burst] .dot {
+    animation: fly 460ms linear 120ms forwards;
+  }
+
+  .like[data-burst] .filled {
+    animation: pop 520ms cubic-bezier(0.3, 0, 0.3, 1) both;
+  }
+
+  .tile[data-paused] :is(.burst, .ring, .dot, .filled) {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes burst {
+  from {
+    visibility: visible;
+  }
+
+  to {
+    visibility: hidden;
+  }
+}
+
+/*
+ * A pale bloom behind the heart that hollows out as it grows: by 70% it's a thin ring in the full red, and it thins
+ * away to nothing at 32px across. The steps are hand-eased (fast, then slower), so each segment is linear.
+ */
+@keyframes ring {
+  0% {
+    opacity: 1;
+    transform: scale(0.3);
+    border-width: 18px;
+    border-color: var(--bloom);
+  }
+
+  35% {
+    transform: scale(0.72);
+    border-width: 8px;
+  }
+
+  70% {
+    transform: scale(0.86);
+    border-width: 2.5px;
+    border-color: var(--like);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(0.9);
+    border-width: 0;
+    border-color: var(--like);
+  }
+}
+
+/* Out from the ring's edge, fast then slower, keeping their size until halfway, then shrinking away */
+@keyframes fly {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(-13px) scale(1);
+  }
+
+  25% {
+    transform: rotate(var(--angle)) translateY(-17.5px) scale(1);
+  }
+
+  50% {
+    transform: rotate(var(--angle)) translateY(-20px) scale(0.8);
+  }
+
+  75% {
+    transform: rotate(var(--angle)) translateY(-21.2px) scale(0.45);
+  }
+
+  100% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(-21.6px) scale(0);
+  }
+}
+
+/* Out of the squash it stretches up past full size, settles back below it and lands */
+@keyframes pop {
+  0% {
+    transform: scale(0.86, 0.72);
+  }
+
+  40% {
+    transform: scale(1.14, 1.22);
+  }
+
+  65% {
+    transform: scale(0.95, 0.92);
+  }
+
+  85% {
+    transform: scale(1.02);
+  }
+
+  100% {
+    transform: none;
+  }
+}
+
+/*
+ * The still picture: the ring hollowed out to a thin line 27px across, clear of the count, and the dots past it on
+ * their way out
+ */
+.tile[data-final] .burst {
+  visibility: visible;
+}
+
+.tile[data-final] .ring {
+  opacity: 1;
+  transform: scale(0.75);
+  border-width: 2.5px;
+}
+
+.tile[data-final] .dot {
+  opacity: 1;
+  transform: rotate(var(--angle)) translateY(-18px) scale(0.75);
+}
+
+/* Wider, the post reads at the size of a post's own page: 17px text, 15px date, 20px icons */
+@container (min-width: 300px) {
+  .row {
+    --icon: 20px;
+    --burst: 1;
+  }
+
+  .text {
+    font-size: 17px;
+    line-height: 22px;
+  }
+
+  .meta {
+    font-size: 15px;
+  }
+
+  .views {
+    display: inline;
+  }
+
+  .bookmark {
+    display: flex;
+  }
+}

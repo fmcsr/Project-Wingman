@@ -4,7 +4,8 @@ import type { UiElementSpec } from '../catalog';
 export type Platform = 'mobile' | 'web' | 'watch' | 'elements';
 
 /**
- * The library's filter chips. Elements use their own families: Data, iOS, Micro-interactions and Productivity.
+ * The library's filter chips. Elements use their own families: Data, Forms, iOS, Micro-interactions, Navigation and
+ * Productivity.
  */
 export type Category =
   | 'AI'
@@ -17,11 +18,13 @@ export type Category =
   | 'Education'
   | 'Finance'
   | 'Food'
+  | 'Forms'
   | 'Health'
   | 'iOS'
   | 'Marketing'
   | 'Media'
   | 'Micro-interactions'
+  | 'Navigation'
   | 'Productivity'
   | 'Social'
   | 'Travel';

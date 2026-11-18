@@ -1,0 +1,343 @@
+/*
+ * How much of the app has downloaded, from 0 to 100. Registered as a number so the ring can fill smoothly between
+ * the download's updates; a registration applies to the whole page, so the property carries the element's name.
+ */
+@property --progress-button {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+/*
+ * A list of apps in the App Store's style, in iOS's light and dark colors: rounded icons, a bold name over a gray
+ * subtitle, and gray pill buttons with blue labels. The system blue is the one accent, for the labels and the ring.
+ */
+.tile {
+  --label: light-dark(#000, #fff);
+  --secondary: light-dark(rgb(60 60 67 / 0.6), rgb(235 235 245 / 0.6));
+  --separator: light-dark(rgb(60 60 67 / 0.2), rgb(84 84 88 / 0.65));
+  --background: light-dark(#fff, #000);
+  --blue: light-dark(#007aff, #0a84ff);
+  --pill: light-dark(rgb(118 118 128 / 0.12), rgb(118 118 128 / 0.24));
+  --track: light-dark(rgb(118 118 128 / 0.2), rgb(118 118 128 / 0.32));
+  --ios: cubic-bezier(0.32, 0.72, 0, 1);
+
+  display: grid;
+  align-content: center;
+  height: 100%;
+  container-type: size;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  color: var(--label);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+}
+
+.list {
+  margin: 0;
+  padding: 0 0 0 12px;
+  list-style: none;
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 64px;
+  padding-right: 12px;
+}
+
+/* Hairlines between the rows, from where the text starts to the edge */
+.row + .row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 50px;
+  height: 1px;
+  background: var(--separator);
+  transform: scaleY(0.5);
+  transform-origin: top;
+}
+
+/* The app icons: our own glyphs on a flat color, with iOS's rounded corners and a hairline edge */
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  color: #fff;
+  box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 0.12);
+}
+
+.icon svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.name,
+.subtitle {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.name {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 19px;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 12.5px;
+  line-height: 16px;
+  color: var(--secondary);
+}
+
+.action {
+  flex: none;
+  transition: opacity 250ms ease;
+}
+
+/* Starting over: the two downloaded buttons fade out and come back as Get */
+.tile[data-dip] .action[data-movable] {
+  opacity: 0;
+  transition-duration: 200ms;
+}
+
+/*
+ * The button: a 74 × 28 pill. While the app downloads, the pill pulls in from both sides into a circle and fades,
+ * and the ring takes its place; done, it opens back out.
+ */
+.button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 28px;
+  transition: --progress-button var(--fill-ms) linear;
+}
+
+.button > * {
+  grid-area: 1 / 1;
+}
+
+/* The pill is only paint: the pointer goes through it to the button or the ring */
+.pill {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: var(--pill);
+  clip-path: inset(0 round 14px);
+  pointer-events: none;
+  transition:
+    clip-path 300ms var(--ios),
+    opacity 200ms ease;
+}
+
+.button:is([data-state='waiting'], [data-state='loading']) .pill {
+  clip-path: inset(0 23px round 14px);
+  opacity: 0;
+  transition:
+    clip-path 300ms var(--ios),
+    opacity 150ms ease 150ms;
+}
+
+.label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--blue);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 120ms ease,
+    visibility 0s linear 120ms;
+}
+
+.button:is([data-state='get'], [data-state='pressed']) .label[data-for='get'],
+.button[data-state='open'] .label[data-for='open'] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 200ms ease 100ms,
+    visibility 0s;
+}
+
+/* Held down: the button dims, as an iOS button does under a finger */
+.button[data-state='pressed'] :is(.pill, .label[data-for='get']) {
+  opacity: 0.45;
+  transition-duration: 80ms;
+  transition-delay: 0s;
+}
+
+.waiting,
+.progress {
+  width: 28px;
+  height: 28px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 150ms ease,
+    visibility 0s linear 150ms;
+}
+
+/* The waiting ring comes in once the pill has pulled in; the progress ring takes over from it in a crossfade */
+.button[data-state='waiting'] .waiting,
+.button[data-state='loading'] .progress {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 200ms ease 150ms,
+    visibility 0s;
+}
+
+.button[data-state='loading'] .progress {
+  transition-delay: 0s;
+}
+
+/* Waiting: three quarters of a gray ring, turning */
+.waiting circle {
+  fill: none;
+  stroke: light-dark(rgb(60 60 67 / 0.3), rgb(235 235 245 / 0.3));
+  stroke-width: 2.25;
+  stroke-dasharray: 75 25;
+  stroke-linecap: round;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .button[data-state='waiting'] .waiting {
+    animation: spin 1s linear infinite;
+  }
+
+  .tile[data-paused] .waiting {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* Downloading: a gray track with the blue arc filling clockwise from 12 o'clock, the stop square in the middle */
+.progress {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.progress svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  rotate: -90deg;
+  pointer-events: none;
+}
+
+.track,
+.arc {
+  fill: none;
+  stroke-width: 2.25;
+}
+
+.track {
+  stroke: var(--track);
+}
+
+.arc {
+  stroke: var(--blue);
+  stroke-dasharray: var(--progress-button) 100;
+}
+
+.stop {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: var(--blue);
+}
+
+/* The finger: a gray touch with a light rim, resting on the button while it's held */
+.finger {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border: 1.5px solid light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.55));
+  border-radius: 50%;
+  background: light-dark(rgb(60 60 67 / 0.22), rgb(235 235 245 / 0.3));
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
+  opacity: 0;
+  scale: 0.8;
+  pointer-events: none;
+  transition:
+    opacity 200ms ease,
+    scale 250ms ease;
+}
+
+.finger[data-down] {
+  opacity: 1;
+  scale: 1;
+  transition:
+    opacity 100ms ease,
+    scale 150ms var(--ios);
+}
+
+/* Room for bigger icons and more of each subtitle */
+@container (min-width: 340px) {
+  .list {
+    padding-left: 16px;
+  }
+
+  .row {
+    gap: 12px;
+    height: 66px;
+    padding-right: 16px;
+  }
+
+  .row + .row::before {
+    left: 60px;
+  }
+
+  .icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 11px;
+  }
+
+  .icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .name {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    line-height: 17px;
+  }
+}

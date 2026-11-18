@@ -1,0 +1,329 @@
+/*
+ * An issue tracker's edit form in the web-app idiom: a white card (near-black in dark mode), 13px type, hairline
+ * borders and pill-shaped label chips with a colored dot. The tracker's blue is the one accent: the focused field's
+ * border and ring, the caret and the chip Backspace has selected. The suggestion list is a small popover with a
+ * neutral highlight.
+ */
+.tile {
+  --card: light-dark(#ffffff, #1d1e22);
+  --card-line: light-dark(#e4e4e8, #2d2e34);
+  --line: light-dark(#d7d7dc, #3a3b42);
+  --text: light-dark(#1b1c1f, #ececef);
+  --text-2: light-dark(#45474d, #c3c5cb);
+  --text-3: light-dark(#8a8d94, #7c7f87);
+  --chip-line: light-dark(#dfdfe4, #393a41);
+  --fill: light-dark(#f0f0f3, #2d2e35);
+  --accent: light-dark(#2f6fde, #6f9bff);
+  --accent-soft: light-dark(#e8effc, rgb(111 155 255 / 0.16));
+  --ring: light-dark(rgb(47 111 222 / 0.16), rgb(111 155 255 / 0.22));
+  --popover: light-dark(#ffffff, #26272d);
+  --popover-line: light-dark(rgb(17 18 22 / 0.09), rgb(255 255 255 / 0.09));
+  --kbd: light-dark(#f4f4f6, #2a2b31);
+  --kbd-line: light-dark(#e0e0e5, #3a3b42);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  display: grid;
+  place-items: center;
+  height: 100%;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--text);
+}
+
+/* The form card, 12px in from the tile's edges (8px on phones, where every pixel of the field counts) */
+.form {
+  display: flex;
+  flex-direction: column;
+  width: min(100% - 24px, 560px);
+  height: calc(100% - 24px);
+  padding: 14px;
+  border: 1px solid var(--card-line);
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: 0 1px 2px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3));
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 7px;
+  white-space: nowrap;
+}
+
+.fieldLabel {
+  font-weight: 500;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 1px solid var(--kbd-line);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--text-2);
+  background: var(--kbd);
+}
+
+.fieldWrap {
+  position: relative;
+}
+
+/*
+ * The field: chips and the text input share one wrapping row, so it grows a line when the chips run out of room. It
+ * has focus all through the loop: the accent border and a 3px ring.
+ */
+.field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  min-height: 38px;
+  padding: 6px 7px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* A chip: a 24px pill with a hairline, the label's dot, its name and a remove button */
+.chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 3px 0 8px;
+  border: 1px solid var(--chip-line);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--text-2);
+  transition:
+    background-color 120ms var(--ease),
+    border-color 120ms var(--ease),
+    color 120ms var(--ease);
+}
+
+/* Selected by the first Backspace: tinted in the accent, so the second one has a visible target */
+.chip[data-selected] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Fresh from ↵ or a comma: it grows in from 85% */
+.chip[data-added] {
+  animation: chip-in 160ms var(--ease);
+}
+
+.tile[data-still] .chip {
+  animation: none;
+}
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+.dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* The ×: a 6px cross in a 16px round hit area */
+.remove {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  color: var(--text-3);
+}
+
+.remove svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.chip[data-selected] .remove {
+  color: inherit;
+}
+
+.query {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  min-width: 26px;
+  height: 24px;
+  padding-left: 2px;
+  white-space: pre;
+}
+
+/* Blinks like a text caret; solid while keys are being typed, and holds when the tile does */
+.caret {
+  flex: none;
+  width: 1.5px;
+  height: 16px;
+  margin-left: 1px;
+  background: var(--accent);
+  animation: caret-blink 1060ms steps(1) infinite;
+}
+
+.tile[data-typing] .caret,
+.tile[data-still] .caret {
+  animation: none;
+}
+
+.tile[data-paused] .caret {
+  animation-play-state: paused;
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* The suggestion list: a popover 4px under the field, over the form below it, opening with a quick fade */
+.list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 1;
+  width: min(232px, 100%);
+  padding: 4px;
+  border: 1px solid var(--popover-line);
+  border-radius: 8px;
+  background: var(--popover);
+  box-shadow: 0 6px 20px -4px light-dark(rgb(17 18 22 / 0.16), rgb(0 0 0 / 0.55));
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 -3px;
+  transition:
+    opacity 120ms var(--ease),
+    translate 120ms var(--ease),
+    visibility 120ms;
+}
+
+.tile[data-open] .list {
+  opacity: 1;
+  visibility: visible;
+  translate: none;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 6px 0 8px;
+  border-radius: 5px;
+  color: var(--text-2);
+}
+
+.optionName {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* The letters typed so far, in bold */
+.optionName b {
+  font-weight: 650;
+  color: var(--text);
+}
+
+/* The highlighted suggestion, the one ↵ adds: a neutral fill */
+.option[aria-selected='true'] {
+  color: var(--text);
+  background: var(--fill);
+}
+
+.enter {
+  color: var(--text-3);
+}
+
+/* Under the field where there's room for it; on narrow tiles four chips take a second line instead */
+.helper {
+  display: none;
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  color: var(--text-3);
+}
+
+@container (width >= 460px) {
+  .helper {
+    display: block;
+  }
+}
+
+@container (width < 360px) {
+  .form {
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    padding: 12px;
+  }
+}
+
+/* The next field, kept at the bottom so the labels field can grow a line without moving it */
+.next {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: auto;
+}
+
+.select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 10px 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.avatar {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  fill: none;
+  stroke: var(--text-3);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

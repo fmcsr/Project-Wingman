@@ -1,0 +1,256 @@
+/*
+ * A sign-up card on the page's gray with Material's outlined text fields: a gray hairline that turns into a 2px accent
+ * border on focus, wrapped in a soft focus ring, and a label that rides up into a notch in the border. One blue for
+ * focus, green for the check.
+ */
+.tile {
+  --card: light-dark(#ffffff, #242528);
+  --card-line: light-dark(#e4e4e7, #323338);
+  --ink: light-dark(#1f1f1f, #e8e8ea);
+  --muted: light-dark(#5f6368, #a4a7ad);
+  --faint: light-dark(#9a9da3, #6f7279);
+  --outline: light-dark(#8a8d93, #7d8087);
+  --accent: light-dark(#1b62d6, #8ab4ff);
+  --ring: light-dark(rgb(27 98 214 / 0.18), rgb(138 180 255 / 0.24));
+  --success: light-dark(#1e8e3e, #6dd58c);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  display: grid;
+  place-items: center;
+  height: 100%;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  width: min(100% - 24px, 340px);
+  padding: 16px 16px 15px;
+  border: 1px solid var(--card-line);
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow:
+    0 1px 2px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3)),
+    0 10px 28px -14px light-dark(rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.6));
+}
+
+.title {
+  margin-bottom: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+}
+
+/* 44px tall, the label and the text 14px in from the left edge */
+.field {
+  position: relative;
+  flex: none;
+  height: 44px;
+}
+
+.field + .field {
+  margin-top: 14px;
+}
+
+/*
+ * The focus ring: 3px of pale accent just outside the border. The box reaches 7px out, with the outer 4px clear, so
+ * the band is easy to point at; the outline above it covers the inside.
+ */
+.ring {
+  position: absolute;
+  inset: -7px;
+  border: 4px solid transparent;
+  border-radius: 13px;
+  box-shadow: inset 0 0 0 3px var(--ring);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 180ms var(--ease),
+    visibility 0s linear 180ms;
+}
+
+/* The border: a 1px gray hairline, 2px of accent while focused (the second pixel inset, so nothing shifts) */
+.outline {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--outline);
+  border-radius: 6px;
+  transition:
+    border-color 180ms var(--ease),
+    box-shadow 180ms var(--ease);
+}
+
+.field[data-focused] .ring {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.field[data-focused] .outline {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+/*
+ * The notch: a gap in the top border as wide as the floated label plus 4px each side. It's the label's own text,
+ * set at the floated size and made clear, on the card's color, so it covers the border and the ring behind the label.
+ * Taller than the border on purpose (24px): the card shows through either way, and the pointer can find it around
+ * the label.
+ */
+.notch {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  height: 24px;
+  padding: 0 4px;
+  font-size: 12px;
+  line-height: 24px;
+  white-space: nowrap;
+  color: transparent;
+  background: var(--card);
+  translate: 0 -50%;
+  transform: scaleX(0);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 180ms var(--ease),
+    opacity 0s linear 180ms,
+    visibility 0s linear 180ms;
+}
+
+.field[data-floated] .notch {
+  transform: none;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/*
+ * The label: 15px and muted while it rests in the middle of the field; floated, it moves up 22px onto the border and
+ * shrinks to 80% (12px), in the accent while the field has focus.
+ */
+.label {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  font-size: 15px;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--muted);
+  transform: translateY(-50%);
+  transform-origin: left center;
+  transition:
+    transform 180ms var(--ease),
+    color 180ms var(--ease);
+}
+
+.field[data-floated] .label {
+  transform: translateY(calc(-50% - 22px)) scale(0.8);
+}
+
+.field[data-focused] .label {
+  color: var(--accent);
+}
+
+.value {
+  position: absolute;
+  top: 50%;
+  right: 40px;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  height: 20px;
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 20px;
+  white-space: pre;
+  translate: 0 -50%;
+}
+
+.text {
+  transition: opacity 250ms var(--ease);
+}
+
+/* Shown only while the field is focused and empty: the label has moved out of the way */
+.placeholder {
+  position: absolute;
+  left: 0;
+  color: var(--faint);
+  opacity: 0;
+  transition: opacity 150ms var(--ease);
+}
+
+.field[data-focused][data-empty] .placeholder {
+  opacity: 1;
+  transition-delay: 100ms;
+}
+
+/* A drawn caret in the accent: solid while keys come in, blinking every 1.06s while the field waits */
+.caret {
+  flex: none;
+  width: 1.5px;
+  height: 18px;
+  margin-left: 1px;
+  border-radius: 1px;
+  background: var(--accent);
+  animation: caret-blink 1060ms steps(1) infinite;
+}
+
+.tile[data-typing] .caret,
+.tile[data-still] .caret {
+  animation: none;
+}
+
+.tile[data-paused] .caret {
+  animation-play-state: paused;
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* A whole address: a green check in the trailing slot */
+.check {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  fill: none;
+  stroke: var(--success);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 150ms var(--ease),
+    transform 200ms var(--ease);
+}
+
+.field[data-valid] .check {
+  opacity: 1;
+  transform: none;
+}
+
+/* Starting over: the address and its check fade out before the field empties */
+.field[data-dip] .text,
+.field[data-dip] .check {
+  opacity: 0;
+}
+
+/* Helper text: 12px under the field, lined up with the text in it */
+.helper {
+  margin-top: 4px;
+  padding-left: 14px;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  color: var(--muted);
+}

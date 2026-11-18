@@ -1,0 +1,324 @@
+/*
+ * A cloud drive's file list in a white card (near-black in dark mode) on the tile's gray: gray hairlines between the
+ * rows, muted file icons and one blue for everything selected: the filled boxes, the tint of the checked rows and
+ * the bulk bar. In dark mode the boxes turn light blue with a dark mark, as the drives' dark themes do. --pad and
+ * --row are shared with the pointer, which finds the checkboxes from them.
+ */
+.tile {
+  --card: light-dark(#fff, #1b1c1f);
+  --ink: light-dark(#1f2023, #e4e5e8);
+  --muted: light-dark(#60656f, #9ca0a8);
+  --line: light-dark(#e8eaee, #2c2e33);
+  --box-line: light-dark(#6b7079, #9ca0a8);
+  --accent: light-dark(#1f5fcc, #9dc1fb);
+  --on-accent: light-dark(#fff, #0a2b5c);
+  --selected: light-dark(#e8effc, #1d2f4a);
+  --bar: light-dark(#dbe6fa, #233a5c);
+  --bar-ink: light-dark(#0f3f8f, #d3e3fd);
+  --hover: light-dark(#f4f5f7, #24262a);
+  --pad: 12px;
+  --row: 34px;
+
+  display: grid;
+  place-items: center;
+  height: 100%;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+}
+
+.tile svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The card: a header and four files, 34px each, up to 460px wide */
+.list {
+  position: relative;
+  width: min(100cqw - 24px, 460px);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: 0 1px 2px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3));
+}
+
+.header,
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--row);
+  padding: 0 var(--pad);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.header {
+  border-bottom: 1px solid var(--line);
+}
+
+/* The column labels and the bulk bar share the header; the header's checkbox stays on top of both */
+.columns,
+.bar {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  transition:
+    opacity 180ms var(--ease-out),
+    translate 180ms var(--ease-out),
+    visibility 0s linear 180ms;
+}
+
+/* The labels line up with the rows' text: after the checkbox, the file icon and their gaps */
+.columns {
+  gap: 10px;
+  padding: 0 var(--pad) 0 calc(var(--pad) + 16px + 10px + 16px + 8px);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.nameColumn {
+  flex: 1;
+}
+
+/* With anything checked, the labels give way to the bar: tinted, the count and the actions */
+.bar {
+  gap: 14px;
+  padding: 0 var(--pad) 0 calc(var(--pad) + 16px + 10px);
+  color: var(--bar-ink);
+  background: var(--bar);
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 -4px;
+}
+
+.header[data-selecting] .columns {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.header[data-selecting] .bar {
+  opacity: 1;
+  visibility: visible;
+  translate: none;
+  transition-delay: 0s;
+}
+
+.count {
+  flex: 1;
+  font-weight: 600;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The actions: icons only on the narrowest tiles, words from 250px, both from 340px */
+.action {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.action svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.75;
+}
+
+.label {
+  display: none;
+}
+
+.row {
+  transition: background-color 150ms var(--ease-out);
+}
+
+.row + .row {
+  border-top: 1px solid var(--line);
+}
+
+.row[data-hover] {
+  background: var(--hover);
+}
+
+.row[aria-selected='true'] {
+  background: var(--selected);
+}
+
+.fileIcon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-right: -2px;
+  color: var(--muted);
+  stroke-width: 1.6;
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Secondary columns, shown where the card has room: the date from 300px, the size from 400px */
+.modified,
+.size {
+  display: none;
+  flex: none;
+  font-size: 12px;
+  text-align: right;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.columns .modified,
+.columns .size {
+  font-weight: 500;
+}
+
+/*
+ * A square box with a 1.5px border. Checked and indeterminate fill with the accent and show their mark: a check
+ * that draws itself in, or a dash. A round state layer appears behind the box under the pointer.
+ */
+.checkbox {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--box-line);
+  border-radius: 4px;
+  background: var(--card);
+  transition:
+    background-color 120ms var(--ease-out),
+    border-color 120ms var(--ease-out),
+    transform 100ms var(--ease-out);
+}
+
+.checkbox::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+  border-radius: 50%;
+  background: light-dark(rgb(31 32 35 / 0.08), rgb(228 229 232 / 0.1));
+  opacity: 0;
+  transition: opacity 150ms var(--ease-out);
+}
+
+.checkbox[data-hover]::before {
+  opacity: 1;
+}
+
+.checkbox[data-pressed] {
+  transform: scale(0.88);
+}
+
+.checkbox svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--on-accent);
+  stroke-width: 2;
+}
+
+.check {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 160ms var(--ease-out);
+}
+
+.dash {
+  opacity: 0;
+  transform: scaleX(0.3);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity 120ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+.checkbox[data-state='checked'],
+.checkbox[data-state='mixed'] {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.checkbox[data-state='checked'] .check {
+  stroke-dashoffset: 0;
+  transition-delay: 60ms;
+}
+
+.checkbox[data-state='mixed'] .dash {
+  opacity: 1;
+  transform: none;
+}
+
+/*
+ * The pointer: black with a white rim, as on a Mac in either theme. It travels to a checkbox: the header's is row
+ * -1, so every box is a row height further down than the one above it.
+ */
+.pointer {
+  --y: calc(var(--row) * (var(--pointer) + 1) + var(--row) / 2);
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 18px;
+  height: 22px;
+  fill: #000;
+  stroke: #fff;
+  stroke-width: 1.25;
+  pointer-events: none;
+  transform: translate(calc(var(--pad) + 7px), var(--y));
+  transition: transform 450ms cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+.tile[data-still] .pointer {
+  visibility: hidden;
+}
+
+@container (min-width: 250px) {
+  .action svg {
+    display: none;
+  }
+
+  .label {
+    display: inline;
+  }
+}
+
+@container (min-width: 300px) {
+  .modified {
+    display: block;
+    width: 48px;
+  }
+}
+
+@container (min-width: 340px) {
+  .action svg {
+    display: block;
+  }
+}
+
+@container (min-width: 400px) {
+  .tile {
+    --pad: 14px;
+  }
+
+  .size {
+    display: block;
+    width: 56px;
+  }
+}
