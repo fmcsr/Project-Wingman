@@ -1,0 +1,1458 @@
+/*
+ * Playback follows the page theme like the watch page it is modeled on: white (#fff) in light, near-black (#0f0f0f)
+ * in dark, gray pills and boxes, and one accent (cobalt). Every chrome color is a light-dark(light, dark) pair. The
+ * exceptions are content that looks the same in both themes: the player (a video frame with white controls on a dark
+ * fade, the progress in cobalt), the thumbnails with the badges on them, and the photos of people.
+ */
+.page {
+  --bg: light-dark(#ffffff, #0f0f0f);
+  --text: light-dark(#0f0f0f, #f1f1f1);
+  --text-2: light-dark(#606060, #aaaaaa);
+  /* Gray pills, chips and the description box: a translucent layer over the page */
+  --fill: light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.1));
+  --line: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.2));
+  /* The strongest buttons are the page turned inside out: dark on light, light on dark */
+  --invert: light-dark(#0f0f0f, #f1f1f1);
+  --on-invert: light-dark(#ffffff, #0f0f0f);
+  /* Cobalt: a lighter tint for links on dark, a solid shade for shapes with white on top */
+  --link: light-dark(#2f5cff, #8aa5ff);
+  --brand: light-dark(#2f5cff, #3d66ff);
+  --played: #3d66ff;
+  container-type: inline-size;
+  container-name: page;
+  /* The reference's own stack; the app bundles Roboto, so no font is fetched */
+  font-family: 'Roboto Variable', Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* Line icons on a 24px grid */
+.icon {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Solid glyphs: the player's transport, the dots of the menus, the heart */
+.glyph {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+/* The thumbs down is the thumbs up turned around */
+.flip {
+  transform: rotate(180deg);
+}
+
+.photo {
+  display: block;
+  flex: none;
+  object-fit: cover;
+}
+
+/* Verified badge: a check cut out of a gray circle, right after the name it vouches for */
+.verified {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--text-2);
+}
+
+.verified circle {
+  fill: currentColor;
+}
+
+.verified path {
+  fill: none;
+  stroke: var(--bg);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Top bar: menu and logo, the search in the middle, then Create, notifications and the account */
+.masthead {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 56px;
+  padding: 0 16px;
+  background: var(--bg);
+}
+
+.start,
+.end {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.end {
+  gap: 8px;
+}
+
+.iconButton {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Logo: a lowercase p whose bowl holds a play symbol, then the name */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 12px;
+  padding: 0 4px;
+}
+
+.logoMark {
+  width: 26px;
+  height: 26px;
+  fill: var(--brand);
+}
+
+.wordmark {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.center {
+  display: flex;
+  flex: 0 1 680px;
+  align-items: center;
+  min-width: 0;
+}
+
+/* Search: the field and its button are joined into one pill, the button a shade grayer */
+.searchBox {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  margin-left: 40px;
+}
+
+.searchInput {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+  padding: 0 16px;
+  border: 1px solid light-dark(#d3d3d3, #303030);
+  border-right: none;
+  border-radius: 40px 0 0 40px;
+  background: light-dark(#ffffff, #121212);
+  box-shadow: inset 0 1px 2px light-dark(rgb(0 0 0 / 0.04), transparent);
+}
+
+.placeholder {
+  overflow: hidden;
+  font-size: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  /* The same mid gray reads as a placeholder on both themes */
+  color: #888888;
+}
+
+.searchButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 64px;
+  border: 1px solid light-dark(#d3d3d3, #303030);
+  border-radius: 0 40px 40px 0;
+  background: light-dark(#f8f8f8, #222222);
+}
+
+/* Voice search: a round button of its own, next to the field */
+.voice {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-left: 12px;
+  border-radius: 50%;
+  background: var(--fill);
+}
+
+/* On narrow screens the field folds into this magnifier */
+.searchToggle {
+  display: none;
+}
+
+.create {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px 0 10px;
+  border-radius: 18px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: var(--fill);
+}
+
+/* Count badge on the bell, ringed in the page color so it reads as cut out of the icon */
+.count {
+  position: absolute;
+  top: 3px;
+  right: 1px;
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  color: #ffffff;
+  background: var(--brand);
+  box-shadow: 0 0 0 2px var(--bg);
+}
+
+.me {
+  width: 32px;
+  height: 32px;
+  margin: 0 8px 0 4px;
+  border-radius: 50%;
+}
+
+/*
+ * Watch page: the player, its details and the comments on the left; the up-next column on the right, 402px wide
+ * and narrowing to 300px before it moves under the description (see the container queries at the end).
+ */
+.watch {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(300px, calc(100cqi - 748px), 402px);
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas:
+    'player side'
+    'below side'
+    'comments side';
+  align-items: start;
+  column-gap: 24px;
+  padding: 24px 24px 40px;
+}
+
+/* Player: a 16:9 frame with rounded corners and the controls drawn over the picture */
+.player {
+  container: player / inline-size;
+  position: relative;
+  grid-area: player;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px;
+  color: #ffffff;
+  background: #000000;
+}
+
+.frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* A dark fade along the bottom keeps the white controls readable over any frame */
+.scrim {
+  position: absolute;
+  inset: auto 0 0;
+  height: 40%;
+  background: linear-gradient(180deg, transparent, rgb(0 0 0 / 0.62));
+}
+
+/* Captions: each line gets its own box, so the dark background hugs the words */
+.caption {
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  width: max-content;
+  max-width: 62%;
+  font-size: clamp(12px, 2.6cqi, 22px);
+  line-height: 1.4;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.caption span {
+  padding: 1px 6px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background: rgb(8 8 8 / 0.75);
+}
+
+.scrubber {
+  position: absolute;
+  right: 12px;
+  bottom: 44px;
+  left: 12px;
+}
+
+/* Progress bar: one segment per chapter, each with its own loaded and played parts */
+.progress {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 12px;
+}
+
+.chapter {
+  position: relative;
+  flex: 1 1 0;
+  height: 5px;
+  background: rgb(255 255 255 / 0.2);
+}
+
+/* The chapter under the pointer swells, so you can tell which one a click lands in */
+.chapterHovered {
+  height: 8px;
+}
+
+.buffered,
+.played {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+.buffered {
+  background: rgb(255 255 255 / 0.4);
+}
+
+.played {
+  background: var(--played);
+}
+
+/* Scrubber knob: sits on the end of the played part; drag it to seek */
+.knob {
+  position: absolute;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  margin: -6.5px 0 0 -6.5px;
+  border-radius: 50%;
+  background: var(--played);
+}
+
+/*
+ * Seek preview: the frame at the pointer's spot on the bar (--at), with that moment's chapter and time under it.
+ * clamp() keeps it inside the player near the ends.
+ */
+.preview {
+  position: absolute;
+  bottom: 22px;
+  left: clamp(0px, calc(var(--at) - 80px), calc(100% - 160px));
+  display: grid;
+  justify-items: center;
+  width: 160px;
+  text-shadow: 0 0 4px rgb(0 0 0 / 0.75);
+}
+
+.previewFrame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 2px solid #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.35);
+}
+
+.previewFrame .photo {
+  width: 100%;
+  height: 100%;
+}
+
+.previewChapter {
+  max-width: 100%;
+  margin-top: 6px;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 17px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.previewTime {
+  font-size: 13px;
+  line-height: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Control bar: transport, volume and time on the left; autoplay, captions, settings and screen modes on the right */
+.controls {
+  position: absolute;
+  right: 12px;
+  bottom: 0;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 48px;
+  text-shadow: 0 0 2px rgb(0 0 0 / 0.5);
+}
+
+.controlGroup {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* The right-hand buttons keep their size; only the chapter title on the left may shorten */
+.controlGroup + .controlGroup {
+  flex: none;
+}
+
+.control {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+}
+
+.control .glyph,
+.control .icon {
+  filter: drop-shadow(0 0 1px rgb(0 0 0 / 0.3));
+}
+
+.control .icon {
+  stroke-width: 2;
+}
+
+/* Volume: the rail slides out next to the speaker while the pointer is over it */
+.volume {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.speakerWaves {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.volumeRail {
+  position: relative;
+  width: 52px;
+  height: 3px;
+  margin-right: 10px;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.2);
+}
+
+.volumeLevel {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 70%;
+  border-radius: inherit;
+  background: #ffffff;
+}
+
+.volumeKnob {
+  position: absolute;
+  top: 50%;
+  left: 70%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.time {
+  margin-left: 4px;
+  font-size: 13px;
+  white-space: nowrap;
+  color: #eeeeee;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The chapter that's playing, after the time; it opens the chapter list */
+.chapterName {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  margin-left: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+  color: #eeeeee;
+}
+
+.chapterLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chapterDot {
+  margin-right: 4px;
+}
+
+.chapterName .icon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
+/* Autoplay switch: a thin track and a round knob with a play symbol; on, the knob sits on the right */
+.autoplay {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 52px;
+  height: 48px;
+}
+
+.autoplayTrack {
+  position: relative;
+  width: 36px;
+  height: 14px;
+  border-radius: 7px;
+  background: rgb(255 255 255 / 0.3);
+}
+
+.autoplayKnob {
+  position: absolute;
+  top: -3px;
+  right: -2px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+}
+
+.autoplayKnob .glyph {
+  width: 12px;
+  height: 12px;
+  color: #0f0f0f;
+}
+
+/* Captions on: a short cobalt bar under the CC icon */
+.captions::after {
+  content: '';
+  position: absolute;
+  bottom: 9px;
+  left: 50%;
+  width: 20px;
+  height: 3px;
+  margin-left: -10px;
+  border-radius: 2px;
+  background: var(--played);
+}
+
+/* The CC icon: a filled screen with the letters cut out */
+.ccScreen {
+  fill: currentColor;
+}
+
+.ccLetters {
+  fill: none;
+  stroke: #1a1a1a;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+
+/* Quality badge: a tiny label on the gear's corner, like a superscript */
+.hd {
+  position: absolute;
+  top: 10px;
+  right: 7px;
+  padding: 0 2px;
+  border-radius: 2px;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 10px;
+  text-shadow: none;
+  color: #ffffff;
+  background: var(--played);
+}
+
+/* Under the player: the title, the channel and action row, then the description */
+.below {
+  container: below / inline-size;
+  grid-area: below;
+  min-width: 0;
+}
+
+.title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  margin-top: 12px;
+  overflow: hidden;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+/* The channel on the left, the actions on the right; when both don't fit, the actions wrap to their own line */
+.topRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin-top: 12px;
+}
+
+.owner {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.ownerAvatar {
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+  border-radius: 50%;
+}
+
+.ownerText {
+  display: grid;
+  min-width: 0;
+}
+
+.channelName {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+}
+
+.channelLabel {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.subscribers {
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-2);
+}
+
+/* Subscribe: the page's strongest button, the page turned inside out */
+.subscribe {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 36px;
+  margin-left: 24px;
+  padding: 0 16px;
+  border-radius: 18px;
+  font-weight: 500;
+  color: var(--on-invert);
+  background: var(--invert);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Like and dislike share one gray pill, split by a hairline */
+.likeGroup {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 36px;
+  border-radius: 18px;
+  background: var(--fill);
+}
+
+.like,
+.dislike {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.like {
+  gap: 6px;
+  padding: 0 12px 0 14px;
+  font-weight: 500;
+}
+
+/* Liked: the thumb is filled in */
+.liked {
+  fill: currentColor;
+}
+
+.likeDivider {
+  width: 1px;
+  height: 24px;
+  background: var(--line);
+}
+
+.dislike {
+  padding: 0 14px 0 12px;
+}
+
+/* The other actions: gray pills with an icon and a label */
+.pill {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px 0 12px;
+  border-radius: 18px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: var(--fill);
+}
+
+.round {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--fill);
+}
+
+/* Description: a gray box; collapsed, it stops after three lines and "...more" opens the rest */
+.description {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--fill);
+}
+
+.descriptionInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  font-weight: 500;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 6px;
+}
+
+.tag,
+.stamp {
+  color: var(--link);
+}
+
+.descriptionBody {
+  position: relative;
+}
+
+.descriptionText {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+/* "...more" sits on the last line, over a short fade into the box's gray */
+.more {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding-left: 36px;
+  font-weight: 500;
+  background: linear-gradient(90deg, transparent, light-dark(#f2f2f2, #272727) 30px);
+}
+
+/* Comments */
+.comments {
+  grid-area: comments;
+  min-width: 0;
+  padding-top: 24px;
+}
+
+.commentsHeader {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.commentsTitle {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0 32px;
+}
+
+/* The composer is a plain underline until it's clicked */
+.composerField {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-2);
+}
+
+.commentList {
+  display: grid;
+  gap: 16px;
+}
+
+.comment {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  padding-right: 40px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.commentBody {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Pinned: a small label above the comment the creator moved to the top */
+.pinned {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--text-2);
+}
+
+.pinned .icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.5;
+}
+
+.commentHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 4px;
+  margin-bottom: 2px;
+}
+
+.handle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+/* The creator's own handle sits in a gray pill, so their replies stand out in any thread */
+.creatorHandle {
+  padding: 1px 6px;
+  border-radius: 10px;
+  color: #ffffff;
+  background: light-dark(#909090, #717171);
+}
+
+.creatorHandle .verified {
+  color: #ffffff;
+}
+
+.creatorHandle .verified path {
+  stroke: light-dark(#909090, #717171);
+}
+
+.commentTime {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--text-2);
+}
+
+.commentText {
+  overflow-wrap: anywhere;
+}
+
+.commentActions {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  margin: 4px 0 0 -8px;
+}
+
+.vote {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.vote .icon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.5;
+}
+
+.voteCount {
+  margin-right: 8px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+/* Creator heart: the channel's face with a small heart pinned to its corner */
+.creatorHeart {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-left: 2px;
+}
+
+.heartAvatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+
+.heart {
+  position: absolute;
+  right: 3px;
+  bottom: 4px;
+  width: 12px;
+  height: 12px;
+  fill: var(--brand);
+  stroke: var(--bg);
+  stroke-width: 3;
+  paint-order: stroke;
+}
+
+.reply {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  margin-left: 6px;
+  padding: 0 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Thread toggle: the replies stay folded until it's opened */
+.replies {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  margin: 2px 0 0 -12px;
+  padding: 0 16px 0 10px;
+  border-radius: 18px;
+  font-weight: 500;
+  color: var(--link);
+}
+
+.replies .icon {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.7;
+}
+
+.repliesAvatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+/* Kebab menus (three stacked dots): report, save to a playlist, not interested */
+.menu {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Up next */
+.side {
+  grid-area: side;
+  min-width: 0;
+}
+
+/*
+ * Filter chips stay on one line. The real product scrolls the extra ones sideways; this picture clips them instead
+ * (a scrolling box would become keyboard-focusable), with an arrow over a fade at the edge.
+ */
+.chipBar {
+  position: relative;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.chip {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: var(--fill);
+}
+
+.chip[aria-pressed='true'] {
+  color: var(--on-invert);
+  background: var(--invert);
+}
+
+.chipArrow {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  display: grid;
+  place-items: center end;
+  width: 88px;
+  height: 40px;
+  background: linear-gradient(90deg, transparent, var(--bg) 44px);
+}
+
+.chipArrow .icon {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+}
+
+.list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* Video card: a thumbnail with its length, then a title clamped to two lines, the channel and the views */
+.card {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  padding-right: 24px;
+}
+
+.thumb {
+  position: relative;
+  flex: none;
+  width: min(168px, 44%);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.thumb .photo {
+  width: 100%;
+  height: 100%;
+}
+
+/* Duration badge: white on translucent black in the corner, so it reads on any picture */
+.duration,
+.live {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  padding: 0 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  color: #ffffff;
+}
+
+.duration {
+  background: rgb(0 0 0 / 0.6);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Live badge: takes the length's place, since a stream on air has no length yet */
+.live {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 4px 0 3px;
+  text-transform: uppercase;
+  background: var(--played);
+}
+
+.live svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.live circle {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* Watched: a bar along the thumbnail's bottom edge, as far as you got */
+.watched {
+  position: absolute;
+  inset: auto 0 0;
+  height: 4px;
+  background: rgb(255 255 255 / 0.6);
+}
+
+.watchedFill {
+  display: block;
+  height: 100%;
+  background: var(--played);
+}
+
+.cardText {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+}
+
+.cardTitle {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  margin: 0 0 4px;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.cardChannel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cardChannel,
+.cardMeta {
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-2);
+}
+
+.cardChannel .verified {
+  width: 12px;
+  height: 12px;
+}
+
+/* New: a small gray label for videos from the last few days */
+.newBadge {
+  justify-self: start;
+  margin-top: 4px;
+  padding: 0 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--text-2);
+  background: var(--fill);
+}
+
+.card .menu {
+  top: -8px;
+  right: -12px;
+}
+
+/* A medium player: the miniplayer button gives way, then the chapter title */
+@container player (width < 720px) {
+  .miniplayer {
+    display: none;
+  }
+}
+
+@container player (width < 660px) {
+  .chapterName {
+    display: none;
+  }
+}
+
+@container player (width < 560px) {
+  .next,
+  .volumeRail {
+    display: none;
+  }
+}
+
+/* A small player: only the essential controls, a little tighter */
+@container player (width < 480px) {
+  .theater {
+    display: none;
+  }
+
+  .controls {
+    right: 4px;
+    left: 4px;
+    height: 40px;
+  }
+
+  .control {
+    width: 40px;
+    height: 40px;
+  }
+
+  .autoplay {
+    width: 44px;
+    height: 40px;
+  }
+
+  .captions::after {
+    bottom: 6px;
+  }
+
+  .hd {
+    top: 7px;
+    right: 3px;
+  }
+
+  .scrubber {
+    right: 10px;
+    bottom: 36px;
+    left: 10px;
+  }
+
+  .caption {
+    bottom: 54px;
+    max-width: 80%;
+  }
+}
+
+/* Action pills give way before the row has to wrap: Download first */
+@container below (width < 800px) {
+  .download {
+    display: none;
+  }
+}
+
+/* One column: the up-next list moves under the description, before the comments */
+@container page (width < 1000px) {
+  .watch {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas:
+      'player'
+      'below'
+      'side'
+      'comments';
+  }
+
+  .side {
+    margin-top: 24px;
+  }
+
+  .chipArrow {
+    display: none;
+  }
+
+  /* Under the description the list stops after eight videos, so the comments stay within reach */
+  .card:nth-child(n + 9) {
+    display: none;
+  }
+}
+
+/* The chips no longer fit on one line: the arrow over the fade comes back */
+@container page (width < 670px) {
+  .chipArrow {
+    display: grid;
+  }
+}
+
+/* The Create label gives way to the search field */
+@container page (width < 800px) {
+  .create {
+    width: 36px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .createLabel {
+    display: none;
+  }
+
+  .searchBox {
+    margin-left: 0;
+  }
+}
+
+/* Phone width: the search folds into a button, the player runs edge to edge and nothing hovers (no preview) */
+@container page (width < 640px) {
+  .masthead {
+    padding: 0 8px;
+  }
+
+  .logo {
+    margin-left: 4px;
+  }
+
+  .center,
+  .create {
+    display: none;
+  }
+
+  .end {
+    gap: 4px;
+  }
+
+  .searchToggle {
+    display: grid;
+  }
+
+  .me {
+    margin: 0 4px;
+  }
+
+  .watch {
+    padding: 0 12px 32px;
+  }
+
+  .player {
+    margin: 0 -12px;
+    border-radius: 0;
+  }
+
+  .preview {
+    display: none;
+  }
+
+  .chapterHovered {
+    height: 5px;
+  }
+
+  .title {
+    font-size: 18px;
+    line-height: 26px;
+  }
+
+  /* The channel takes the whole first line with Subscribe at its end; the actions always wrap under it */
+  .owner {
+    flex: 1 1 100%;
+  }
+
+  .ownerText {
+    flex: 1;
+  }
+
+  .ownerAvatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .channelName {
+    font-size: 15px;
+  }
+
+  .subscribe {
+    margin-left: 12px;
+  }
+
+  .thumb {
+    width: 46%;
+  }
+
+  .comment {
+    gap: 12px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .composer {
+    gap: 12px;
+  }
+
+  .commentsHeader {
+    gap: 24px;
+  }
+}
+
+/* The narrowest screens: Save keeps only its icon, so the actions stay on one line */
+@container page (width < 440px) {
+  .save {
+    justify-content: center;
+    width: 36px;
+    padding: 0;
+  }
+
+  .saveLabel {
+    display: none;
+  }
+
+  .wordmark {
+    font-size: 19px;
+  }
+}

@@ -180,7 +180,7 @@
   color: var(--color-text-muted);
 }
 
-/* Balloons are drawn on a layer over the whole grid, so they're never clipped by a phone */
+/* Balloons are drawn on a layer over the whole grid, so they're never clipped by a phone or a watch */
 .stage {
   position: relative;
   margin-top: 20px;
@@ -209,7 +209,7 @@
   min-width: 0;
 }
 
-/* Card headings stay on one line, so every phone in a row starts at the same height */
+/* Card headings stay on one line, so every phone (or watch) in a row starts at the same height */
 .meta {
   display: flex;
   align-items: baseline;
@@ -252,6 +252,14 @@ a.name:hover {
 }
 
 .inspired {
+  font-size: 13px;
+  color: var(--color-text-subtle);
+}
+
+/* The examples are fictional; the products they're inspired by belong to their owners */
+.footnote {
+  max-width: 72ch;
+  margin-top: 56px;
   font-size: 13px;
   color: var(--color-text-subtle);
 }

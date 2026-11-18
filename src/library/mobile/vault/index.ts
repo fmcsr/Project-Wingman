@@ -8,9 +8,9 @@ export const vault: LibraryExample = {
   name: 'Vault',
   kind: 'Banking',
   category: 'Finance',
-  inspiredBy: ['Revolut', 'Monzo', 'Cash App'],
+  inspiredBy: ['Revolut'],
   description:
-    'A banking home screen: a balance you can hide, quick actions, card art, a spending chart and color-coded transactions.',
+    'A banking home screen: a profile photo with a dot badge, a search pill and icon buttons over a brand wash, the balance with smaller cents, an Accounts button and page dots, quick actions, transaction rows with a merchant logo, a currency pair and signed amounts, See all, a Cards widget with card thumbnails and a frosted tab bar led by the logo.',
   Component: VaultApp,
   specs: vaultSpecs,
 };

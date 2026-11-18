@@ -97,6 +97,52 @@
   color: var(--color-text-muted);
 }
 
+/* A site's heading: the project line, then the vague prompt behind its AI slop side */
+.siteHeader {
+  display: grid;
+  gap: 6px;
+}
+
+.prompt {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--color-text-subtle);
+}
+
+.promptLabel {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+
+.promptText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Under a phone the label sits above the prompt, and the prompt may wrap onto a second line */
+.phoneProject .prompt {
+  flex-direction: column;
+  gap: 2px;
+}
+
+.phoneProject .promptText {
+  white-space: normal;
+}
+
+@container (width < 200px) {
+  .phoneProject .prompt {
+    display: none;
+  }
+}
+
 /* After the examples: the way into the full library (sign-in comes first if needed) */
 .more {
   display: flex;

@@ -3,9 +3,10 @@
   top: 0;
   left: 0;
   /* Preview is narrow, the pinned balloon wide; always fits the layer (8px = useAnchorPosition EDGE_GAP) */
+  display: flex;
+  flex-direction: column;
   width: min(320px, calc(100% - 16px));
   container-type: inline-size;
-  padding: 16px 18px 12px;
   border-radius: var(--radius-lg);
   font-size: 14px;
   line-height: 1.5;
@@ -15,15 +16,34 @@
     var(--shadow-pop),
     inset 0 0 0 1px var(--balloon-line);
   pointer-events: auto;
-  animation: balloon-in 140ms var(--ease-out);
+  /* Where the unroll starts (see the keyframes): the edge next to the element; below it, that's the top edge */
+  --unroll-from: inset(-64px -64px 100% -64px);
+  --unroll-shift: -6px;
+  /* An even ease (slow, quick, slow) reads as a menu rolling open, rather than a pop */
+  animation: unroll-preview 460ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .panel[data-mode='pinned'] {
   width: min(440px, calc(100% - 16px));
+  animation-name: unroll-pinned;
+}
+
+/* Above its element, the balloon unrolls upward, from its bottom edge */
+.panel[data-placement='top'] {
+  --unroll-from: inset(100% -64px -64px -64px);
+  --unroll-shift: 6px;
 }
 
 .panel[hidden] {
   display: none;
+}
+
+/* The content. Where space is short, the balloon gets a max-height (useAnchorPosition) and this scrolls inside */
+.body {
+  min-height: 0;
+  padding: 16px 18px 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .panel:focus {
@@ -76,6 +96,13 @@
 .panel[data-placement='top'] .arrow {
   bottom: -6px;
   box-shadow: 1px 1px 0 var(--balloon-line);
+}
+
+/* Little room above or below a tall element: the balloon covers part of it, so there's nothing for an arrow to point at */
+.panel[data-placement='over'] .arrow,
+.panel[data-placement='over']::before,
+.panel[data-placement='over']::after {
+  display: none;
 }
 
 .header {
@@ -278,14 +305,47 @@
 }
 
 @media (max-width: 479px) {
-  .panel {
+  .body {
     padding: 14px 14px 10px;
   }
 }
 
-@keyframes balloon-in {
+/*
+ * The balloon unrolls like a dropdown menu, from the edge next to its element: the arrow first, then the panel, over
+ * 460 ms. The clip reaches 64 px past each edge so the arrow and the shadow show; once done, nothing clips. Preview and
+ * pinned use two identical keyframes, because switching between them restarts the animation: a click on a preview
+ * unrolls the details too. Reduced motion skips it (global.css).
+ */
+@keyframes unroll-preview {
   from {
+    clip-path: var(--unroll-from);
     opacity: 0;
-    transform: scale(0.98);
+    transform: translateY(var(--unroll-shift));
+  }
+
+  40% {
+    opacity: 1;
+  }
+
+  to {
+    clip-path: inset(-64px);
+    transform: none;
+  }
+}
+
+@keyframes unroll-pinned {
+  from {
+    clip-path: var(--unroll-from);
+    opacity: 0;
+    transform: translateY(var(--unroll-shift));
+  }
+
+  40% {
+    opacity: 1;
+  }
+
+  to {
+    clip-path: inset(-64px);
+    transform: none;
   }
 }

@@ -106,6 +106,13 @@
   overflow: hidden;
 }
 
+/* Before/after comparison: the line covers the site, below the address bar, and stays put while the site scrolls */
+.compare {
+  position: absolute;
+  inset: 41px 0 0;
+  pointer-events: none;
+}
+
 /* Thin scrollbar like on macOS: visible only while scrolling, shows where you are in the content */
 .scrollbar {
   position: absolute;

@@ -1,0 +1,86 @@
+.fit {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Space the watch takes up on the page: design size × scale. The watch itself shrinks to fit this box. */
+.slot {
+  flex: none;
+  width: calc(242px * var(--watch-scale, 1));
+  height: calc(284px * var(--watch-scale, 1));
+  border-radius: calc(67px * var(--watch-scale, 1));
+}
+
+/* Keyboard focus is drawn on the unscaled box; same thickness however small the watch gets */
+.slot:has(:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+/* 46 mm proportions: a 208 × 248 screen, 12–13px of black border and a 5px rim of the case around it */
+.watch {
+  position: relative;
+  width: 242px;
+  height: 284px;
+  transform: scale(var(--watch-scale, 1));
+  transform-origin: top left;
+}
+
+/* Jet black aluminum: polished, so its rounded edges catch a little light at the top left and bottom right */
+.case {
+  position: relative;
+  height: 100%;
+  padding: 5px;
+  border-radius: 67px;
+  background: linear-gradient(150deg, #36363b 0%, #141416 18%, #0a0a0b 55%, #19191c 88%, #2a2a2e 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.08),
+    0 0 0 1px var(--color-border),
+    0 26px 50px -26px rgb(0 0 0 / 0.5);
+}
+
+/* The glass: the display's black border runs to its edge, where a hairline of light marks the curve */
+.glass {
+  height: 100%;
+  padding: 13px 12px;
+  border-radius: 62px;
+  background: #000;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.07),
+    0 0 0 1px rgb(0 0 0 / 0.7);
+}
+
+/* An OLED display: its black is the border's black, so only what's lit shows where the screen is */
+.screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 50px;
+  background: #000;
+}
+
+/* The Digital Crown, seen from the front: a knurled cylinder lit from above, tucked under the case's edge */
+.crown {
+  position: absolute;
+  top: 62px;
+  right: -11px;
+  width: 18px;
+  height: 44px;
+  border-radius: 3px 5px 5px 3px;
+  background:
+    repeating-linear-gradient(to bottom, rgb(255 255 255 / 0.1) 0 1px, transparent 1px 3px),
+    linear-gradient(to bottom, #111113, #3b3b40 42%, #26262a 60%, #0d0d0e);
+  box-shadow: inset -1px 0 0 rgb(255 255 255 / 0.12);
+}
+
+/* The side button: long, nearly flush with the case */
+.sideButton {
+  position: absolute;
+  top: 138px;
+  right: -3px;
+  width: 10px;
+  height: 66px;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #1b1b1e, #2f2f34 50%, #161618);
+}

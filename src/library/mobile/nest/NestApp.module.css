@@ -1,82 +1,111 @@
 /*
- * Nest follows the page theme with light-dark() pairs, in the iOS system font.
- * The photos and what sits on them (badge, heart, dots) look the same in both themes, as real photos do.
+ * Nest follows the page theme like the Explore screen it is modeled on: a white or near-black page, near-black or
+ * near-white type in the iOS system font, gray for the details and hairlines. Color comes from the photos and from
+ * one brand hue, terracotta, kept for the selected tab, the saved heart and the new-message dot. The photos and what
+ * sits on them (badge, heart, dots) look the same in both themes, as real photos do.
  */
 .app {
+  --page: light-dark(#fff, #121212);
+  --ink: light-dark(#222, #f2f2f2);
+  --ink-2: light-dark(#6a6a6a, #a3a3a3);
+  --line: light-dark(#ebebeb, #2c2c2c);
+  --field: light-dark(#fff, #222);
+  --field-line: light-dark(#ddd, #3a3a3a);
+  --accent: light-dark(#c65029, #eb7a52);
+
   position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
   font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
-  font-size: 14px;
-  color: light-dark(#222, #f2f2f2);
-  background: light-dark(#fff, #121212);
+  font-size: 10.5px;
+  line-height: 15px;
+  color: var(--ink);
+  background: var(--page);
 }
 
+/* Outline icons on a 24px grid with round strokes */
 .app svg {
   fill: none;
   stroke: currentColor;
-  stroke-width: 2;
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+/*
+ * The header stays put while the feed scrolls under it. It starts in a pale gray that fades to the page behind the
+ * search pill, so the white pill stands out, and a hairline with a soft shadow marks its lower edge.
+ */
+.header {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  border-bottom: 0.5px solid var(--line);
+  background: linear-gradient(light-dark(#efefef, #1e1e1e), var(--page) 118px);
+  box-shadow: 0 3px 10px -3px light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.7));
 }
 
 /* Search pill and filter button */
 .searchRow {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 4px 14px 0;
+  gap: 8px;
+  margin: 4px 17px 0;
 }
 
 .search {
   display: flex;
   flex: 1;
   align-items: center;
-  gap: 8px;
+  gap: 11px;
   min-width: 0;
-  height: 46px;
-  padding: 0 12px;
-  border: 1px solid light-dark(#ebebeb, #333);
+  height: 40px;
+  padding: 0 14px;
+  border: 0.5px solid var(--field-line);
   border-radius: 999px;
-  background: light-dark(#fff, #222);
-  box-shadow: 0 3px 12px light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.5));
+  background: var(--field);
+  box-shadow: 0 2px 9px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.6));
 }
 
 .app .searchIcon {
   flex: none;
-  stroke-width: 2.6;
+  stroke-width: 2.8;
 }
 
 .searchText {
   display: grid;
   min-width: 0;
-  line-height: 1.25;
 }
 
 .searchTitle {
-  font-size: 12.5px;
+  font-size: 11px;
   font-weight: 600;
+  line-height: 14px;
 }
 
 .searchHint {
   overflow: hidden;
-  font-size: 9.5px;
+  font-size: 8.5px;
+  line-height: 11px;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: light-dark(#6a6a6a, #a3a3a3);
+  color: var(--ink-2);
 }
 
 .filter {
   display: grid;
   flex: none;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  border: 1px solid light-dark(#ddd, #3a3a3a);
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--field-line);
   border-radius: 50%;
-  background: light-dark(#fff, #222);
+}
+
+.app .filter svg {
+  stroke-width: 2;
 }
 
 /*
@@ -85,11 +114,10 @@
  */
 .categories {
   display: flex;
-  gap: 26px;
-  margin-top: 12px;
-  padding: 0 14px;
+  gap: 20px;
+  margin-top: 11px;
+  padding: 0 17px;
   overflow-x: clip;
-  border-bottom: 1px solid light-dark(#ebebeb, #2a2a2a);
 }
 
 .category,
@@ -99,32 +127,35 @@
   flex: none;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding-bottom: 9px;
-  font-size: 10.5px;
+  font-size: 8.5px;
   font-weight: 600;
-  line-height: 1.2;
-  color: light-dark(#6a6a6a, #a3a3a3);
+  line-height: 11px;
+  color: var(--ink-2);
 }
 
 .app .category svg,
 .app .categoryActive svg {
-  stroke-width: 1.6;
+  stroke-width: 1.4;
+}
+
+/* The tabs you're not on fade back; the selected one is ink and underlined */
+.category svg {
+  opacity: 0.75;
 }
 
 .categoryActive {
-  color: light-dark(#222, #f2f2f2);
+  color: var(--ink);
 }
 
-/* Active indicator: a short bar in the text color, laid over the divider */
 .categoryActive::after {
   content: '';
   position: absolute;
   right: 0;
-  bottom: -1px;
+  bottom: -0.5px;
   left: 0;
   height: 2px;
-  border-radius: 1px;
   background: currentColor;
 }
 
@@ -138,154 +169,78 @@
   overflow: clip;
 }
 
-/* Listing card: photo first, details below */
+/* Listing card: the photo first, the words below on the page itself, no card around them */
 .listing {
-  margin: 14px 14px 0;
+  margin: 14px 17px 0;
 }
 
+.listing + .listing {
+  margin-top: 26px;
+}
+
+/* One photo shows at a time; the others wait to the right (scroll-snap in a real app) */
 .photo {
   position: relative;
-}
-
-/* The photos sit side by side and snap one at a time; the rounded window shows the first */
-.track {
-  display: flex;
-  aspect-ratio: 6 / 5;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 14px;
-  scroll-snap-type: x mandatory;
+  background: light-dark(#ebebeb, #222);
 }
 
-.slide {
-  position: relative;
-  flex: none;
+.photoImage {
+  display: block;
   width: 100%;
-  scroll-snap-align: center;
-}
-
-/* Photo 1: a lakeside cabin at dusk, layered from gradients */
-.dusk {
-  background:
-    radial-gradient(circle at 74% 48%, #fff4d6 0 3.5%, rgb(255 222 168 / 0.6) 4.5%, transparent 24%),
-    linear-gradient(#f7c08a 0%, #f39b80 34%, #c27aa2 58%, #6c5596 100%);
-}
-
-.ridge {
-  position: absolute;
-  inset: 38% 0 30%;
-  background: #7a5c98;
-  clip-path: polygon(0 62%, 12% 36%, 24% 54%, 40% 12%, 55% 46%, 70% 26%, 84% 52%, 100% 32%, 100% 100%, 0 100%);
-}
-
-/* Pines along the shore: one repeating triangle (a 60° slice of a conic gradient) */
-.pines {
-  position: absolute;
-  right: 0;
-  bottom: 31%;
-  left: 0;
-  height: 17%;
-  background:
-    conic-gradient(from 150deg at 50% 0, #2c2550 60deg, transparent 0) 0 100% / 12px 100% repeat-x,
-    conic-gradient(from 155deg at 50% 0, #3a3064 50deg, transparent 0) 5px 100% / 17px 100% repeat-x;
-}
-
-.cabin {
-  position: absolute;
-  bottom: 30%;
-  left: 16%;
-  width: 34px;
-  height: 27px;
-  clip-path: polygon(50% 0, 100% 44%, 100% 100%, 0 100%, 0 44%);
-  background:
-    linear-gradient(#ffd27a, #ffd27a) 9px 15px / 6px 6px no-repeat,
-    linear-gradient(#ffd27a, #ffd27a) 19px 15px / 6px 6px no-repeat,
-    #4a2c46;
-}
-
-.lake {
-  position: absolute;
-  inset: 70% 0 0;
-  background:
-    radial-gradient(7% 70% at 74% 0, rgb(255 228 180 / 0.55), transparent),
-    repeating-linear-gradient(transparent 0 6px, rgb(255 255 255 / 0.08) 6px 7px),
-    linear-gradient(#d98a8c, #7d5a93 55%, #463c78);
-}
-
-/* The other photos are off to the right, out of view */
-.livingRoom {
-  background: linear-gradient(160deg, #f3d9b8, #c98f62 60%, #7a4b32);
-}
-
-.dock {
-  background: linear-gradient(#bfe0f2, #7fb6d6 55%, #3f6f8f);
-}
-
-.bedroom {
-  background: linear-gradient(200deg, #efe7dc, #cdbba3 60%, #8f7b63);
-}
-
-.night {
-  background: linear-gradient(#1b2347, #2f3a6b 60%, #151a33);
-}
-
-.kitchen {
-  background: linear-gradient(170deg, #f6efe6, #d9c3a5 55%, #a98a66);
-}
-
-.trail {
-  background: linear-gradient(#cfe3f3, #9cbf8f 50%, #5d7f4f);
-}
-
-/* The next listing's photo: a forest morning */
-.forest {
-  background:
-    radial-gradient(circle at 28% 30%, rgb(255 251 225 / 0.85), transparent 30%),
-    linear-gradient(#d8ecd2 0%, #9cc8a0 40%, #5c8f68 75%, #345b44 100%);
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Badge: a white pill that lifts off the photo */
 .badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 4px 9px;
+  top: 9px;
+  left: 9px;
+  padding: 3.5px 8.5px;
   border-radius: 999px;
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 13px;
   color: #222;
-  background: #fff;
+  background: rgb(255 255 255 / 0.95);
   box-shadow: 0 1px 4px rgb(0 0 0 / 0.18);
 }
 
-/* Heart: a white outline over a dark fill stays visible on light and dark photos alike */
+/* Heart: a white outline over a see-through dark fill stays visible on light and dark photos alike */
 .heart {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: 7px;
+  right: 7px;
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
 }
 
 .app .heart svg {
-  fill: rgb(0 0 0 / 0.45);
+  width: 22px;
+  height: 22px;
+  fill: rgb(0 0 0 / 0.5);
   stroke: #fff;
+  stroke-width: 1.9;
 }
 
-.app .heartSaved svg {
-  fill: #f43f5e;
+/* Saved: the heart fills with the brand color */
+.app .saved svg {
+  fill: var(--accent);
 }
 
 /* Pagination dots: the current photo is solid white, and the last dot shrinks to hint at more */
 .dots {
   position: absolute;
-  bottom: 10px;
+  bottom: 9px;
   left: 50%;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   filter: drop-shadow(0 0 2px rgb(0 0 0 / 0.35));
   transform: translateX(-50%);
 }
@@ -293,8 +248,8 @@
 .dot,
 .dotActive,
 .dotEdge {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: rgb(255 255 255 / 0.6);
 }
@@ -304,24 +259,24 @@
 }
 
 .dotEdge {
-  width: 4px;
-  height: 4px;
+  width: 3.5px;
+  height: 3.5px;
 }
 
-/* Listing details */
+/* Title and rating share the first line */
 .titleRow {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
-  margin-top: 9px;
+  margin-top: 8px;
 }
 
-.place {
+.title {
   overflow: hidden;
-  font-size: 13px;
+  font-size: 11.5px;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 15px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -331,8 +286,6 @@
   flex: none;
   align-items: center;
   gap: 3px;
-  font-size: 12.5px;
-  line-height: 1.3;
 }
 
 .app .rating svg {
@@ -340,45 +293,57 @@
   stroke: none;
 }
 
+/* The gray lines: the listing's own name (cut to one line), the beds, the dates */
 .detail {
-  font-size: 12px;
-  line-height: 1.35;
-  color: light-dark(#6a6a6a, #a3a3a3);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ink-2);
 }
 
 .price {
   margin-top: 3px;
-  font-size: 12.5px;
-  line-height: 1.3;
 }
 
 .was {
-  color: light-dark(#6a6a6a, #a3a3a3);
-  text-decoration: line-through;
+  color: var(--ink-2);
 }
 
-.now {
+/* The total for the stay, underlined because it opens the price breakdown */
+.total {
   font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+.per {
+  color: var(--ink-2);
 }
 
 /* Floating Map button: centered above the tab bar, over whatever scrolls beneath */
 .mapButton {
   position: absolute;
-  bottom: 94px;
+  bottom: 82px;
   left: 50%;
   z-index: 2;
   display: flex;
   align-items: center;
   gap: 6px;
-  height: 36px;
-  padding: 0 14px;
+  height: 29px;
+  padding: 0 13px 0 14px;
   border-radius: 999px;
-  font-size: 12.5px;
+  font-size: 11px;
   font-weight: 600;
   color: light-dark(#fff, #222);
   background: light-dark(#222, #f2f2f2);
-  box-shadow: 0 6px 16px rgb(0 0 0 / 0.25);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
   transform: translateX(-50%);
+}
+
+.app .mapButton svg {
+  fill: currentColor;
+  stroke: none;
 }
 
 /* Bottom tab bar: solid, with a hairline on top */
@@ -390,10 +355,10 @@
   z-index: 2;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  height: 80px;
-  padding-top: 8px;
-  border-top: 1px solid light-dark(#ebebeb, #2a2a2a);
-  background: light-dark(#fff, #121212);
+  height: 65px;
+  padding-top: 5px;
+  border-top: 0.5px solid var(--line);
+  background: var(--page);
 }
 
 .tab,
@@ -401,21 +366,44 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  font-size: 10px;
+  gap: 4px;
+  font-size: 7.5px;
   font-weight: 500;
-  line-height: 1.2;
-  color: light-dark(#6a6a6a, #a3a3a3);
+  line-height: 10px;
+  color: var(--ink-2);
 }
 
-.app .tab svg,
-.app .tabActive svg {
-  stroke-width: 1.8;
+.tabIcon {
+  position: relative;
+  display: block;
+  height: 19px;
 }
 
+.app .tabIcon svg {
+  display: block;
+  stroke-width: 1.6;
+}
+
+/* The selected tab: icon and label in the brand color, the icon drawn a little heavier */
 .tabActive {
   font-weight: 600;
-  color: light-dark(#d63a4c, #ff6b7d);
+  color: var(--accent);
+}
+
+.app .tabActive svg {
+  stroke-width: 2.4;
+}
+
+/* New-message dot: the brand color, cut out of the icon by a ring in the page color */
+.tabDot {
+  position: absolute;
+  top: -1px;
+  right: -3px;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid var(--page);
+  border-radius: 50%;
+  background: var(--accent);
 }
 
 .homeIndicator {

@@ -14,6 +14,23 @@ const discovered = Object.values(import.meta.glob('./*/*/index.ts', { eager: tru
 /** Every example, in the order the library shows them: the landing page's five first. */
 export const LIBRARY: LibraryExample[] = [wave, muse, stride, acme, orbit, ...discovered];
 
+/** The library's tabs, in order: each platform with the label it goes by. */
+export const PLATFORMS: { platform: Platform; label: string }[] = [
+  { platform: 'mobile', label: 'Mobile' },
+  { platform: 'web', label: 'Web' },
+  { platform: 'watch', label: 'Watch' },
+];
+
+/** Whether a URL segment or a saved value names a platform. */
+export function isPlatform(value: unknown): value is Platform {
+  return PLATFORMS.some((entry) => entry.platform === value);
+}
+
+/** The platform's name on its tab and its pages, e.g. "Watch". */
+export function platformLabel(platform: Platform) {
+  return PLATFORMS.find((entry) => entry.platform === platform)?.label ?? platform;
+}
+
 export function examplesFor(platform: Platform) {
   return LIBRARY.filter((example) => example.platform === platform);
 }

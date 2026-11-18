@@ -1,7 +1,7 @@
 import type { ComponentType } from 'react';
 import type { UiElementSpec } from '../catalog';
 
-export type Platform = 'mobile' | 'web';
+export type Platform = 'mobile' | 'web' | 'watch';
 
 /** The library's filter chips. */
 export type Category =
@@ -9,8 +9,11 @@ export type Category =
   | 'Analytics'
   | 'Commerce'
   | 'Communication'
+  | 'Design'
   | 'Developer'
+  | 'Education'
   | 'Finance'
+  | 'Food'
   | 'Health'
   | 'Marketing'
   | 'Media'
@@ -34,7 +37,10 @@ export type LibraryExample = {
   description: string;
   /** Web only: the domain shown in the browser's address bar, e.g. "ledger.dev". */
   url?: string;
-  /** The demo. Mobile demos fill a 280 × 600 phone screen; web demos fill the browser window's width. */
+  /**
+   * The demo. Mobile demos fill a 280 × 600 phone screen, watch demos a 208 × 248 watch screen; web demos fill the
+   * browser window's width.
+   */
   Component: ComponentType;
   /** Descriptions of every element the demo marks with `data-inspect`. */
   specs: readonly UiElementSpec[];

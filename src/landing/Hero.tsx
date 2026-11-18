@@ -1,5 +1,6 @@
 import { HorizonLines } from '../brand/HorizonLines';
 import { ButtonLink } from './ButtonLink';
+import { SIGN_UP_HREF } from './links';
 import styles from './Hero.module.css';
 
 /** Hero: bracketed label, one-line promise, two actions; in the background, rays converging on a single line. */
@@ -19,8 +20,8 @@ export function Hero() {
           <ButtonLink href="#examples" size="lg">
             See examples
           </ButtonLink>
-          <ButtonLink href="#pricing" variant="primary" size="lg">
-            Get started
+          <ButtonLink href={SIGN_UP_HREF} variant="primary" size="lg">
+            Get started free
           </ButtonLink>
         </div>
       </div>

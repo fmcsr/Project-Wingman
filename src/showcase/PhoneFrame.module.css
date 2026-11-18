@@ -57,6 +57,13 @@
   background: light-dark(#fff, #000);
 }
 
+/* Before/after comparison: the line covers the whole screen */
+.compare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 /* Dynamic Island in iPhone 18 Pro proportions: about 24% narrower than the 17 Pro's (≈126 → ≈96 of 402 pt) */
 .island {
   position: absolute;

@@ -11,33 +11,60 @@ understand. Next, it will write that brief from everyday descriptions like “th
 
 ## A look inside
 
-Hover anything in the examples to learn what it's called. Click to pin the full explanation: how it looks, how it
-behaves, and the exact CSS behind it. The examples switch to dark mode with the page (Muse is dark by design), and the
-balloons show the values for the theme you're in.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/inspect-dark.png">
-  <img alt="The Acme example pinned in its scroll scene: its product screenshot passes under the frosted-glass navbar, whose explanation is open" src="docs/screenshots/inspect-light.png">
-</picture>
-
-Three mobile apps side by side, with a preview of Muse's Liquid Glass navbar:
+Each example on the landing page is a before/after: drag the line to compare the AI slop a vague prompt produces with
+the same product built from a Wingman brief. Hover anything on either side to learn what it's called. Click to pin the
+full explanation: how it looks, how it behaves, and the exact CSS behind it. The examples switch to dark mode with the
+page (products that are dark by design stay dark), and the balloons show the values for the theme you're in.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/phones-dark.png">
-  <img alt="The Wave, Muse and Stride phone examples in one row, with a balloon describing the Liquid Glass navbar" src="docs/screenshots/phones-light.png">
+  <img alt="The Wave, Muse and Stride phone examples in one row, each split down the middle between the AI slop version and the Wingman version, with a balloon describing Muse's Liquid Glass navbar" src="docs/screenshots/phones-light.png">
+</picture>
+
+### The library
+
+Behind sign-in, the library holds more than thirty apps, sites and watch apps, each modeled on a product people use
+every day: the same layout and component shapes, with its own name, colors, copy and real photos. Every element can be
+inspected the same way and added to a brief. Here Lanes, a board in the style of Jira, explains its WIP limit:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/inspect-dark.png">
+  <img alt="Lanes, a kanban board in the style of Jira, with the In progress column over its limit and the WIP limit's explanation pinned: what it is, what people call it and the CSS behind it" src="docs/screenshots/inspect-light.png">
+</picture>
+
+Apps for the phone and the watch:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/library-apps-dark.png">
+  <img alt="Eight library examples: Loop (a photo feed like Instagram), Flick (short videos like TikTok), Nest (stays like Airbnb), Vault (banking like Revolut), Kindred (dating like Tinder), Tempo (music like Spotify), Remedy (doctor booking like Zocdoc) and Pace (a workout on Apple Watch)" src="docs/screenshots/library-apps-light.png">
+</picture>
+
+And websites:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/library-sites-dark.png">
+  <img alt="Six library sites: Stream (streaming like Netflix), Shelf (a store like Amazon), Glyph (a code editor like VS Code), Conduit (automations like Zapier), Cadence (a calendar like Notion Calendar) and Lanes (a board like Jira)" src="docs/screenshots/library-sites-light.png">
 </picture>
 
 ## Current status: landing page, sign-in, the library and the brief
 
-An English landing page with a sticky header (with a theme toggle), a hero, examples, feature cards, pricing and a
-footer. The examples section has five projects (a marketing site, an analytics dashboard and three mobile apps), and
-nearly every element shows its name on hover, a summary after a short pause and the full explanation on click.
+An English landing page with a sticky header (with a theme toggle), a hero, examples, feature cards, a support section
+and a footer. The examples section has five projects (a marketing site, an analytics dashboard and three mobile apps),
+each a before/after comparison with a line to drag: on the left, the AI slop a vague prompt produces; on the right, the
+same product built from a Wingman brief. On both sides nearly every element shows its name on hover, a summary after a
+two-second pause and the full explanation on click; on the slop side, the explanation says what makes it read as AI
+slop. The Wingman versions move like real products (charts draw in, payments arrive, the chat answer streams, the
+gallery slides) and hold still while you inspect them.
 
-Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to the library (`/app/mobile`, `/app/web`): mobile apps and
-websites in two tabs, each a fictional product built from the patterns of well-known ones (“inspired by” Spotify,
-Airbnb, Stripe, Linear and others). Phones can be inspected right in the grid; every example also has its own page
-(`/app/<platform>/<id>`) with all of its elements written out. A search finds examples by name or by element
-(“bottom sheet”, “toast”). There's no auth backend yet: email and password sign-in only works with the development
+Wingman is free: an account opens the library and the brief builder. People who find it useful can sponsor it on
+GitHub (`SPONSOR_HREF` in `src/landing/links.ts`; GitHub Sponsors has to be set up on that account).
+
+Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to the library (`/app/mobile`, `/app/web`, `/app/watch`):
+mobile apps, websites and Apple Watch apps in three tabs, each a fictional product built from the patterns of
+well-known ones (“inspired by” Spotify, Airbnb, Stripe, Notion, Figma, VS Code and others). Phones and watches can be
+inspected right in the grid; every example also has its own page (`/app/<platform>/<id>`) with all of its elements
+written out. A search finds examples by name or by
+element (“bottom sheet”, “toast”). There's no auth backend yet: email and password sign-in only works with the development
 account below, and Google sign-in and sign-ups show a “not connected yet” message.
 
 Any element in the library can go into a brief: choose **Add to brief** in its pinned explanation or in the example's
@@ -45,8 +72,8 @@ element list. The brief page (`/app/brief`) adds what you're building and a note
 Markdown to copy or download: each element's look and behavior with the terms and values to use, followed by acceptance
 criteria. The brief is put together from the element descriptions (no LLM yet) and kept in the browser.
 
-Out of scope for now (later phases): a real auth backend, payments and subscriptions (plan prices are placeholders),
-and a real LLM integration (writing the brief from a plain description).
+Out of scope for now (later phases): a real auth backend (sign-ups open once it exists) and a real LLM integration
+(writing the brief from a plain description).
 
 ## Before going live
 
@@ -86,12 +113,14 @@ setting (light or dark) and can be switched from the header. All visual decision
 
 ```
 src/
-  landing/     Landing page sections: header, theme toggle, hero, examples, feature cards, pricing, footer
+  landing/     Landing page sections: header, theme toggle, hero, examples, feature cards, support, footer
   auth/        Sign-in and sign-up pages, the session store (no backend yet) and the dev account
   workspace/   The signed-in area: the library's tabs, search and grids, and each example's page with its glossary
   brief/       The brief: its store (in localStorage), the Markdown writer, the Add to brief button and the brief page
   library/     The library: types, the registry, and one folder per example (mobile/<id>, web/<id>)
-  demos/       The landing page's five examples: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ StatusBar)
+  demos/       The landing page's five examples: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ StatusBar),
+               their motion (motion.ts: entrances, live parts that hold while inspected), and in slop/ the AI slop
+               version each one is compared with
   catalog/     Element descriptions (English, typed data) for those five, plus elements every phone shares
   inspector/   The “inspect element” layer: InspectSurface, explainer balloon, positioning
   showcase/    Frames and the interaction guide: the browser frame as a scroll scene (useScrollScene), a scalable phone
@@ -108,7 +137,7 @@ docs/
 Create a folder; the library picks it up on its own (`import.meta.glob` in `src/library/index.ts`):
 
 ```
-src/library/<mobile|web>/<id>/
+src/library/<mobile|web|watch>/<id>/
   <Name>.tsx         the demo (a named export)
   <Name>.module.css  its styles
   specs.ts           a UiElementSpec for every data-inspect id the demo uses
@@ -116,12 +145,17 @@ src/library/<mobile|web>/<id>/
 ```
 
 - **The demo is a picture:** no real links, buttons or inputs (`<a>` without `href`, `<span>`), since it sits inside
-  one focusable region. Colors are `light-dark()` pairs so it follows the theme. Anything that moves on its own
-  pauses while inspected (`useInspectActivity()`).
+  one focusable region. Colors are `light-dark()` pairs so it follows the theme. Anything that moves holds still while
+  it's inspected and under reduced motion (`useDemoMotion()` in `src/demos/motion.ts`).
 - **Mobile** fills a 280 × 600 phone screen and starts with the shared `<StatusBar />`; reuse the `statusBar` and
-  `homeIndicator` specs from `src/catalog`. **Web** sets `container-type: inline-size` and works from about 340 px to
-  1150 px wide; it can be taller than the window.
+  `homeIndicator` specs from `src/catalog`. **Watch** fills a 208 × 248 Apple Watch screen (46 mm). **Web** sets
+  `container-type: inline-size` and works from about 340 px to 1150 px wide; it can be taller than the window.
 - **Names are fictional;** real products go in `inspiredBy`.
+- **Same design type, our own identity:** follow one familiar product's real screen closely (layout, type scale, color
+  scheme, component shapes) so people recognize it, with our own name, logo, accent hue, copy and data. No real logos,
+  mascots or brand marks.
+- **Real photos:** anything that stands for a photo (avatars, video frames, food, places) is a free-license Unsplash
+  photo, stored in the example's `photos/` folder and listed in its `CREDITS.md`.
 
 ## Adding a UI element
 

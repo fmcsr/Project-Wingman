@@ -8,6 +8,11 @@
   height: 100%;
 }
 
+/* A demo shorter than its frame still fills it (an AI slop site under the comparison line, say) */
+.fill > .content > * {
+  min-height: 100%;
+}
+
 .surface [data-inspect] {
   cursor: pointer;
 }
@@ -44,11 +49,14 @@
   box-shadow: 0 0 0 calc(3px / var(--inspect-scale, 1)) rgb(10 143 101 / 0.25);
 }
 
-.tag {
+/*
+ * The name tag, drawn on the shared layer (see NameTag), so the phone screen or the browser window can't cut it off.
+ * Hidden until it's placed, so it never flashes at the layer's corner.
+ */
+.nameTag {
   position: absolute;
-  left: calc(-1.5px / var(--inspect-scale, 1));
-  bottom: 100%;
-  margin-bottom: calc(4px / var(--inspect-scale, 1));
+  top: 0;
+  left: 0;
   padding: 2px 6px;
   border-radius: 4px;
   font-family: var(--font-mono);
@@ -57,13 +65,9 @@
   white-space: nowrap;
   color: var(--color-on-inspect);
   background: var(--color-inspect);
-  transform: scale(calc(1 / var(--inspect-scale, 1)));
-  transform-origin: bottom left;
+  pointer-events: none;
 }
 
-.tag[data-placement='below'] {
-  top: 100%;
-  bottom: auto;
-  margin: calc(4px / var(--inspect-scale, 1)) 0 0;
-  transform-origin: top left;
+.nameTag:not([data-placed]) {
+  visibility: hidden;
 }

@@ -3,9 +3,14 @@ import type { CSSProperties } from 'react';
 import { AcmeSite } from '../demos/AcmeSite';
 import { MuseApp } from '../demos/MuseApp';
 import { OrbitDashboard } from '../demos/OrbitDashboard';
+import { AcmeSlop } from '../demos/slop/AcmeSlop';
+import { MuseSlop } from '../demos/slop/MuseSlop';
+import { OrbitSlop } from '../demos/slop/OrbitSlop';
+import { StrideSlop } from '../demos/slop/StrideSlop';
+import { WaveSlop } from '../demos/slop/WaveSlop';
 import { StrideApp } from '../demos/StrideApp';
 import { WaveApp } from '../demos/WaveApp';
-import { showcaseSpecs } from '../catalog';
+import { acmeSlopSpecs, museSlopSpecs, orbitSlopSpecs, showcaseSpecs, strideSlopSpecs, waveSlopSpecs } from '../catalog';
 import { InspectSurface } from '../inspector/InspectSurface';
 import { InspectorLayerHost } from '../inspector/InspectorLayer';
 import { BrowserFrame } from '../showcase/BrowserFrame';
@@ -40,6 +45,16 @@ function ProjectMeta({ index, name, kind, count }: ProjectMetaProps) {
   );
 }
 
+/** The vague prompt behind the AI slop side; the Wingman side comes from a brief that names every element. */
+function Prompt({ children }: { children: string }) {
+  return (
+    <p className={styles.prompt}>
+      <span className={styles.promptLabel}>Vague prompt</span>
+      <span className={styles.promptText}>“{children}”</span>
+    </p>
+  );
+}
+
 /** Scale that fits the three phones in a single row at any width; capped at 1 (actual size). */
 function usePhoneScale() {
   const rowRef = useRef<HTMLDivElement>(null);
@@ -62,9 +77,10 @@ function usePhoneScale() {
 }
 
 /**
- * Demo on the home page: five example projects. The full library opens after sign-in, so only a few
- * projects are shown here. Sites scroll in their own windows as the page scrolls; phones sit in one row.
- * Balloons are drawn on a shared layer that covers all the frames.
+ * Demo on the home page: five example projects, each as a before/after comparison. On the left, the AI slop a vague
+ * prompt produces; on the right, the same product built from a Wingman brief. Both sides are inspectable, so the same
+ * element can be seen done both ways. The full library opens after sign-in, so only a few projects are shown here. Sites scroll in their own windows as the page
+ * scrolls; phones sit in one row. Balloons are drawn on a shared layer that covers all the frames.
  */
 export function Examples() {
   const [counts, setCounts] = useState<Partial<Record<ProjectId, number>>>({});
@@ -87,9 +103,9 @@ export function Examples() {
           id="examples-title"
           index="[01]"
           label="Examples"
-          title="Hover anything."
-          muted="Learn what it's called."
-          description="Five sample projects: a marketing site, an analytics dashboard, and three mobile apps. Every element explains itself."
+          title="Same idea."
+          muted="Better words."
+          description="Drag the line on each example. On the left, what an AI coding tool builds from a vague prompt. On the right, what it builds from a Wingman brief that names every element. Hover either side to learn the names."
         />
         <InteractionGuide />
       </div>
@@ -99,7 +115,18 @@ export function Examples() {
           <div className={styles.scenes}>
             <BrowserFrame
               url="acme.app"
-              header={<ProjectMeta index="[01]" name="Acme" kind="Marketing site" count={counts.acme} />}
+              label="Acme marketing site"
+              before={
+                <InspectSurface specs={acmeSlopSpecs} label="Acme marketing site, AI slop version" fill>
+                  <AcmeSlop />
+                </InspectSurface>
+              }
+              header={
+                <div className={styles.siteHeader}>
+                  <ProjectMeta index="[01]" name="Acme" kind="Marketing site" count={counts.acme} />
+                  <Prompt>Make a landing page for my product-planning SaaS.</Prompt>
+                </div>
+              }
             >
               <InspectSurface specs={showcaseSpecs} label="Acme marketing site" onCount={onCount.acme}>
                 <AcmeSite />
@@ -108,7 +135,18 @@ export function Examples() {
 
             <BrowserFrame
               url="app.orbit.io"
-              header={<ProjectMeta index="[02]" name="Orbit" kind="Analytics dashboard" count={counts.orbit} />}
+              label="Orbit analytics dashboard"
+              before={
+                <InspectSurface specs={orbitSlopSpecs} label="Orbit analytics dashboard, AI slop version" fill>
+                  <OrbitSlop />
+                </InspectSurface>
+              }
+              header={
+                <div className={styles.siteHeader}>
+                  <ProjectMeta index="[02]" name="Orbit" kind="Analytics dashboard" count={counts.orbit} />
+                  <Prompt>Build an analytics dashboard for my startup.</Prompt>
+                </div>
+              }
             >
               <InspectSurface specs={showcaseSpecs} label="Orbit analytics dashboard" onCount={onCount.orbit}>
                 <OrbitDashboard />
@@ -118,29 +156,53 @@ export function Examples() {
             <div ref={rowRef} className={styles.phones} style={{ '--phone-scale': scale } as CSSProperties}>
               <div className={styles.phoneProject}>
                 <ProjectMeta index="[03]" name="Wave" kind="Habit tracker" count={counts.wave} />
-                <PhoneFrame>
+                <PhoneFrame
+                  before={
+                    <InspectSurface specs={waveSlopSpecs} label="Wave habit tracker, AI slop version" fill>
+                      <WaveSlop />
+                    </InspectSurface>
+                  }
+                  label="Wave habit tracker"
+                >
                   <InspectSurface specs={showcaseSpecs} label="Wave habit tracker" onCount={onCount.wave} fill>
                     <WaveApp />
                   </InspectSurface>
                 </PhoneFrame>
+                <Prompt>Make a habit tracker app.</Prompt>
               </div>
 
               <div className={styles.phoneProject}>
                 <ProjectMeta index="[04]" name="Muse" kind="AI assistant" count={counts.muse} />
-                <PhoneFrame>
+                <PhoneFrame
+                  before={
+                    <InspectSurface specs={museSlopSpecs} label="Muse AI assistant, AI slop version" fill>
+                      <MuseSlop />
+                    </InspectSurface>
+                  }
+                  label="Muse AI assistant"
+                >
                   <InspectSurface specs={showcaseSpecs} label="Muse AI assistant" onCount={onCount.muse} fill>
                     <MuseApp />
                   </InspectSurface>
                 </PhoneFrame>
+                <Prompt>Make an AI chat app.</Prompt>
               </div>
 
               <div className={styles.phoneProject}>
                 <ProjectMeta index="[05]" name="Stride" kind="Shopping" count={counts.stride} />
-                <PhoneFrame>
+                <PhoneFrame
+                  before={
+                    <InspectSurface specs={strideSlopSpecs} label="Stride shopping app, AI slop version" fill>
+                      <StrideSlop />
+                    </InspectSurface>
+                  }
+                  label="Stride shopping app"
+                >
                   <InspectSurface specs={showcaseSpecs} label="Stride shopping app" onCount={onCount.stride} fill>
                     <StrideApp />
                   </InspectSurface>
                 </PhoneFrame>
+                <Prompt>Build a product page for a sneaker shop.</Prompt>
               </div>
             </div>
           </div>

@@ -17,8 +17,11 @@ export type InspectMode = 'closed' | 'preview' | 'pinned';
 /** Attribute that marks inspectable elements in demos; its value is the catalog ID. */
 export const TARGET_SELECTOR = '[data-inspect]';
 
-/** Once the cursor rests on an element this long, the summary balloon opens; the name tag shows right away. */
-const DWELL_MS = 280;
+/**
+ * Once the cursor rests on an element this long, the summary balloon opens; the name tag and outline show right away.
+ * Long enough that passing over the example only names things, short enough that resting on one explains it.
+ */
+const DWELL_MS = 2000;
 /** Grace period so the balloon stays open while the cursor moves from the target to the balloon. */
 const CLOSE_DELAY_MS = 220;
 
@@ -82,7 +85,7 @@ export function useInspectSurface() {
     }, CLOSE_DELAY_MS);
   };
 
-  // Mouse: the name tag appears right away; the summary balloon opens after a short dwell.
+  // Mouse: the name tag appears right away; the summary balloon opens after a two-second dwell.
   // Once the preview is open, the balloon updates without delay as the cursor moves between elements.
   const onPointerMove = (event: ReactPointerEvent) => {
     if (event.pointerType !== 'mouse') return;

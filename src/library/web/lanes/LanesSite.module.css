@@ -1,0 +1,1138 @@
+/*
+ * The example app follows the page theme: every color is a light-dark(light, dark) pair, white surfaces and cool grays
+ * in light mode, a near-black workspace in dark mode, like the reference. Teal is Lanes' own color: the logo, Create,
+ * the open tab and space, the active grouping and the drop placeholder. Work types, priorities and statuses keep their
+ * usual colors (a red bug, an orange medium priority, a green done), and a column over its limit turns red. Photos look
+ * the same in both themes.
+ */
+/*
+ * Container queries apply to child elements, not the container itself; that's why the grid sits inside it. It has a
+ * name so the queries below always measure the whole app.
+ */
+.root {
+  container: lanes / inline-size;
+}
+
+/* The top bar across the full width, then the sidebar and the board */
+.app {
+  --bg: light-dark(#ffffff, #1f1f21);
+  --sunken: light-dark(#f4f5f7, #18191b);
+  --card: light-dark(#ffffff, #2a2b2f);
+  --text: light-dark(#292a2e, #cecfd2);
+  --subtle: light-dark(#505258, #a9abaf);
+  --subtlest: light-dark(#6b6e76, #8c8f97);
+  --line: light-dark(#dfe1e6, #37383c);
+  --input: light-dark(#8c8f97, #5d6067);
+  --neutral: light-dark(#e9eaee, #37393d);
+  --shadow: light-dark(rgb(30 31 33 / 0.22), rgb(0 0 0 / 0.55));
+  --shadow-edge: light-dark(rgb(30 31 33 / 0.3), rgb(255 255 255 / 0.08));
+  /* Lanes' teal */
+  --brand: light-dark(#0b7468, #3cc2ad);
+  --on-brand: light-dark(#ffffff, #0f2420);
+  --brand-text: light-dark(#0a6b60, #5fd4c0);
+  --brand-soft: light-dark(#e1f3f0, #173430);
+  --brand-line: light-dark(#7cc5bb, #2f8679);
+  /* Over the limit */
+  --danger: light-dark(#c9372c, #fd9891);
+  --danger-soft: light-dark(#ffeceb, #3a2321);
+  --danger-fill: light-dark(#e2483d, #e2483d);
+  --success: light-dark(#1f845a, #4bce97);
+  /* The board's four columns, shared by the headers and every swimlane */
+  --board-cols: repeat(4, minmax(206px, 1fr));
+
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  grid-template-rows: 48px minmax(0, 1fr);
+  /* The operating system's own font */
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* Resets sit in :where() (zero specificity), so any class below can override them */
+:where(.app p, .app h1, .app h2, .app ul) {
+  margin: 0;
+  padding: 0;
+}
+
+:where(.app ul) {
+  list-style: none;
+}
+
+/* Line icons on a 20px grid */
+.icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dots {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* Photo avatars: circles */
+.avatar {
+  display: block;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Top bar: the app switcher and Lanes, search and Create in the middle, then notifications and you */
+.topNav {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr) auto;
+  align-items: center;
+  height: 48px;
+  padding-right: 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.navStart {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 auto 0 2px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.logoMark {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.logoTile {
+  fill: #0b7468;
+}
+
+.logoBar {
+  fill: #ffffff;
+}
+
+.navButton {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  color: var(--subtle);
+}
+
+.navCenter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 16px 0 12px;
+}
+
+.search {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  max-width: 560px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--input);
+  border-radius: 6px;
+  color: var(--subtlest);
+}
+
+.search .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.searchText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Create: the one filled button in the bar, in Lanes' teal */
+.create {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 12px 0 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  color: var(--on-brand);
+  background: var(--brand);
+}
+
+.navEnd {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* The search field folds into this button on narrow windows */
+.searchIcon {
+  display: none;
+}
+
+/* Unread notifications: a red count on the bell */
+.badge {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  background: #e2483d;
+  box-shadow: 0 0 0 2px var(--bg);
+}
+
+.me {
+  display: grid;
+  margin-left: 6px;
+}
+
+.meAvatar {
+  width: 26px;
+  height: 26px;
+}
+
+/* Sidebar: your places, then the spaces you starred and visited; the open one is tinted teal with a bar */
+.sidebar {
+  border-right: 1px solid var(--line);
+}
+
+/* The sidebar stays in the window while the board scrolls */
+.sidebarInner {
+  position: sticky;
+  top: 48px;
+  padding: 12px 8px 16px 12px;
+}
+
+.navList {
+  display: grid;
+  gap: 2px;
+}
+
+.navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-weight: 500;
+  color: var(--subtle);
+}
+
+.navIcon {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+}
+
+.navLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.navMore {
+  width: 16px;
+  height: 16px;
+  color: var(--subtlest);
+}
+
+.navTool {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  color: var(--subtle);
+}
+
+.navTool .icon,
+.navTool .dots {
+  width: 16px;
+  height: 16px;
+}
+
+.navItem[aria-current='page'] {
+  color: var(--brand-text);
+  background: var(--brand-soft);
+}
+
+.navItem[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: -8px;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--brand);
+}
+
+/* The spaces sit one step in, under Spaces */
+.spaceGroup {
+  margin-top: 6px;
+  padding-left: 16px;
+}
+
+.spaceGroup + .navList {
+  padding-left: 16px;
+}
+
+.sectionLabel {
+  padding: 6px 8px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--subtlest);
+}
+
+.navGap {
+  margin: 10px 0 0 -16px;
+}
+
+.navGap ~ li {
+  margin-left: -16px;
+}
+
+.spaceIcon {
+  display: block;
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.spaceIcon rect {
+  fill: var(--tone);
+}
+
+.spaceIcon path {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.coral {
+  --tone: #e2603f;
+}
+
+.violet {
+  --tone: #7b61d6;
+}
+
+.amber {
+  --tone: #d9930d;
+}
+
+.blue {
+  --tone: #2f7ae5;
+}
+
+/* Space header: where you are, the space's name and its actions */
+.main {
+  min-width: 0;
+}
+
+.spaceHeader {
+  padding: 16px 20px 0;
+}
+
+.breadcrumbs {
+  display: flex;
+  gap: 6px;
+  color: var(--subtle);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  margin-top: 2px;
+}
+
+.titleIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.spaceName {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 20px;
+  font-weight: 650;
+  line-height: 28px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.squareButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--subtle);
+}
+
+.squareButton .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.plain {
+  border-color: transparent;
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* View tabs: the same work as a summary, list, board, calendar or timeline; Board is open */
+.tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  height: 40px;
+  margin-top: 6px;
+  padding: 0 14px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+
+.tab {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: -1px;
+  padding: 0 6px;
+  border-bottom: 2px solid transparent;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--subtle);
+}
+
+.tab .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.tab[aria-selected='true'] {
+  border-bottom-color: var(--brand);
+  color: var(--brand-text);
+}
+
+.addTab {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  color: var(--subtle);
+}
+
+.addTab .icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Filter bar: search the board, pick people by their photo, or open every filter */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px 14px;
+}
+
+.boardSearch {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  width: 168px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--input);
+  border-radius: 4px;
+  color: var(--subtlest);
+}
+
+.boardSearch .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.boardSearchText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Avatar filter: overlapping faces, each a toggle; a ring in the background color keeps the edges apart */
+.faces {
+  display: flex;
+  flex: none;
+  margin: 0 4px 0 2px;
+}
+
+.face {
+  display: grid;
+  border-radius: 50%;
+}
+
+.face + .face {
+  margin-left: -4px;
+}
+
+.faceAvatar,
+.unassigned,
+.moreFaces {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--bg);
+}
+
+.unassigned,
+.moreFaces {
+  display: grid;
+  place-items: center;
+  color: var(--subtle);
+  background: var(--neutral);
+}
+
+.unassigned .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.moreFaces {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Phones show fewer faces, so the count grows */
+.moreNarrow {
+  display: none;
+}
+
+.toolButton {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-weight: 500;
+  color: var(--subtle);
+}
+
+.toolButton .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.toolbarEnd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Grouping is on, so the button is tinted teal */
+.groupBy[aria-pressed='true'] {
+  padding: 0 8px 0 10px;
+  border-color: var(--brand-line);
+  color: var(--brand-text);
+  background: var(--brand-soft);
+}
+
+/* The board: wider than the window on small screens, where its right side is cut off as if scrolled */
+.boardClip {
+  overflow-x: clip;
+  padding: 0 20px 28px;
+}
+
+.board {
+  display: grid;
+  gap: 4px;
+}
+
+/* Column headers stay pinned under the top bar while the cards scroll */
+.heads {
+  position: sticky;
+  top: 48px;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: var(--board-cols);
+  gap: 8px;
+  padding-bottom: 4px;
+  background: var(--bg);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--sunken);
+}
+
+.columnName {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--subtle);
+}
+
+.count {
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--subtle);
+  background: var(--neutral);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Over its work-in-progress limit: the whole column turns red, and the count with it */
+.head.over,
+.cell.over {
+  background: var(--danger-soft);
+}
+
+.over .columnName {
+  color: var(--danger);
+}
+
+.over .count {
+  color: #ffffff;
+  background: var(--danger-fill);
+}
+
+.wip {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--danger);
+}
+
+.wip .icon {
+  width: 15px;
+  height: 15px;
+}
+
+.doneCheck {
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  stroke-width: 2;
+  color: var(--success);
+}
+
+/* Swimlane: a header with the epic it groups, then one cell per column */
+.lane {
+  margin-top: 4px;
+}
+
+.laneHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.laneChevron {
+  width: 16px;
+  height: 16px;
+  color: var(--subtle);
+}
+
+.epicIcon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.epicIcon rect {
+  fill: light-dark(#8270db, #9483ec);
+}
+
+.epicIcon path {
+  fill: #ffffff;
+}
+
+.laneKey,
+.laneCount {
+  font-size: 12px;
+  color: var(--subtlest);
+}
+
+.laneName {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+}
+
+/* Status lozenge: uppercase on a pale blue, the color work in progress usually wears */
+.status {
+  flex: none;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  text-transform: uppercase;
+  color: light-dark(#0055cc, #85b8ff);
+  background: light-dark(#e9f2ff, #1c2b41);
+}
+
+.laneAvatar {
+  width: 20px;
+  height: 20px;
+}
+
+.cells {
+  display: grid;
+  grid-template-columns: var(--board-cols);
+  gap: 8px;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  min-height: 88px;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--sunken);
+}
+
+/* A card: the title, then labels and the due date, then the key, priority, points and the assignee */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 12px 10px;
+  border-radius: 6px;
+  background: var(--card);
+  box-shadow:
+    0 1px 1px var(--shadow),
+    0 0 1px var(--shadow-edge);
+}
+
+.cardTitle {
+  overflow-wrap: break-word;
+}
+
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* Labels: small gray lozenges anyone on the team can add */
+.label {
+  padding: 0 5px;
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--subtle);
+  background: var(--neutral);
+}
+
+/* Due date: a bordered chip with a calendar; red once the day has passed */
+.due {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 6px 0 5px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--subtle);
+}
+
+.due .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.overdue {
+  border-color: light-dark(#f5b8b3, #6e2b26);
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.cardFoot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+}
+
+.keyGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin-right: auto;
+}
+
+.typeIcon {
+  display: block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.typeIcon rect {
+  fill: var(--type);
+}
+
+.glyphFill {
+  fill: #ffffff;
+}
+
+.glyphStroke {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.story {
+  --type: light-dark(#22a06b, #2abb7f);
+}
+
+.task {
+  --type: light-dark(#357de8, #4c8ff0);
+}
+
+.bug {
+  --type: light-dark(#e2483d, #f15b50);
+}
+
+.key {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--subtle);
+}
+
+/* Done work keeps its card, with the key struck through */
+.keyDone {
+  text-decoration: line-through;
+  color: var(--subtlest);
+}
+
+.priority {
+  display: block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--priority);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.highest,
+.high {
+  --priority: light-dark(#e2483d, #f87168);
+}
+
+.medium {
+  --priority: light-dark(#e06c00, #fea362);
+}
+
+.low {
+  --priority: light-dark(#357de8, #6ca4f8);
+}
+
+/* Story points: the size estimate in a gray pill */
+.points {
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--subtle);
+  background: var(--neutral);
+  font-variant-numeric: tabular-nums;
+}
+
+.assignee {
+  display: grid;
+  flex: none;
+}
+
+.cardAvatar {
+  width: 24px;
+  height: 24px;
+}
+
+/* Flagged: blocked by something outside the team, so the card turns yellow and carries a red flag */
+.flagged {
+  background: light-dark(#fff7d6, #3a3322);
+}
+
+.flag {
+  display: grid;
+  color: var(--danger);
+}
+
+.flag .icon {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  fill-opacity: 0.18;
+}
+
+/* The drop target: a dashed teal slot the size of the card, with the card lifted above it, tilted, in a deep shadow */
+.dropSlot {
+  display: grid;
+}
+
+.dropSlot > * {
+  grid-area: 1 / 1;
+}
+
+.placeholder {
+  border: 2px dashed var(--brand-line);
+  border-radius: 6px;
+  background: var(--brand-soft);
+}
+
+.lifted {
+  z-index: 4;
+  transform: translate(-30px, -16px) rotate(2.5deg);
+  box-shadow:
+    0 0 1px var(--shadow-edge),
+    0 14px 28px light-dark(rgb(9 30 66 / 0.24), rgb(0 0 0 / 0.6)),
+    0 3px 8px light-dark(rgb(9 30 66 / 0.14), rgb(0 0 0 / 0.4));
+}
+
+/* The pointer, closed around the card it's holding */
+.grabCursor {
+  position: absolute;
+  top: 60px;
+  right: 18px;
+  width: 22px;
+  height: 22px;
+  fill: #ffffff;
+  stroke: #1d1d1f;
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.25));
+}
+
+/* Create: add a card at the bottom of the first column */
+.inlineCreate {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  color: var(--subtle);
+}
+
+.inlineCreate .icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* The insight and settings buttons step aside first */
+@container lanes (width < 1080px) {
+  .toolOptional {
+    display: none;
+  }
+}
+
+/* Narrower windows: the sidebar folds away; its button stays in the top bar */
+@container lanes (width < 1000px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .topNav {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .navStart {
+    gap: 2px;
+  }
+
+  .brand {
+    margin-right: 6px;
+  }
+
+  .sidebar {
+    display: none;
+  }
+}
+
+/* Tablets: the search field turns into a button, Create into a plus, and the header's actions step aside */
+@container lanes (width < 760px) {
+  .search,
+  .navOptional,
+  .headerActions,
+  .createLabel,
+  .toolButton:not(.groupBy) .toolLabel {
+    display: none;
+  }
+
+  .navCenter {
+    justify-content: flex-end;
+    padding-right: 4px;
+  }
+
+  .create {
+    padding: 0 8px;
+  }
+
+  .searchIcon {
+    display: grid;
+  }
+}
+
+/*
+ * Phone width: a slimmer frame, and the board shows one column and the edge of the next, scrolled to In progress so
+ * the column over its limit is the one in view.
+ */
+@container lanes (width < 640px) {
+  .app {
+    --board-cols: repeat(3, minmax(252px, 1fr));
+  }
+
+  .navStart {
+    padding: 0 4px 0 8px;
+  }
+
+  .navStart > .navButton:first-child,
+  .boardSearchText,
+  .groupBy,
+  .faces .face:nth-child(5),
+  .faces .face:nth-child(6),
+  .moreWide {
+    display: none;
+  }
+
+  .moreNarrow {
+    display: inline;
+  }
+
+  .spaceHeader,
+  .toolbar {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .tabs {
+    padding: 0 10px;
+  }
+
+  .boardSearch {
+    width: auto;
+  }
+
+  .boardClip {
+    padding: 0 16px 24px;
+  }
+
+  .firstColumn {
+    display: none;
+  }
+
+  /* Mid-drag, the card has left In progress and is crossing into In review */
+  .lifted {
+    transform: translate(-104px, -12px) rotate(2.5deg);
+  }
+}

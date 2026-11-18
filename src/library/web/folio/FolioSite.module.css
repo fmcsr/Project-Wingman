@@ -1,0 +1,1095 @@
+/*
+ * The example app follows the page theme: every color is a light-dark(light, dark) pair. Photos (the cover and the
+ * faces) and emoji are content, so they look the same in both themes.
+ */
+/* Container queries apply to child elements, not the container itself; that's why the grid sits inside it */
+.root {
+  container-type: inline-size;
+}
+
+/* An app screen: at least as tall as the browser window, so the sidebar runs to the bottom */
+.app {
+  /* Warm grays and hairlines; one accent (petrol blue) for the Share button, checked boxes and the logo */
+  --page: light-dark(#ffffff, #191919);
+  --sidebar: light-dark(#f8f8f7, #202020);
+  --raised: light-dark(#ffffff, #252525);
+  --hover: light-dark(#efeeec, #2c2c2c);
+  --border: light-dark(#e9e9e7, #2f2f2f);
+  --ink: light-dark(#37352f, #d4d4d4);
+  --ink-2: light-dark(#787774, #9b9b9b);
+  --ink-3: light-dark(#9b9a97, #7f7f7f);
+  --sidebar-ink: light-dark(#5f5e5b, #c3c3c3);
+  --icon: light-dark(#91918e, #858585);
+  --accent: light-dark(#0f6f8f, #1f7fa3);
+  --popover-shadow:
+    0 0 0 1px light-dark(rgb(15 15 15 / 0.05), rgb(255 255 255 / 0.07)),
+    0 3px 6px light-dark(rgb(15 15 15 / 0.08), rgb(0 0 0 / 0.3)),
+    0 9px 24px light-dark(rgb(15 15 15 / 0.14), rgb(0 0 0 / 0.45));
+
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: 900px;
+  /* The operating system's own font, as the reference uses; the emoji fonts come last so icons render in color */
+  font-family:
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Helvetica,
+    Arial,
+    sans-serif,
+    'Apple Color Emoji',
+    'Segoe UI Emoji';
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--page);
+}
+
+/* Resets sit in :where() (zero specificity), so any class below can override them */
+:where(.app ul, .app ol, .app dl, .app dd, .app p, .app h2, .app h3) {
+  margin: 0;
+  padding: 0;
+}
+
+:where(.app ul, .app ol) {
+  list-style: none;
+}
+
+/* Line icons on a 20px grid */
+.icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Filled dot icons: more (···) and the drag grip */
+.dots {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* Emoji used as icons: the font draws them, so their size is a font size */
+.emoji {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  font-style: normal;
+  line-height: 1;
+}
+
+/* Sidebar: a warm gray column, set apart from the page by color and a faint edge */
+.sidebar {
+  border-right: 1px solid light-dark(#efeeec, #262626);
+  background: var(--sidebar);
+}
+
+/* Stays in view while the page scrolls, like an app's fixed navigation */
+.sidebarInner {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px 20px;
+}
+
+.workspaceRow {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 40px;
+  margin-bottom: 2px;
+}
+
+.workspace {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  height: 30px;
+  padding: 0 6px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+/* The workspace's own icon (an emoji the team picked), in a small rounded tile */
+.workspaceIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  font-size: 15px;
+  background: light-dark(#ebe9e4, #333333);
+}
+
+.workspaceName {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.workspaceChevron {
+  width: 14px;
+  height: 14px;
+  margin-left: -4px;
+  color: var(--icon);
+}
+
+.compose {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--sidebar-ink);
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-weight: 500;
+  color: var(--sidebar-ink);
+}
+
+.navItem .icon {
+  width: 20px;
+  height: 20px;
+  color: var(--icon);
+}
+
+/* Unread count: a small red tile, the only red in the app */
+.badge {
+  display: grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  margin-left: auto;
+  padding: 0 4px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  color: #ffffff;
+  background: light-dark(#e5534b, #d9534c);
+}
+
+/* Page tree */
+.treeHeading {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  margin-top: 14px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+/* Every level is pushed in by 12px, so the nesting reads like branches */
+.treeRow {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 30px;
+  padding: 0 8px 0 calc(2px + var(--depth) * 12px);
+  border-radius: 6px;
+  font-weight: 500;
+  color: var(--sidebar-ink);
+}
+
+/* The open page: a gray fill and full-strength text */
+.treeRow[aria-current='page'] {
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--hover);
+}
+
+.toggle {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  color: var(--icon);
+}
+
+/* Disclosure chevron: points right while a page is folded, turns down once its subpages show */
+.chevron {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.7;
+}
+
+[aria-expanded='true'] > .treeRow .chevron {
+  transform: rotate(90deg);
+}
+
+.treeIcon {
+  width: 22px;
+  height: 22px;
+  margin-right: 4px;
+  font-size: 15.5px;
+}
+
+.treeLabel {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Desktop app card: a dismissible nudge at the end of the sidebar, the one place the product's logo shows */
+.appCard {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  margin: 22px 2px 0;
+  padding: 10px 30px 11px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: light-dark(#ffffff, #252525);
+  box-shadow: 0 1px 2px light-dark(rgb(15 15 15 / 0.04), rgb(0 0 0 / 0.2));
+}
+
+.logo {
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+
+.logoTile {
+  fill: var(--accent);
+}
+
+.logoLeaf {
+  fill: #ffffff;
+}
+
+.logoLeafFolded {
+  fill: #ffffff;
+  opacity: 0.55;
+}
+
+.appTitle {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.appText {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.appClose {
+  position: absolute;
+  top: 7px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  color: var(--icon);
+}
+
+.appClose .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Main column */
+.main {
+  min-width: 0;
+}
+
+/* Top bar: stays pinned while the page scrolls under it */
+.topBar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 10px 0 12px;
+  background: var(--page);
+}
+
+.menuButton {
+  display: none;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--ink);
+}
+
+.menuButton .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.breadcrumbs {
+  min-width: 0;
+}
+
+.breadcrumbs ol {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.crumbItem {
+  display: flex;
+  flex: none;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* Only the current page's name may shorten (with an ellipsis); the steps before it keep their width */
+.crumbItem:last-child {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* The slash between steps is drawn by CSS, so a hidden step takes its slash with it */
+.crumbItem:not(:last-child)::after {
+  content: '/';
+  margin: 0 1px;
+  color: var(--ink-3);
+}
+
+/* Collapsed steps (…): shown only when there's no room for the whole path */
+.crumbMore {
+  display: none;
+}
+
+.crumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 4px;
+}
+
+.crumbIcon {
+  width: 18px;
+  height: 18px;
+  font-size: 14.5px;
+}
+
+.crumbLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.barEnd {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.edited {
+  margin-right: 10px;
+  white-space: nowrap;
+  color: var(--ink-3);
+}
+
+/* Presence: who else has the page open. Each face overlaps the one before; a ring in the page color keeps them apart */
+.presence {
+  display: flex;
+  margin-right: 10px;
+}
+
+.presence img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px var(--page);
+}
+
+.presence img + img {
+  margin-left: -4px;
+}
+
+/* Share: the page's main action, the only filled button on screen */
+.share {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  margin-right: 6px;
+  padding: 0 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  color: #ffffff;
+  background: var(--accent);
+}
+
+.iconButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: light-dark(#4d4b46, #c3c3c3);
+}
+
+.iconButton .icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Cover: a full-width photo across the top of the page, cropped to fill the band */
+.cover {
+  height: clamp(150px, 22cqi, 260px);
+}
+
+.cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 58%;
+}
+
+/*
+ * The page: a gutter on the left for the block handles, the text column, and a margin on the right for comments.
+ * The container queries at the end change these.
+ */
+.doc {
+  --gutter: 56px;
+  --rail: 240px;
+  --rail-gap: 28px;
+  max-width: calc(var(--gutter) + 708px + var(--rail-gap) + var(--rail) + 24px);
+  margin: 0 auto;
+  padding: 0 24px 0 var(--gutter);
+  font-size: 16px;
+}
+
+.column {
+  margin-right: calc(var(--rail-gap) + var(--rail));
+}
+
+/* The page icon: an emoji that overlaps the cover's bottom edge */
+.pageIcon {
+  position: relative;
+  display: grid;
+  width: 78px;
+  height: 78px;
+  margin: -40px 0 0 -4px;
+  font-size: 66px;
+}
+
+.title {
+  margin-top: 20px;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Properties: a name column and a value column, like a small form */
+.properties {
+  display: grid;
+  margin-top: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+/* Names stay level with the first line of their value when a value wraps */
+.property {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  align-items: start;
+}
+
+.propertyName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding-left: 2px;
+  color: var(--ink-2);
+}
+
+.propertyName .icon {
+  width: 16px;
+  height: 16px;
+  color: var(--icon);
+}
+
+.propertyValue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 34px;
+  padding: 4px 6px;
+}
+
+.ownerPhoto {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Status: a pill in the status color, with a dot so the color isn't the only cue */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 9px 0 8px;
+  border-radius: 999px;
+  line-height: 1;
+  color: light-dark(#1c3a4f, #c9dbe8);
+  background: light-dark(#d9e7f0, #2c3e4f);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: light-dark(#5f93b8, #6fa3c8);
+}
+
+/* Option tags: soft fills with darker text, one color per option */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.tagGray {
+  color: light-dark(#32302c, #d4d4d4);
+  background: light-dark(#e6e5e2, #3d3d3d);
+}
+
+.tagPurple {
+  color: light-dark(#43285a, #dccbe8);
+  background: light-dark(#ebe1f0, #463454);
+}
+
+/* Blocks: text runs at 16px, each block with a little air above and below */
+.block {
+  padding: 3px 2px;
+}
+
+.commented {
+  position: relative;
+  margin-top: 16px;
+}
+
+/* Mentions: gray @ text that stays on one line; a person and a date look the same */
+.mention {
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+
+.at {
+  opacity: 0.75;
+}
+
+/* Commented text: a yellow wash with a stronger underline. The phrase is short, so it stays on one line */
+.highlight {
+  padding-bottom: 1px;
+  white-space: nowrap;
+  color: inherit;
+  background: light-dark(rgb(255 212 0 / 0.3), rgb(255 212 0 / 0.2));
+  border-bottom: 2px solid light-dark(rgb(232 184 0 / 0.9), rgb(255 212 0 / 0.55));
+}
+
+/* Comment thread: in the margin, level with the block it's about */
+.thread {
+  position: absolute;
+  top: 0;
+  left: calc(100% + var(--rail-gap));
+  width: var(--rail);
+  padding: 12px 12px 10px;
+  border-radius: 10px;
+  font-size: 14px;
+  background: var(--raised);
+  box-shadow: var(--popover-shadow);
+}
+
+.resolve {
+  position: absolute;
+  top: 10px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  color: var(--icon);
+}
+
+.comment + .comment {
+  margin-top: 12px;
+}
+
+.commentHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 24px;
+  padding-right: 26px;
+}
+
+.commentHead img,
+.reply img {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.commentName {
+  overflow: hidden;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.commentTime {
+  flex: none;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.commentText {
+  margin-top: 2px;
+  padding-left: 32px;
+  line-height: 1.5;
+}
+
+.reply {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  margin-top: 10px;
+  color: var(--ink-3);
+}
+
+.replyText {
+  flex: 1;
+}
+
+.reply .icon {
+  width: 17px;
+  height: 17px;
+  color: var(--icon);
+}
+
+/* Send: gray until there's something to send */
+.send {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.sendCircle {
+  fill: light-dark(#d9d8d5, #4a4a4a);
+}
+
+.sendArrow {
+  fill: none;
+  stroke: light-dark(#ffffff, #252525);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Callout: a shaded box with an emoji, for the one thing nobody should miss */
+.callout {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 16px 16px 16px 12px;
+  border-radius: 10px;
+  background: light-dark(#f7f6f3, #2f2f2f);
+}
+
+.calloutIcon {
+  width: 24px;
+  height: 24px;
+  font-size: 18px;
+}
+
+.callout strong {
+  font-weight: 600;
+}
+
+.heading {
+  margin-top: 30px;
+  padding: 3px 2px 1px;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Toggle: a filled triangle that turns down when open; what's inside is indented under the title */
+.toggleTitle {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.toggleArrow {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+}
+
+.toggleArrow svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+[aria-expanded='true'] > .toggleArrow svg {
+  transform: rotate(90deg);
+}
+
+/* A numbered list inside the toggle; each number sits in its own 24px column */
+.stages {
+  padding-left: 26px;
+  counter-reset: stage;
+}
+
+.stages li {
+  display: flex;
+  gap: 2px;
+  padding: 3px 2px;
+  counter-increment: stage;
+}
+
+.stages li::before {
+  content: counter(stage) '.';
+  flex: none;
+  width: 24px;
+  text-align: center;
+}
+
+.stageDate {
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+
+/* To-do list */
+.todo {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.checkbox {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+}
+
+.box {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid light-dark(#4d4b46, #bdbdbd);
+  border-radius: 3px;
+}
+
+[aria-checked='true'] > .box {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.box svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Done: struck through and grayed, so open tasks stand out */
+.todoDone {
+  color: var(--ink-2);
+  text-decoration: line-through;
+  text-decoration-color: light-dark(rgb(55 53 47 / 0.3), rgb(255 255 255 / 0.3));
+}
+
+/* Block handles: they appear in the gutter next to the block under the pointer */
+.handles {
+  position: absolute;
+  top: 3px;
+  left: -50px;
+  display: flex;
+}
+
+.handle {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  color: light-dark(#b4b3af, #6a6a6a);
+}
+
+.handle .icon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.7;
+}
+
+.handle .dots {
+  width: 14px;
+  height: 18px;
+}
+
+/* The new line where "/" was typed; the menu opens under it and needs the room below */
+.slashBlock {
+  position: relative;
+  margin-top: 2px;
+  padding: 3px 2px 360px;
+}
+
+/* What's typed after the slash filters the menu; until then a hint fills the space */
+.slashQuery {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 4px 0 2px;
+  border-radius: 4px;
+  background: var(--hover);
+}
+
+/* Text cursor */
+.caret {
+  width: 1.5px;
+  height: 19px;
+  margin: 0 1px;
+  background: var(--ink);
+}
+
+.slashHint {
+  color: var(--ink-3);
+}
+
+/* Slash menu: floats under the line; the pick that Enter would insert is highlighted */
+.slashMenu {
+  position: absolute;
+  top: 36px;
+  left: 0;
+  z-index: 2;
+  width: min(300px, 100%);
+  padding: 4px;
+  border-radius: 10px;
+  font-size: 14px;
+  background: var(--raised);
+  box-shadow: var(--popover-shadow);
+}
+
+.menuGroup {
+  padding: 6px 8px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 6px;
+}
+
+.menuItem[aria-selected='true'] {
+  background: var(--hover);
+}
+
+.menuIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  color: light-dark(#4d4b46, #c3c3c3);
+}
+
+/* H1, H2, H3: a letter with a small number, set in text so it stays crisp */
+.headingGlyph {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.headingGlyph small {
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* The Markdown you could type instead */
+.markdown {
+  margin-left: auto;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.menuFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  margin: 4px -4px -4px;
+  padding: 0 12px;
+  border-top: 1px solid var(--border);
+}
+
+.menuFooter kbd {
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* The margin gets too narrow for comments: the thread moves under the paragraph it belongs to */
+@container (width < 1080px) {
+  .column {
+    margin-right: 0;
+  }
+
+  .doc {
+    max-width: calc(var(--gutter) + 708px + 24px);
+  }
+
+  .thread {
+    position: relative;
+    left: 0;
+    width: auto;
+    max-width: 400px;
+    margin-top: 10px;
+  }
+}
+
+/* Secondary details in the top bar give way first */
+@container (width < 960px) {
+  .edited,
+  .extraAction {
+    display: none;
+  }
+}
+
+/* The breadcrumbs fold their first step into “…”, then only the current page stays */
+@container (width < 800px) {
+  .crumbMore {
+    display: flex;
+  }
+
+  .crumbTeamspace {
+    display: none;
+  }
+}
+
+@container (width < 720px) {
+  .crumbParent {
+    display: none;
+  }
+}
+
+/* Phone width: the sidebar hides behind a ☰ button, and the hover-only block handles go away */
+@container (width < 640px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar,
+  .handles {
+    display: none;
+  }
+
+  .menuButton {
+    display: grid;
+  }
+
+  .topBar {
+    gap: 4px;
+    padding: 0 8px;
+  }
+
+  .doc {
+    --gutter: 20px;
+    padding: 0 20px;
+  }
+
+  .pageIcon {
+    width: 64px;
+    height: 64px;
+    margin-top: -34px;
+    font-size: 54px;
+  }
+
+  .title {
+    margin-top: 14px;
+    font-size: 32px;
+  }
+
+  .property {
+    grid-template-columns: 120px minmax(0, 1fr);
+  }
+
+  .thread {
+    max-width: none;
+  }
+
+  .heading {
+    font-size: 22px;
+  }
+}
+
+@container (width < 480px) {
+  .presence {
+    display: none;
+  }
+
+  .share {
+    margin-right: 2px;
+  }
+}

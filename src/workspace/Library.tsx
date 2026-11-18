@@ -2,25 +2,21 @@ import { useState } from 'react';
 import { AddToBrief } from '../brief/AddToBrief';
 import { InspectSurface } from '../inspector/InspectSurface';
 import { InspectorLayerHost } from '../inspector/InspectorLayer';
-import { examplesFor, matchesQuery } from '../library';
+import { examplesFor, matchesQuery, PLATFORMS, platformLabel } from '../library';
 import type { Category, LibraryExample, Platform } from '../library';
 import { Link, useDocumentTitle } from '../router';
 import { FitPhone } from '../showcase/FitPhone';
 import { InteractionGuide } from '../showcase/InteractionGuide';
+import { FitWatch } from '../showcase/WatchFrame';
 import { SitePreview } from './SitePreview';
 import styles from './Library.module.css';
 
-const TABS: { platform: Platform; label: string }[] = [
-  { platform: 'mobile', label: 'Mobile' },
-  { platform: 'web', label: 'Web' },
-];
-
 /**
- * The library: mobile apps and websites in two tabs, like a pattern gallery. Phones can be inspected right in
- * the grid; sites open on their own page, where there's room to scroll through them.
+ * The library: mobile apps, websites and watch apps in three tabs, like a pattern gallery. Phones and watches can be
+ * inspected right in the grid; sites open on their own page, where there's room to scroll through them.
  */
 export function Library({ platform }: { platform: Platform }) {
-  const label = platform === 'mobile' ? 'Mobile' : 'Web';
+  const label = platformLabel(platform);
   useDocumentTitle(`${label} · Library · Project Wingman`);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<Category | null>(null);
@@ -56,7 +52,7 @@ export function Library({ platform }: { platform: Platform }) {
 
       <div className={styles.controls}>
         <nav className={styles.tabs} aria-label="Platform">
-          {TABS.map((tab) => (
+          {PLATFORMS.map((tab) => (
             <Link
               key={tab.platform}
               href={`/app/${tab.platform}`}
@@ -118,39 +114,46 @@ export function Library({ platform }: { platform: Platform }) {
             Clear search
           </button>
         </div>
-      ) : platform === 'mobile' ? (
-        <div className={styles.stage}>
-          <InspectorLayerHost className={styles.layer}>
-            <ul className={styles.mobileGrid}>
-              {shown.map((example) => (
-                <MobileCard key={example.id} example={example} />
-              ))}
-            </ul>
-          </InspectorLayerHost>
-        </div>
-      ) : (
+      ) : platform === 'web' ? (
         <ul className={styles.webGrid}>
           {shown.map((example) => (
             <WebCard key={example.id} example={example} />
           ))}
         </ul>
+      ) : (
+        <div className={styles.stage}>
+          <InspectorLayerHost className={styles.layer}>
+            <ul className={styles.mobileGrid}>
+              {shown.map((example) => (
+                <DeviceCard key={example.id} example={example} />
+              ))}
+            </ul>
+          </InspectorLayerHost>
+        </div>
       )}
+
+      <p className={styles.footnote}>
+        Every example is a fictional product built from common patterns. The products named under “Inspired by” belong
+        to their owners, who aren't affiliated with Project Wingman.
+      </p>
     </div>
   );
 }
 
-function MobileCard({ example }: { example: LibraryExample }) {
+/** A phone or a watch, inspectable in place. */
+function DeviceCard({ example }: { example: LibraryExample }) {
   const { Component } = example;
+  const Frame = example.platform === 'watch' ? FitWatch : FitPhone;
   return (
     <li className={styles.card}>
       <div className={styles.meta}>
-        <Link href={`/app/mobile/${example.id}`} className={styles.name}>
+        <Link href={`/app/${example.platform}/${example.id}`} className={styles.name}>
           {example.name}
         </Link>
         <span className={styles.kind}>{example.kind}</span>
         <span className={styles.count}>{example.specs.length} elements</span>
       </div>
-      <FitPhone>
+      <Frame>
         <InspectSurface
           label={`${example.name} ${example.kind.toLowerCase()}`}
           specs={example.specs}
@@ -159,7 +162,7 @@ function MobileCard({ example }: { example: LibraryExample }) {
         >
           <Component />
         </InspectSurface>
-      </FitPhone>
+      </Frame>
       <p className={styles.inspired}>Inspired by {example.inspiredBy.join(', ')}</p>
     </li>
   );

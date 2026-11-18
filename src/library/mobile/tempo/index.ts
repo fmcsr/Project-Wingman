@@ -8,9 +8,9 @@ export const tempo: LibraryExample = {
   name: 'Tempo',
   kind: 'Music player',
   category: 'Media',
-  inspiredBy: ['Spotify', 'Apple Music'],
+  inspiredBy: ['Spotify'],
   description:
-    'A Now Playing screen: cover art, a scrubber, transport controls with on and off toggles, an output picker and a peeking bottom sheet.',
+    'A Now Playing screen tinted by its cover: a square album cover, a save button, a scrubber, transport controls with a repeat toggle, a device picker, share and queue buttons and a peeking lyrics card.',
   Component: TempoApp,
   specs: tempoSpecs,
 };

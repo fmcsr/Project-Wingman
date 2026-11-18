@@ -1,6 +1,6 @@
 import { useMemo, useSyncExternalStore } from 'react';
 import type { UiElementSpec } from '../catalog';
-import { findExample } from '../library';
+import { findExample, isPlatform } from '../library';
 import type { LibraryExample, Platform } from '../library';
 
 /** Points at one element of one example. The same element can appear in several examples with different values. */
@@ -29,7 +29,7 @@ function isItem(value: unknown): value is BriefItem {
   if (typeof value !== 'object' || value === null) return false;
   const item = value as Record<string, unknown>;
   return (
-    (item.platform === 'mobile' || item.platform === 'web') &&
+    isPlatform(item.platform) &&
     typeof item.exampleId === 'string' &&
     typeof item.specId === 'string' &&
     typeof item.note === 'string'

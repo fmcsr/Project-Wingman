@@ -156,6 +156,12 @@ export const marketing: UiElementSpec[] = [
         value: '“New”',
         plain: 'A tinted chip at the start says what kind of news it is before you read the rest.',
       },
+      {
+        kind: 'behavior',
+        term: 'Sheen',
+        value: '@keyframes · 1.3s sweep every 6s',
+        plain: 'Every few seconds a soft band of light sweeps across the pill, drawing the eye without blinking or bouncing.',
+      },
     ],
   },
   {
@@ -260,6 +266,19 @@ export const marketing: UiElementSpec[] = [
         value: 'the roadmap view',
         plain: 'It shows an actual screen with believable content instead of abstract shapes, so visitors see the product at work.',
       },
+      {
+        kind: 'behavior',
+        term: 'clip-path',
+        value: 'inset(0 100% 0 0) → inset(0) · 90ms apart',
+        plain: 'As it scrolls into view, the bars grow into place one after another and the Today line drops in. It plays once.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Live data',
+        value: 'one change every 6s',
+        plain:
+          'Every few seconds one small thing changes, as on a real team’s roadmap: progress fills, a teammate joins, an item ships. Then it starts over.',
+      },
     ],
   },
   {
@@ -276,10 +295,22 @@ export const marketing: UiElementSpec[] = [
         plain: 'Every logo is shown in the same gray, so they support the page instead of pulling attention.',
       },
       {
+        kind: 'appearance',
+        term: 'mask-image',
+        value: 'linear-gradient(to right, transparent, #000 12%, #000 88%, transparent)',
+        plain: 'Fades the strip out at both edges, so logos glide in and out instead of being cut off.',
+      },
+      {
         kind: 'behavior',
-        term: 'flex-wrap',
-        value: 'wrap',
-        plain: 'Items flow onto a new line when space runs out, so the row never overflows.',
+        term: 'Marquee',
+        value: 'translateX(-50%) · 70s linear infinite',
+        plain: 'The logos drift slowly left in an endless loop. Two identical rows sit end to end, so no seam ever shows.',
+      },
+      {
+        kind: 'behavior',
+        term: 'prefers-reduced-motion',
+        value: 'reduce → flex-wrap: wrap',
+        plain: 'With reduced motion turned on, the strip stands still and the logos wrap onto new lines instead.',
       },
     ],
   },
@@ -308,6 +339,13 @@ export const marketing: UiElementSpec[] = [
         term: 'Grid layout',
         value: 'repeat(3, minmax(0, 1fr))',
         plain: 'Cards sit in three equal columns and stack into one on narrow screens.',
+      },
+      {
+        kind: 'behavior',
+        term: 'Scroll-triggered animation',
+        value: 'IntersectionObserver · plays once',
+        plain:
+          'Each picture plays once as it scrolls into view: bars grow, the 18% counts up from zero, and requests slide in one by one.',
       },
     ],
   },

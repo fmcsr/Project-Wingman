@@ -130,16 +130,45 @@
 }
 
 .badge {
+  --sheen: light-dark(rgb(47 84 235 / 0.1), rgb(255 255 255 / 0.1));
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 3px 12px 3px 3px;
+  overflow: clip;
   border: 1px solid var(--line);
   border-radius: 999px;
   font-size: 13px;
   font-weight: 500;
   color: var(--ink-2);
   background: var(--paper);
+}
+
+/* Sheen: every 6 s a soft band of light sweeps across the badge (in 1.3 s), then it rests */
+.badge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, var(--sheen) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: sheen 6s cubic-bezier(0.45, 0, 0.25, 1) 1.5s infinite;
+  pointer-events: none;
+}
+
+.badge[data-paused]::after {
+  animation-play-state: paused;
+}
+
+@keyframes sheen {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  22%,
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .badgeTag {
@@ -383,6 +412,10 @@
   height: 28px;
 }
 
+/*
+ * Entrance: once the screenshot is in view (data-started), each bar grows from its start date to its end date,
+ * 90 ms after the one above it (--i). clip-path reveals the bar without squashing its label.
+ */
 .bar {
   position: absolute;
   top: 0;
@@ -397,6 +430,20 @@
   border-radius: 7px;
   font-weight: 600;
   white-space: nowrap;
+  clip-path: inset(0 round 7px);
+  transition:
+    clip-path 800ms var(--ease-out) calc(var(--i) * 90ms),
+    opacity 400ms var(--ease-out) calc(var(--i) * 90ms);
+}
+
+.shot:not([data-started]) .bar {
+  clip-path: inset(0 100% 0 0 round 7px);
+  opacity: 0;
+}
+
+/* The icon and label sit above the progress layer */
+.bar > * {
+  position: relative;
 }
 
 .barLabel {
@@ -405,10 +452,18 @@
   text-overflow: ellipsis;
 }
 
-.bar svg {
+/* Status icon: a check when done; while in review, a half-filled ring sits on top of the hidden check */
+.barIcon {
   flex: none;
   width: 13px;
   height: 13px;
+}
+
+.barIcon svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
@@ -416,7 +471,34 @@
   stroke-linejoin: round;
 }
 
-.bar[data-state='done'] {
+/* The check draws itself in (stroke-dashoffset): as its bar appears, and when the item ships */
+.check path {
+  stroke-dasharray: 1 2;
+  transition: stroke-dashoffset 500ms var(--ease-out) 300ms;
+}
+
+/* A little past the path's start, so the hidden check leaves no dot from its round cap */
+.shot:not([data-started]) .check path,
+.bar[data-state='review'] .check path {
+  stroke-dashoffset: 1.25;
+}
+
+.review {
+  color: light-dark(#dc6803, #fdb022);
+  transition: opacity 250ms var(--ease-out);
+}
+
+.review path {
+  fill: currentColor;
+  stroke: none;
+}
+
+.bar[data-state='done'] .review {
+  opacity: 0;
+}
+
+.bar[data-state='done'],
+.bar[data-state='review'] {
   color: var(--ink-2);
   background: light-dark(#f0f0f0, #1f1f1f);
 }
@@ -426,18 +508,87 @@
   background: var(--brand);
 }
 
+/*
+ * Progress: the part still to do sits closer to the page color (lighter in light mode, dimmer in dark mode);
+ * --progress is the share that's done, and a new value slides there
+ */
+.bar[data-state='active']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: light-dark(rgb(255 255 255 / 0.22), rgb(0 0 0 / 0.34));
+  transform: scaleX(calc(1 - var(--progress)));
+  transform-origin: right;
+  transition: transform 1200ms var(--ease-out);
+}
+
 .bar[data-state='planned'] {
   color: var(--brand-ink);
   background: var(--brand-tint);
   box-shadow: inset 0 0 0 1px var(--brand-edge);
 }
 
+/* An item that just shipped lights up green for a moment, then settles into the done style */
+.bar[data-shipped] {
+  animation: shipped 1800ms var(--ease-out);
+}
+
+.shot[data-paused] .bar {
+  animation-play-state: paused;
+}
+
+@keyframes shipped {
+  from {
+    color: light-dark(#067647, #47cd89);
+    background-color: light-dark(#dcfae6, rgb(18 183 106 / 0.2));
+  }
+}
+
+/* A teammate's avatar beside an item: it fades in when they join and out when they leave */
+.teammate {
+  position: absolute;
+  top: 4px;
+  left: calc(var(--at) * 100% + 2px);
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+  background: #12b76a;
+  box-shadow: 0 0 0 2px var(--paper);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 300ms var(--ease-out),
+    transform 500ms var(--ease-out);
+}
+
+.teammate[data-joined] {
+  opacity: 1;
+  transform: none;
+}
+
+/* The Today line drops in after the first bars: its label fades in and the line extends down (clip-path) */
 .today {
   position: absolute;
   top: 0;
   bottom: 0;
   left: calc(var(--at) * 100%);
   border-left: 1.5px solid #f04438;
+  clip-path: inset(-16px -48px 0 -48px);
+  transition:
+    clip-path 700ms var(--ease-out) 450ms,
+    opacity 300ms var(--ease-out) 450ms;
+}
+
+.shot:not([data-started]) .today {
+  clip-path: inset(-16px -48px 100% -48px);
+  opacity: 0;
 }
 
 .today span {
@@ -453,11 +604,31 @@
   transform: translateX(-50%);
 }
 
-/* Logo cloud: made-up customers, each with its own type style, all in one muted gray */
+/*
+ * Logo cloud: made-up customers, each with its own type style, all in one muted gray. Two layers share one grid cell:
+ * the resting layout, where the logos wrap, sets the height; while the strip moves it's hidden and the moving layer
+ * (label and marquee) sits centered over it, so the section is as tall as before at every width.
+ */
 .logos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   padding: 40px 32px 44px;
   border-bottom: 1px solid var(--line);
   text-align: center;
+}
+
+.logosStill,
+.logosMoving {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.logosStill[data-hidden] {
+  visibility: hidden;
+}
+
+.logosMoving {
+  align-self: center;
 }
 
 .logosLabel {
@@ -465,23 +636,30 @@
   color: var(--ink-3);
 }
 
-.logoRow {
+.logoRow,
+.group {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  gap: 16px 44px;
-  margin-top: 20px;
   color: light-dark(#a3a3a3, #6b6b6b);
 }
 
-.logoRow > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
+.logoRow {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px 44px;
+  margin-top: 20px;
 }
 
-.logoRow svg {
+.logoRow > span,
+.group > span {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.logos svg {
   flex: none;
   width: 16px;
   height: 16px;
@@ -490,9 +668,64 @@
   stroke-width: 1.6;
 }
 
-.logoRow .fill {
+.logos .fill {
   fill: currentColor;
   stroke: none;
+}
+
+/*
+ * Marquee: two identical groups sit end to end and the track moves left by one group's width in 70 s, then starts
+ * over; the second group has taken the first one's place, so no seam shows. It clips without becoming a scroll
+ * container, the edges fade out (mask-image), and it holds while inspected or out of view (data-paused).
+ */
+.marquee {
+  margin-top: 20px;
+  overflow: clip;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: marquee 70s linear infinite;
+}
+
+.marquee[data-paused] .track {
+  animation-play-state: paused;
+}
+
+/* Trailing space on each group makes the gap between groups match the gap between logos */
+.group {
+  gap: 44px;
+  padding-right: 44px;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/*
+ * The second row shows only where the resting logos wrap (below 654 px; see the container query), drifting the other
+ * way from a different starting point. Two rows (29 + 10 + 29 px) are never taller than the wrapped logos (70 px or
+ * more), so the section keeps its height.
+ */
+.reverse {
+  display: none;
+  margin-top: 10px;
+}
+
+.reverse .track {
+  animation-direction: reverse;
+  animation-delay: -35s;
+}
+
+@container (width < 654px) {
+  .reverse {
+    display: block;
+  }
 }
 
 .paragon {
@@ -526,7 +759,7 @@
   letter-spacing: -0.01em;
 }
 
-.logoRow .monarch svg {
+.logos .monarch svg {
   width: 20px;
 }
 
@@ -602,6 +835,10 @@
   background-image: repeating-linear-gradient(to right, var(--line) 0 1px, transparent 1px calc(100% / 6));
 }
 
+/*
+ * The cards' pictures play once as they scroll into view (data-started on .art), each part a little after the one
+ * before it (--i): roadmap bars grow from their start, requests slide up, chart bars grow from the baseline.
+ */
 .miniRoadmap span {
   display: flex;
   align-items: center;
@@ -614,6 +851,15 @@
   font-size: 10px;
   font-weight: 600;
   white-space: nowrap;
+  clip-path: inset(0 round 5px);
+  transition:
+    clip-path 700ms var(--ease-out) calc(var(--i) * 90ms),
+    opacity 350ms var(--ease-out) calc(var(--i) * 90ms);
+}
+
+.art:not([data-started]) .miniRoadmap span {
+  clip-path: inset(0 100% 0 0 round 5px);
+  opacity: 0;
 }
 
 .miniRoadmap [data-state='done'] {
@@ -638,6 +884,12 @@
   bottom: 0;
   left: calc(var(--at) * 100%);
   border-left: 1.5px solid #f04438;
+  clip-path: inset(0 -2px);
+  transition: clip-path 600ms var(--ease-out) 400ms;
+}
+
+.art:not([data-started]) .miniToday {
+  clip-path: inset(0 -2px 100%);
 }
 
 .miniFeedback {
@@ -658,6 +910,14 @@
   border: 1px solid var(--line);
   border-radius: 7px;
   background: var(--paper);
+  transition:
+    opacity 500ms var(--ease-out) calc(var(--i) * 110ms),
+    transform 600ms var(--ease-out) calc(var(--i) * 110ms);
+}
+
+.art:not([data-started]) .miniFeedback li {
+  opacity: 0;
+  transform: translateY(10px);
 }
 
 .votes {
@@ -714,8 +974,10 @@
   color: var(--ink-2);
 }
 
+/* Tabular figures keep the label steady while the number counts up */
 .chartLabel b {
   margin-left: 4px;
+  font-variant-numeric: tabular-nums;
   color: light-dark(#067647, #47cd89);
 }
 
@@ -730,6 +992,12 @@
   flex: 1;
   border-radius: 4px 4px 2px 2px;
   background: light-dark(#e5e5e5, #262626);
+  clip-path: inset(0 round 4px 4px 2px 2px);
+  transition: clip-path 800ms var(--ease-out) calc(var(--i) * 60ms);
+}
+
+.art:not([data-started]) .chartBars span {
+  clip-path: inset(100% 0 0 round 4px 4px 2px 2px);
 }
 
 .chartBars [data-last] {
@@ -890,5 +1158,27 @@
 
   .footerBrand {
     grid-column: 1 / -1;
+  }
+}
+
+/* Reduced motion: the components already show their finished state; this makes sure nothing animates regardless */
+@media (prefers-reduced-motion: reduce) {
+  .badge::after,
+  .bar[data-shipped],
+  .track {
+    animation: none;
+  }
+
+  .bar,
+  .bar[data-state='active']::before,
+  .check path,
+  .review,
+  .teammate,
+  .today,
+  .miniRoadmap span,
+  .miniToday,
+  .miniFeedback li,
+  .chartBars span {
+    transition: none;
   }
 }

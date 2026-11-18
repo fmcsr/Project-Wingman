@@ -1,0 +1,1297 @@
+/*
+ * Glyph follows the page theme with the reference's two default themes: a near-black dark one and a white light one.
+ * Every color is a light-dark(light, dark) pair on .app. The syntax colors, the git and problem colors and the
+ * terminal's ANSI colors follow the reference's defaults; jade (--accent) is Glyph's own and marks what's active: the
+ * current view, the open tab, the open panel and the remote button.
+ */
+/* Container queries apply to child elements, not the container itself; that's why the window sits inside it */
+.root {
+  container: glyph / inline-size;
+}
+
+/*
+ * The window: the title bar across the top, then the activity bar, the side bar and the editor with its panel, and
+ * the status bar along the bottom.
+ */
+.app {
+  --chrome: light-dark(#f8f8f8, #181818);
+  --editor-bg: light-dark(#ffffff, #1f1f1f);
+  --line: light-dark(#e5e5e5, #2b2b2b);
+  --text: light-dark(#3b3b3b, #cccccc);
+  --strong: light-dark(#1e1e1e, #ffffff);
+  --muted: light-dark(#616161, #9d9d9d);
+  --icon: light-dark(#616161, #868686);
+  --icon-active: light-dark(#1f1f1f, #d7d7d7);
+  --selection: light-dark(#e4e6f1, #37373d);
+  --badge: light-dark(#cccccc, #616161);
+  --badge-text: light-dark(#3b3b3b, #f8f8f8);
+  --field: light-dark(#ffffff, #222222);
+  --field-line: light-dark(#d4d4d4, #383838);
+  --link: light-dark(#005fb8, #4daafc);
+  /* Glyph's jade: indicators on the chrome, and a deeper fill under white text */
+  --accent: light-dark(#0e7c5f, #2bab84);
+  --accent-fill: light-dark(#0e7c5f, #1d8566);
+  /* Problems and git status, in the explorer's names and badges, the gutter and the scrollbar */
+  --error: light-dark(#e51400, #f14c4c);
+  --decor-error: light-dark(#b01011, #f88070);
+  --decor-modified: light-dark(#895503, #e2c08d);
+  --decor-ignored: light-dark(#8e8e90, #8c8c8c);
+  --git-added: light-dark(#2ea043, #2ea043);
+  --git-modified: light-dark(#2090d3, #1b81a8);
+  --git-deleted: light-dark(#f85149, #f85149);
+  /* The editor */
+  --line-number: #6e7681;
+  --line-number-active: light-dark(#171184, #cccccc);
+  --current-line: light-dark(#eeeeee, #282828);
+  --guide: light-dark(#d3d3d3, #404040);
+  --guide-active: light-dark(#939393, #707070);
+  --cursor: light-dark(#000000, #aeafad);
+  --widget: light-dark(#f8f8f8, #202020);
+  --widget-line: light-dark(#c8c8c8, #454545);
+  --widget-status: light-dark(#f0f0f0, #2b2b2b);
+  --shadow: light-dark(rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.36));
+  /* Syntax: keywords that steer the flow in pink, declarations in blue, functions yellow, types teal */
+  --syn-plain: light-dark(#3b3b3b, #cccccc);
+  --syn-comment: light-dark(#008000, #6a9955);
+  --syn-string: light-dark(#a31515, #ce9178);
+  --syn-number: light-dark(#098658, #b5cea8);
+  --syn-control: light-dark(#af00db, #c586c0);
+  --syn-storage: light-dark(#0000ff, #569cd6);
+  --syn-type: light-dark(#267f99, #4ec9b0);
+  --syn-constant: light-dark(#0070c1, #4fc1ff);
+  --syn-function: light-dark(#795e26, #dcdcaa);
+  --syn-variable: light-dark(#001080, #9cdcfe);
+  --syn-bracket0: light-dark(#0431fa, #ffd700);
+  --syn-bracket1: light-dark(#319331, #da70d6);
+  --syn-bracket2: light-dark(#7b3814, #179fff);
+  /* The terminal's ANSI colors, darkened in the light theme to keep them readable on white */
+  --ansi-green: light-dark(#008a00, #23d18b);
+  --ansi-cyan: light-dark(#05799a, #29b8db);
+  --ansi-blue: light-dark(#0451a5, #3b8eea);
+  --ansi-red: light-dark(#cd3131, #f14c4c);
+  --ansi-yellow: light-dark(#7c7f00, #f5f543);
+  --ansi-gray: light-dark(#666666, #8b8b8b);
+  /* Sizes the container queries at the end change */
+  --side-w: 260px;
+  --panel-h: 280px;
+  --line-h: 18px;
+  --ui-font: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, Ubuntu, 'Droid Sans', sans-serif;
+  --code-font: Menlo, Monaco, Consolas, 'Courier New', monospace;
+
+  display: grid;
+  grid-template-columns: 48px var(--side-w) minmax(0, 1fr);
+  grid-template-rows: 35px minmax(0, 1fr) 22px;
+  grid-template-areas:
+    'title title title'
+    'activity side main'
+    'status status status';
+  height: 800px;
+  overflow: hidden;
+  font-family: var(--ui-font);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text);
+  background: var(--chrome);
+}
+
+/* Resets sit in :where() (zero specificity), so any class below can override them */
+:where(.app p, .app h2, .app ul, .app pre) {
+  margin: 0;
+  padding: 0;
+}
+
+:where(.app ul) {
+  list-style: none;
+}
+
+/* Outline icons on a 16px grid */
+.icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.iconFill,
+.iconDot {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* Title bar: the menus on the left, the command center in the middle, the layout buttons on the right */
+.titleBar {
+  grid-area: title;
+  display: grid;
+  grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
+  align-items: center;
+  height: 35px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+  background: var(--chrome);
+}
+
+.titleStart {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.appMark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 35px;
+  height: 100%;
+}
+
+.mark {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.markTile {
+  fill: var(--accent-fill);
+}
+
+.markG {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.menuBar {
+  display: flex;
+  height: 100%;
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+/* Where the menus don't fit, the last ones fold into a "more" button (narrower windows, below) */
+.menuOverflow,
+.hamburger {
+  display: none;
+}
+
+.hamburger {
+  place-items: center;
+  width: 30px;
+  height: 100%;
+}
+
+.titleCenter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navArrows {
+  display: flex;
+  gap: 2px;
+}
+
+.titleButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  color: var(--text);
+}
+
+.titleButtonOff {
+  opacity: 0.4;
+}
+
+/* Command center: a field for files, commands and symbols, labeled with the open folder */
+.commandCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: clamp(180px, calc(100cqi - 900px), 420px);
+  height: 22px;
+  padding: 0 10px;
+  border: 1px solid var(--field-line);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--field);
+}
+
+.commandCenter .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.commandLabel {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.titleEnd {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
+  padding-right: 8px;
+}
+
+/* Activity bar: one icon per view; the open one is bright with a jade line on its left */
+.activityBar {
+  grid-area: activity;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid var(--line);
+  background: var(--chrome);
+}
+
+.activityItem {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 47px;
+  height: 48px;
+  color: var(--icon);
+}
+
+.activityItem[aria-current='page'] {
+  color: var(--icon-active);
+}
+
+.activityItem[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--accent);
+}
+
+.activityIcon {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The count of things waiting in a view, on the icon's lower right */
+.activityBadge {
+  position: absolute;
+  top: 24px;
+  right: 8px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 16px;
+  text-align: center;
+  color: #ffffff;
+  background: var(--accent-fill);
+}
+
+.activityBottom {
+  padding-bottom: 4px;
+}
+
+/* Side bar: the Explorer, a tree of the open folder */
+.sideBar {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border-right: 1px solid var(--line);
+  background: var(--chrome);
+}
+
+.sideTitle {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: 35px;
+  padding: 0 8px 0 20px;
+}
+
+.sideHeading {
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.sideAction {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+}
+
+/* Section headers: bold capitals with a chevron that folds the section */
+.sectionHeader {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  height: 22px;
+  padding-left: 2px;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.twistie {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.3;
+}
+
+.tree {
+  flex: none;
+}
+
+.treeRow {
+  display: flex;
+  align-items: center;
+  height: 22px;
+  padding-right: 12px;
+  white-space: nowrap;
+}
+
+/* The file open in the editor stays selected; gray, since the focus is in the editor */
+.treeSelected {
+  background: var(--selection);
+}
+
+.twistieSlot {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 16px;
+  margin-right: 4px;
+}
+
+.treeLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Problems and git color the name: red for errors, amber for changes, gray for files git ignores */
+.toneError {
+  color: var(--decor-error);
+}
+
+.toneModified {
+  color: var(--decor-modified);
+}
+
+.toneIgnored {
+  color: var(--decor-ignored);
+}
+
+.decoration {
+  flex: none;
+  margin-left: 6px;
+  font-size: 12px;
+}
+
+/* Outline and Timeline wait folded at the bottom */
+.sideFooter {
+  margin-top: auto;
+}
+
+.sideFooter .sectionHeader {
+  border-top: 1px solid var(--line);
+}
+
+/* The icon theme's file glyphs */
+.fileIcon {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  font-family: var(--ui-font);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.fileSvg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  fill: none;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ts {
+  color: #519aba;
+}
+
+.test {
+  color: #e37933;
+}
+
+.json {
+  font-size: 10px;
+  letter-spacing: 0;
+  color: light-dark(#b0b02e, #cbcb41);
+}
+
+.info {
+  stroke: #519aba;
+}
+
+.ignore {
+  stroke: #6d8086;
+}
+
+/* The editor column: tabs, breadcrumbs, the editor itself, and the panel under it */
+.main {
+  grid-area: main;
+  display: grid;
+  grid-template-rows: 35px 22px minmax(0, 1fr) var(--panel-h);
+  min-width: 0;
+  background: var(--editor-bg);
+}
+
+/* Tabs: one per open file; the line under the inactive ones stops at the open tab */
+.tabBar {
+  display: flex;
+  min-width: 0;
+  background: var(--chrome);
+  box-shadow: inset 0 -1px var(--line);
+}
+
+.tabs {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 35px;
+  padding-left: 10px;
+  border-right: 1px solid var(--line);
+  white-space: nowrap;
+  color: var(--muted);
+  background: var(--chrome);
+  box-shadow: inset 0 -1px var(--line);
+}
+
+.tab .fileIcon {
+  margin-right: 6px;
+}
+
+/* The open tab: the editor's own color, so it reads as part of the page below, and a jade line on top */
+.tab[aria-selected='true'] {
+  color: var(--strong);
+  background: var(--editor-bg);
+  box-shadow: none;
+}
+
+.tab[aria-selected='true']::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--accent);
+}
+
+.tab.toneError {
+  color: var(--decor-error);
+}
+
+.tab.toneModified {
+  color: var(--decor-modified);
+}
+
+.tabDecoration {
+  margin-left: 6px;
+  font-size: 12px;
+}
+
+/* Close button; a file with unsaved changes shows a dot in its place */
+.tabClose {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 100%;
+  color: var(--text);
+}
+
+.dirtyDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text);
+}
+
+.editorActions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  padding: 0 8px 0 4px;
+}
+
+/* Breadcrumbs: the folder, the file and the symbol the cursor is in */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 22px;
+  padding-left: 14px;
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  color: light-dark(#616161, #a9a9a9);
+  background: var(--editor-bg);
+}
+
+.crumb {
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+}
+
+.crumb .fileIcon {
+  margin-right: 4px;
+}
+
+.crumbSeparator {
+  width: 16px;
+  height: 16px;
+  opacity: 0.8;
+}
+
+.symbolIcon {
+  margin-right: 4px;
+  color: light-dark(#652d90, #b180d7);
+}
+
+/*
+ * The editor: a glyph margin (where the lightbulb sits), line numbers, the lane for git changes, the code, and the
+ * minimap with the scrollbar. Lines run under the minimap, like in the real editor; the hover card stays clear of it.
+ */
+.editor {
+  position: relative;
+  display: grid;
+  grid-template-columns: 18px 34px 26px minmax(0, 1fr) auto;
+  min-height: 0;
+  overflow: hidden;
+  font-family: var(--code-font);
+  font-size: 12px;
+  line-height: var(--line-h);
+  background: var(--editor-bg);
+}
+
+.glyphMargin,
+.decorations {
+  position: relative;
+}
+
+/* The lightbulb: a quick fix is available on this line */
+.lightbulb {
+  position: absolute;
+  left: 1px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: var(--line-h);
+}
+
+.lightbulb svg {
+  width: 16px;
+  height: 16px;
+}
+
+.bulb {
+  fill: #ffcc00;
+}
+
+.bulbBase {
+  fill: none;
+  stroke: #ffcc00;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.lineNumbers {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: var(--line-number);
+  font-variant-numeric: tabular-nums;
+}
+
+.lineNumbers span {
+  height: var(--line-h);
+}
+
+.lineNumberActive {
+  color: var(--line-number-active);
+}
+
+/* Git change bars: a thin bar beside added and changed lines, a small wedge where lines were deleted */
+.changeBar {
+  position: absolute;
+  left: 0;
+  width: 11px;
+}
+
+.changeBar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 4px;
+  width: 3px;
+  background: currentColor;
+}
+
+.changeBar.changeDeleted {
+  height: 10px;
+  transform: translateY(-5px);
+}
+
+.changeBar.changeDeleted::before {
+  top: 1px;
+  bottom: auto;
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 5px solid currentColor;
+  background: none;
+}
+
+.changeAdded {
+  color: var(--git-added);
+  fill: var(--git-added);
+}
+
+.changeModified {
+  color: var(--git-modified);
+  fill: var(--git-modified);
+}
+
+.changeDeleted {
+  color: var(--git-deleted);
+  fill: var(--git-deleted);
+}
+
+.code {
+  position: relative;
+  min-width: 0;
+  color: var(--syn-plain);
+}
+
+.line {
+  position: relative;
+  height: var(--line-h);
+  white-space: pre;
+}
+
+/* The cursor's line is outlined, so it's easy to find */
+.currentLine {
+  box-shadow: inset 0 0 0 2px var(--current-line);
+}
+
+/* Indent guides: one hairline per level; the block the cursor is in gets a brighter one */
+.guide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--guide);
+}
+
+.guideActive {
+  background: var(--guide-active);
+}
+
+/* Token colors, for the text and for the minimap's blocks */
+.plain {
+  color: var(--syn-plain);
+  fill: var(--syn-plain);
+}
+
+.comment {
+  color: var(--syn-comment);
+  fill: var(--syn-comment);
+}
+
+.string {
+  color: var(--syn-string);
+  fill: var(--syn-string);
+}
+
+.number {
+  color: var(--syn-number);
+  fill: var(--syn-number);
+}
+
+.control {
+  color: var(--syn-control);
+  fill: var(--syn-control);
+}
+
+.storage {
+  color: var(--syn-storage);
+  fill: var(--syn-storage);
+}
+
+.type {
+  color: var(--syn-type);
+  fill: var(--syn-type);
+}
+
+.constant {
+  color: var(--syn-constant);
+  fill: var(--syn-constant);
+}
+
+.function {
+  color: var(--syn-function);
+  fill: var(--syn-function);
+}
+
+.variable {
+  color: var(--syn-variable);
+  fill: var(--syn-variable);
+}
+
+.bracket0 {
+  color: var(--syn-bracket0);
+  fill: var(--syn-bracket0);
+}
+
+.bracket1 {
+  color: var(--syn-bracket1);
+  fill: var(--syn-bracket1);
+}
+
+.bracket2 {
+  color: var(--syn-bracket2);
+  fill: var(--syn-bracket2);
+}
+
+/* The squiggle: a wavy red line under the code the compiler rejects */
+.squiggle {
+  text-decoration: underline wavy var(--error);
+  text-decoration-thickness: 1px;
+  text-decoration-skip-ink: none;
+  text-underline-offset: 3px;
+}
+
+/* The cursor: a 2px bar that blinks */
+.caret {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: var(--line-h);
+  background: var(--cursor);
+}
+
+.caret:not([data-paused]) {
+  animation: blink 1.06s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Hover: the problem under the pointer, explained above it, with its fixes at the bottom */
+.hoverAnchor {
+  position: absolute;
+  right: 0;
+  z-index: 3;
+  height: 0;
+}
+
+.hoverCard {
+  position: absolute;
+  bottom: 2px;
+  left: -4px;
+  width: max-content;
+  max-width: min(500px, 100%);
+  overflow: hidden;
+  border: 1px solid var(--widget-line);
+  border-radius: 4px;
+  font-family: var(--ui-font);
+  font-size: 13px;
+  line-height: 19px;
+  white-space: normal;
+  color: var(--text);
+  background: var(--widget);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.hoverMessage {
+  padding: 4px 8px 0;
+}
+
+.hoverSource {
+  color: var(--muted);
+}
+
+.hoverRelated {
+  padding: 0 8px 5px;
+}
+
+.hoverActions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 22px;
+  padding: 0 8px;
+  border-top: 1px solid var(--widget-line);
+  font-size: 12px;
+  background: var(--widget-status);
+}
+
+.hoverLink {
+  color: var(--link);
+}
+
+/* Minimap: the whole file in miniature, the shaded box marking what's on screen; then the scrollbar */
+.minimap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  background: var(--editor-bg);
+}
+
+.minimapCanvas {
+  display: block;
+  flex: none;
+  fill-opacity: 0.7;
+}
+
+.minimapError {
+  fill: var(--error);
+  fill-opacity: 0.45;
+}
+
+.minimapSlider {
+  fill: light-dark(rgb(100 100 100 / 0.2), rgb(121 121 121 / 0.2));
+  fill-opacity: 1;
+}
+
+/* Overview ruler: the scrollbar's track, with changes marked on its left, problems on its right, the cursor across */
+.ruler {
+  position: relative;
+  width: 14px;
+  border-left: 1px solid light-dark(#e5e5e5, #010409);
+}
+
+.rulerThumb {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  background: light-dark(rgb(100 100 100 / 0.3), rgb(121 121 121 / 0.3));
+}
+
+.rulerChange {
+  position: absolute;
+  left: 1px;
+  width: 4px;
+  background: currentColor;
+}
+
+.rulerCursor {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: light-dark(rgb(0 0 0 / 0.35), rgb(255 255 255 / 0.4));
+}
+
+.rulerError {
+  position: absolute;
+  right: 1px;
+  width: 4px;
+  height: 3px;
+  background: var(--error);
+}
+
+/* Panel: Problems, Output, Debug Console, Terminal and Ports share one area under the editor */
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-top: 1px solid var(--line);
+  background: var(--chrome);
+}
+
+.panelHeader {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 35px;
+  padding: 0 8px 0 10px;
+}
+
+.panelTabs {
+  display: flex;
+  align-items: stretch;
+  gap: 20px;
+  min-width: 0;
+  height: 26px;
+}
+
+.panelTab {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+/* The open view: full color, underlined in jade */
+.panelTab[aria-selected='true'] {
+  color: var(--strong);
+  box-shadow: inset 0 -1px var(--accent);
+}
+
+.panelCount {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  color: var(--badge-text);
+  background: var(--badge);
+}
+
+.panelOverflow {
+  display: none;
+}
+
+.panelActions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+}
+
+.newTerminal {
+  display: flex;
+}
+
+.profileButton {
+  width: 14px;
+}
+
+.panelDivider {
+  width: 1px;
+  height: 16px;
+  margin: 0 4px;
+  background: var(--line);
+}
+
+/* Terminal: the newest output sits at the bottom, and older lines scroll out of view at the top */
+.terminal {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 0;
+  padding: 0 20px 6px;
+  overflow: hidden;
+}
+
+.terminalText {
+  font-family: var(--code-font);
+  font-size: 12px;
+  line-height: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--text);
+}
+
+.ansiGreen {
+  font-weight: 700;
+  color: var(--ansi-green);
+}
+
+.ansiCyan {
+  color: var(--ansi-cyan);
+}
+
+.ansiBlue {
+  font-weight: 700;
+  color: var(--ansi-blue);
+}
+
+.ansiRed {
+  color: var(--ansi-red);
+}
+
+.ansiYellow {
+  color: var(--ansi-yellow);
+}
+
+.ansiGray {
+  color: var(--ansi-gray);
+}
+
+/* Line numbers in the compiler's code excerpts print in reverse video */
+.ansiInverse {
+  color: var(--chrome);
+  background: var(--text);
+}
+
+.terminalCursor {
+  display: inline-block;
+  width: 1ch;
+  height: 14px;
+  vertical-align: bottom;
+  background: var(--text);
+}
+
+/* Status bar: the workspace on the left (remote, branch, problems), the open file on the right */
+.statusBar {
+  grid-area: status;
+  display: flex;
+  justify-content: space-between;
+  min-width: 0;
+  height: 22px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  line-height: 21px;
+  color: var(--text);
+  background: var(--chrome);
+}
+
+.statusStart,
+.statusEnd {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.statusEnd {
+  flex: none;
+  padding-right: 4px;
+}
+
+.statusItem {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  margin: 0 3px;
+  padding: 0 5px;
+  white-space: nowrap;
+}
+
+.statusItem .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.warningIcon {
+  margin-left: 4px;
+}
+
+/* The remote button: the one item on a jade fill */
+.remote {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  margin-top: -1px;
+  color: #ffffff;
+  background: var(--accent-fill);
+}
+
+.branchName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sync {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 3px;
+  margin-left: 6px;
+}
+
+.languageStatus {
+  margin-right: 6px;
+}
+
+/* Narrower windows: the last menus fold into "more", and the side bar slims down */
+@container glyph (width < 1120px) {
+  .app {
+    --side-w: 220px;
+  }
+
+  .menuLate {
+    display: none;
+  }
+
+  .menuOverflow {
+    display: flex;
+  }
+
+  .commandCenter {
+    width: clamp(180px, calc(100cqi - 760px), 420px);
+  }
+}
+
+/* The menus fold into one button, and the minimap steps aside for the code */
+@container glyph (width < 940px) {
+  .menuBar {
+    display: none;
+  }
+
+  .hamburger {
+    display: grid;
+  }
+
+  .commandCenter {
+    width: clamp(160px, calc(100cqi - 360px), 420px);
+  }
+
+  .layoutExtra,
+  .statusExtra:not([data-inspect]) {
+    display: none;
+  }
+}
+
+@container glyph (width < 860px) {
+  .minimapCanvas {
+    display: none;
+  }
+}
+
+/* The side bar closes; no view is open in the activity bar then */
+@container glyph (width < 720px) {
+  .app {
+    grid-template-columns: 48px minmax(0, 1fr);
+    grid-template-areas:
+      'title title'
+      'activity main'
+      'status status';
+  }
+
+  .sideBar {
+    display: none;
+  }
+
+  .activityItem[aria-current='page'] {
+    color: var(--icon);
+  }
+
+  .activityItem[aria-current='page']::before {
+    display: none;
+  }
+}
+
+/*
+ * Phone width: the arrows and the split button go, the hover card waits for a pointer, the panel keeps two views
+ * and folds the rest into "more", and the status bar keeps the branch, the problems and the cursor.
+ */
+@container glyph (width < 640px) {
+  .navArrows,
+  .editorActions,
+  .hoverAnchor,
+  .panelTabOptional,
+  .panelExtra,
+  .panelDivider,
+  .sync,
+  .statusExtra {
+    display: none;
+  }
+
+  .panelOverflow {
+    display: flex;
+  }
+
+  .panelTabs {
+    gap: 14px;
+  }
+
+  .commandCenter {
+    width: auto;
+    min-width: 0;
+  }
+
+  .titleCenter {
+    min-width: 0;
+  }
+
+  .titleBar {
+    grid-template-columns: max-content minmax(0, 1fr) max-content;
+    column-gap: 8px;
+  }
+
+  .terminal {
+    padding: 0 12px 6px;
+  }
+
+  /* A slimmer gutter and no scrollbar track, so the code keeps as many columns as it can */
+  .editor {
+    grid-template-columns: 16px 24px 12px minmax(0, 1fr) auto;
+  }
+
+  .ruler,
+  .profileButton {
+    display: none;
+  }
+}
+
+@container glyph (width < 400px) {
+  .titleEnd .titleButton:first-child {
+    display: none;
+  }
+}

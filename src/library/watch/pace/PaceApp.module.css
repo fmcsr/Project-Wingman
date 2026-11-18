@@ -1,0 +1,152 @@
+/*
+ * Pace follows a watch's workout screen, which is dark by design: the same in both themes. The black is the display
+ * switched off, so the screen's corners disappear into the border and only the numbers light up. Every metric is a
+ * big white figure with a small label, and color carries meaning: yellow is time, red is the heart, and Pace's own
+ * aqua marks the workout itself (its icon and goal ring).
+ */
+.app {
+  --accent: #3fd8f0;
+  --accent-track: rgb(63 216 240 / 0.25);
+  --time: #ffd60a;
+  --heart: #ff375f;
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  padding: 0 12px;
+  font-family: 'SF Compact', 'SF Compact Display', -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  color: #fff;
+  background: #000;
+}
+
+/* Top row: the workout's icon in its goal ring and the time, both kept inside the screen's rounded corners */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 30px;
+  margin-top: 6px;
+  padding: 0 8px 0 3px;
+}
+
+.goal {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+}
+
+/* Goal ring: one circle's outline drawn as a single dash, from twelve o'clock, as long as the share of the goal */
+.ring {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+  fill: none;
+  stroke-width: 3;
+}
+
+.track {
+  stroke: var(--accent-track);
+}
+
+.progress {
+  stroke: var(--accent);
+  stroke-linecap: round;
+}
+
+/* The workout's glyph: a runner in thick round strokes, solid-looking at this size */
+.glyph {
+  position: relative;
+  display: block;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.glyphHead {
+  fill: var(--accent);
+  stroke: none;
+}
+
+.clock {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The metrics view: one figure per line, left-aligned, read top to bottom at a glance */
+.view {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 2px;
+}
+
+/* Elapsed time: the biggest figure and the only yellow one. Equal-width digits keep it from jiggling as it counts */
+.elapsed {
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 44px;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--time);
+}
+
+/* A metric: the figure, then its label sitting on the same baseline */
+.metric {
+  display: flex;
+  align-items: last baseline;
+  gap: 4px;
+  height: 38px;
+}
+
+.value {
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 38px;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Unit label: small capitals; two words stack into two short lines so the row stays one line tall */
+.unit {
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 11px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.heart {
+  display: block;
+  margin-left: 1px;
+  fill: var(--heart);
+}
+
+/* Page indicator: one dot per workout view, in a column by the Digital Crown; the white one is on screen */
+.pages {
+  position: absolute;
+  top: 46px;
+  right: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 2px;
+}
+
+.page {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.3);
+}
+
+.pageOn {
+  background: #fff;
+}

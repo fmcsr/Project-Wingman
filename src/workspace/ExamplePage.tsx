@@ -1,22 +1,23 @@
 import { AddToBrief } from '../brief/AddToBrief';
 import { InspectSurface } from '../inspector/InspectSurface';
 import { InspectorLayerHost } from '../inspector/InspectorLayer';
-import { examplesFor } from '../library';
+import { examplesFor, platformLabel } from '../library';
 import type { LibraryExample } from '../library';
 import { Link, useDocumentTitle } from '../router';
 import { BrowserFrame } from '../showcase/BrowserFrame';
 import { FitPhone } from '../showcase/FitPhone';
+import { FitWatch } from '../showcase/WatchFrame';
 import { ElementGlossary } from './ElementGlossary';
 import styles from './ExamplePage.module.css';
 
 /**
- * One example at full size, with every element written out next to it (phones) or below it (sites).
+ * One example at full size, with every element written out next to it (phones and watches) or below it (sites).
  * Sites use the scroll scene: the window pins and page scrolling scrolls the site.
  */
 export function ExamplePage({ example }: { example: LibraryExample }) {
   useDocumentTitle(`${example.name} · Library · Project Wingman`);
   const { Component } = example;
-  const label = example.platform === 'mobile' ? 'Mobile' : 'Web';
+  const label = platformLabel(example.platform);
   const siblings = examplesFor(example.platform);
   const index = siblings.indexOf(example);
   const previous = siblings[(index - 1 + siblings.length) % siblings.length];
@@ -26,7 +27,7 @@ export function ExamplePage({ example }: { example: LibraryExample }) {
     <InspectSurface
       label={`${example.name} ${example.kind.toLowerCase()}`}
       specs={example.specs}
-      fill={example.platform === 'mobile'}
+      fill={example.platform !== 'web'}
       renderAction={(spec) => <AddToBrief example={example} specId={spec.id} tone="balloon" />}
     >
       <Component />
@@ -46,7 +47,9 @@ export function ExamplePage({ example }: { example: LibraryExample }) {
           {example.name} <span className={styles.muted}>{example.kind}</span>
         </h1>
         <p className={styles.lead}>{example.description}</p>
-        <p className={styles.inspired}>Inspired by {example.inspiredBy.join(', ')}</p>
+        <p className={styles.inspired}>
+          Inspired by {example.inspiredBy.join(', ')}. A fictional example, not affiliated with them.
+        </p>
       </header>
 
       <div className={styles.stage}>
@@ -59,7 +62,7 @@ export function ExamplePage({ example }: { example: LibraryExample }) {
           ) : (
             <div className={styles.mobileLayout}>
               <div className={styles.phoneColumn}>
-                <FitPhone>{surface}</FitPhone>
+                {example.platform === 'watch' ? <FitWatch>{surface}</FitWatch> : <FitPhone>{surface}</FitPhone>}
               </div>
               <ElementGlossary example={example} />
             </div>
@@ -67,15 +70,18 @@ export function ExamplePage({ example }: { example: LibraryExample }) {
         </InspectorLayerHost>
       </div>
 
-      <nav className={styles.pager} aria-label="More examples">
-        <Link href={`/app/${example.platform}/${previous.id}`}>
-          <span className={styles.pagerLabel}>Previous</span>← {previous.name}
-        </Link>
-        <Link href={`/app/${example.platform}/${next.id}`} className={styles.next}>
-          <span className={styles.pagerLabel}>Next</span>
-          {next.name} →
-        </Link>
-      </nav>
+      {/* A tab with a single example has nowhere else to go */}
+      {siblings.length > 1 && (
+        <nav className={styles.pager} aria-label="More examples">
+          <Link href={`/app/${example.platform}/${previous.id}`}>
+            <span className={styles.pagerLabel}>Previous</span>← {previous.name}
+          </Link>
+          <Link href={`/app/${example.platform}/${next.id}`} className={styles.next}>
+            <span className={styles.pagerLabel}>Next</span>
+            {next.name} →
+          </Link>
+        </nav>
+      )}
     </div>
   );
 }

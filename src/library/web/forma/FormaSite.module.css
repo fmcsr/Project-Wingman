@@ -1,0 +1,1527 @@
+/*
+ * Forma's editor follows the page theme: every chrome color is a light-dark(light, dark) pair, gathered as tokens on
+ * .app. What's on the canvas (the payment screens and their product photos) is content inside the file, so like a
+ * photo it looks the same in both themes; so do the colors people get for their cursors and avatar rings.
+ */
+/* Container queries apply to child elements, not the container itself; that's why the grid sits inside it */
+.root {
+  container-type: inline-size;
+}
+
+/*
+ * An app screen: the left panel (file, pages, layers), the canvas with a toolbar floating at its bottom, and the
+ * Design panel on the right. Teal (--accent) marks what's selected or active, components get their own pink
+ * (--component) and measurements their own red (--guide), so the three never read as one another.
+ */
+.app {
+  --panel: light-dark(#ffffff, #2c2c2c);
+  --canvas: light-dark(#f5f5f5, #1e1e1e);
+  --line: light-dark(#e6e6e6, #3b3b3b);
+  --text: light-dark(#1e1e1e, #f5f5f5);
+  --muted: light-dark(#737373, #a3a3a3);
+  --field: light-dark(#f5f5f5, #383838);
+  --hover: light-dark(#f0f0f0, #363636);
+  --raised: light-dark(#ffffff, #4a4a4a);
+  --accent: light-dark(#0d857a, #109486);
+  --accent-soft: light-dark(#e0f2ef, #1d3b38);
+  --accent-ink: light-dark(#0b6e65, #63c9bb);
+  --component: light-dark(#c2307e, #e0559e);
+  --guide: light-dark(#e5482d, #f25c3f);
+  --float-shadow:
+    0 0 0 0.5px light-dark(rgb(0 0 0 / 0.16), rgb(255 255 255 / 0.14)),
+    0 2px 6px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.35)),
+    0 8px 20px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.35));
+  /* The canvas: its zoom, and where the design sits on it (the container queries at the end move it) */
+  --zoom: 0.75;
+  --pan: 48px;
+  --top: 72px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr) 240px;
+  grid-template-areas: 'left canvas right';
+  height: 900px;
+  /* The operating system's own font, at the reference's small, dense size */
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--text);
+  background: var(--panel);
+}
+
+/* Resets sit in :where() (zero specificity), so any class below can override them */
+:where(.app svg) {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+:where(.app p) {
+  margin: 0;
+}
+
+/* Line icons: 24px boxes with a 1px stroke. Icons drawn smaller get a thicker stroke, so they still render at 1px */
+.icon {
+  width: 24px;
+  height: 24px;
+}
+
+.filled {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* The small arrow after anything that opens a menu */
+.tinyChevron {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  stroke-width: 1.5;
+}
+
+/* Icon buttons: 24px squares */
+.panelToggle,
+.headTool,
+.rowTool {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  color: var(--text);
+}
+
+/* Left panel: the file header, then the File and Assets tabs, the pages and the layers */
+.left {
+  grid-area: left;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border-right: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.fileHeader {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px 8px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.menuRow {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  justify-content: space-between;
+  height: 32px;
+}
+
+.mainMenu {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 1px;
+  height: 28px;
+  padding-left: 6px;
+  border-radius: 5px;
+}
+
+/* Forma's mark: a monochrome tile, as small as the menu it opens */
+.mark {
+  width: 18px;
+  height: 18px;
+}
+
+.markTile {
+  fill: var(--text);
+  stroke: none;
+}
+
+.markShape {
+  fill: var(--panel);
+  stroke: none;
+}
+
+.fileName {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+  margin-top: 4px;
+  padding-left: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.fileTitle {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.project {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 8px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+/* The plan the team is on: a small tag in a tint of the accent */
+.plan {
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+}
+
+.leftBody {
+  min-height: 0;
+}
+
+/* Tab rows on both panels: File / Assets on the left, Design / Prototype and the zoom on the right */
+.leftTabs,
+.rightTabs {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* The open tab is a gray pill with full-strength text */
+.tab[aria-selected='true'] {
+  font-weight: 600;
+  color: var(--text);
+  background: var(--field);
+}
+
+.pages {
+  padding: 0 8px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.listHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  padding-left: 8px;
+  font-weight: 600;
+}
+
+.pageRow {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 5px;
+}
+
+.pageRow[aria-current='page'] {
+  font-weight: 500;
+  background: var(--field);
+}
+
+/* Layers: one 32px row per layer, indented 16px per level of nesting */
+.layers {
+  padding: 0 8px;
+}
+
+.layer {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 4px 0 calc(var(--depth) * 16px);
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+/* The arrow that opens a layer only shows under the pointer, so the tree reads by its indents */
+.caret {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 16px;
+  height: 24px;
+  color: var(--muted);
+  visibility: hidden;
+}
+
+.caret svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.5;
+}
+
+.layer[aria-expanded='true'] .caret svg {
+  rotate: 90deg;
+}
+
+.layerIcon {
+  color: var(--muted);
+}
+
+.layerName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding-left: 2px;
+  text-overflow: ellipsis;
+}
+
+/* Frames at the top of the tree are set in bold */
+.layerTop .layerName {
+  font-weight: 600;
+}
+
+.layerTop .layerIcon {
+  color: var(--text);
+}
+
+/* Instances of components carry the component color, icon and name */
+.layerInstance .layerIcon,
+.layerInstance .layerName {
+  color: var(--component);
+}
+
+/* The layer selected on the canvas is highlighted here too */
+.selected {
+  background: var(--accent-soft);
+}
+
+.hovered {
+  background: var(--hover);
+}
+
+.hovered .caret {
+  visibility: visible;
+}
+
+/* Lock and eye: hidden until the row is hovered, and kept in view once switched on */
+.toggle {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: var(--muted);
+  visibility: hidden;
+}
+
+.hovered .toggle,
+.toggleOn {
+  visibility: visible;
+}
+
+/* A hidden layer stays in the list, faded */
+.layerHidden .layerIcon,
+.layerHidden .layerName {
+  opacity: 0.4;
+}
+
+/* Canvas: an endless gray surface; the design sits on it at 75% (--zoom) */
+.canvas {
+  grid-area: canvas;
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--canvas);
+}
+
+/* Everything on the canvas, in design pixels */
+.world {
+  position: absolute;
+  top: var(--top);
+  left: var(--pan);
+  transform: scale(var(--zoom));
+  transform-origin: 0 0;
+}
+
+.frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 390px;
+  height: 844px;
+}
+
+/* The error state, 80px to the right; the canvas's edge (the Design panel) cuts it off */
+.frameNext {
+  left: 470px;
+}
+
+.frameClip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/*
+ * Canvas overlays (labels, handles, badges, the pin, cursors) keep their size at any zoom, like in a real editor:
+ * each one is scaled back up by 1 / --zoom.
+ */
+.frameLabel {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  padding-bottom: 4px;
+  font-size: 11px;
+  line-height: 16px;
+  white-space: nowrap;
+  color: var(--muted);
+  scale: calc(1 / var(--zoom));
+  transform-origin: 0 100%;
+}
+
+/* The design itself: content inside the file, not editor chrome, so its colors are the same in both themes */
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 20px;
+  color: #16181d;
+  background: #ffffff;
+}
+
+.mStatus {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  padding: 4px 26px 0 38px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.mStatusIcons {
+  width: 68px;
+  height: 12px;
+  fill: #16181d;
+  stroke: none;
+}
+
+.mBatteryCase {
+  fill: none;
+  stroke: #16181d;
+  stroke-width: 1;
+  opacity: 0.4;
+}
+
+.mNav {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  height: 52px;
+  padding: 0 20px 0 12px;
+}
+
+.mBack {
+  width: 28px;
+  height: 28px;
+  stroke-width: 2;
+}
+
+.mTitle {
+  position: absolute;
+  right: 0;
+  left: 0;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.mStep {
+  margin-left: auto;
+  font-size: 14px;
+  color: #6b7079;
+}
+
+/* Order summary: a card listing what's being bought, each item with its product photo */
+.mSummary {
+  position: absolute;
+  top: 112px;
+  right: 20px;
+  left: 20px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #f5f5f7;
+}
+
+.mSummaryHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+.mCount {
+  font-size: 13px;
+  font-weight: 400;
+  color: #6b7079;
+}
+
+.mItems {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.mItem {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.mItem img {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.mItemText {
+  display: grid;
+  min-width: 0;
+}
+
+.mItemName {
+  overflow: hidden;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mItemMeta {
+  font-size: 13px;
+  line-height: 18px;
+  color: #6b7079;
+}
+
+.mItemPrice {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.mTotal {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #e3e4e8;
+  font-weight: 600;
+}
+
+.mTotalValue {
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.mMethods {
+  position: absolute;
+  top: 437px;
+  right: 20px;
+  left: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: 44px;
+  padding: 3px;
+  border-radius: 12px;
+  background: #f1f2f4;
+}
+
+.mMethod {
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #5c616b;
+}
+
+.mMethod[aria-selected='true'] {
+  color: #16181d;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(16 24 40 / 0.12);
+}
+
+.mCard,
+.mPair {
+  position: absolute;
+  right: 20px;
+  left: 20px;
+}
+
+.mCard {
+  top: 501px;
+}
+
+.mPair {
+  top: 587px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.mField {
+  display: grid;
+  gap: 6px;
+}
+
+.mLabel {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 16px;
+  color: #4a4f58;
+}
+
+.mInput {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid #d5d8de;
+  border-radius: 12px;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.mInputIcon {
+  width: 22px;
+  height: 22px;
+  color: #8b909a;
+  stroke-width: 1.5;
+}
+
+.mInputError {
+  border-color: #d92d20;
+  box-shadow: 0 0 0 3px rgb(217 45 32 / 0.12);
+}
+
+.mError {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 18px;
+  white-space: nowrap;
+  color: #d92d20;
+}
+
+.mErrorIcon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+/* The Pay button: an auto layout frame (icon + label, gap 8, padding 16/24) with one fill and one drop shadow */
+.mPay {
+  position: absolute;
+  top: 681px;
+  right: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 52px;
+  padding: 16px 24px;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #16181d;
+  box-shadow: 0 6px 16px rgb(22 24 29 / 0.24);
+}
+
+.mPayIcon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
+.mPayDisabled {
+  color: #9a9fa8;
+  background: #e9eaed;
+  box-shadow: none;
+}
+
+/* Far enough below the button that the size badge, which hangs under the selection, doesn't cover it */
+.mNote {
+  position: absolute;
+  top: 765px;
+  right: 20px;
+  left: 20px;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+  color: #6b7079;
+}
+
+.mHome {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 134px;
+  height: 5px;
+  margin-left: -67px;
+  border-radius: 3px;
+  background: #16181d;
+}
+
+/* In the error state, the message under the card number pushes everything below it down */
+.screenError .mShift {
+  translate: 0 24px;
+}
+
+/* Measurement (redline): from the selected button up to the field under the pointer, which is outlined */
+.measure {
+  position: absolute;
+  top: 609px;
+  left: 203px;
+  width: 167px;
+  height: 72px;
+}
+
+.measureTarget {
+  position: absolute;
+  inset: 0 0 24px;
+  box-shadow: 0 0 0 calc(1px / var(--zoom)) var(--guide);
+}
+
+.measureLine {
+  position: absolute;
+  top: 48px;
+  left: 50%;
+  width: calc(1px / var(--zoom));
+  height: 24px;
+  background: var(--guide);
+  translate: -50% 0;
+}
+
+.measureLabel {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  margin-left: calc(4px / var(--zoom));
+  padding: 0 4px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  color: #ffffff;
+  background: var(--guide);
+  translate: 0 -50%;
+  scale: calc(1 / var(--zoom));
+  transform-origin: 0 50%;
+}
+
+/* Selection: the button is an instance, so its outline and handles take the component color */
+.selection {
+  position: absolute;
+  top: 681px;
+  left: 20px;
+  width: 350px;
+  height: 52px;
+  box-shadow: 0 0 0 calc(1px / var(--zoom)) var(--component);
+}
+
+/* Handles stay white in both themes, as in real editors, so they show on any fill */
+.handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--component);
+  border-radius: 1px;
+  background: #ffffff;
+  translate: -50% -50%;
+  scale: calc(1 / var(--zoom));
+}
+
+.nw {
+  top: 0;
+  left: 0;
+}
+
+.ne {
+  top: 0;
+  left: 100%;
+}
+
+.se {
+  top: 100%;
+  left: 100%;
+}
+
+.sw {
+  top: 100%;
+  left: 0;
+}
+
+.sizeBadge {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-top: calc(6px / var(--zoom));
+  padding: 0 4px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+  color: #ffffff;
+  background: var(--component);
+  font-variant-numeric: tabular-nums;
+  translate: -50% 0;
+  scale: calc(1 / var(--zoom));
+  transform-origin: 50% 0;
+}
+
+/*
+ * Comment pin: the author's face in a bubble whose one sharp corner marks the spot, just off the order summary's
+ * top-right corner. Under the pointer it widens into a preview of the thread, out over the canvas.
+ */
+.comment {
+  position: absolute;
+  top: 150px;
+  left: 376px;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 248px;
+  padding: 8px 12px 10px 8px;
+  border-radius: 16px 16px 16px 2px;
+  background: var(--panel);
+  box-shadow: var(--float-shadow);
+  translate: 0 -100%;
+  scale: calc(1 / var(--zoom));
+  transform-origin: 0 100%;
+}
+
+.commentAvatar {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.commentPreview {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.commentMeta {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+.commentAuthor {
+  font-weight: 600;
+}
+
+.commentTime,
+.commentReplies {
+  color: var(--muted);
+}
+
+.commentReplies {
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* Multiplayer cursor: someone else's pointer in their color, with their name on a tag */
+.cursor {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  scale: calc(1 / var(--zoom));
+  transform-origin: 0 0;
+}
+
+.cursorArrow {
+  width: 18px;
+  height: 18px;
+  fill: var(--who);
+  stroke: #ffffff;
+  stroke-width: 1.25;
+  filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.25));
+}
+
+.cursorName {
+  margin: 14px 0 0 -3px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+  color: var(--who-ink);
+  background: var(--who);
+}
+
+.cursorTheo {
+  top: 462px;
+  left: 212px;
+}
+
+/* Noor points into the card number field of the error state; her tag needs about 620px of canvas to show whole */
+.cursorNoor {
+  top: 546px;
+  left: 206px;
+}
+
+/* Toolbar: floats over the bottom of the canvas; the tool in use is filled with the accent */
+.toolbar {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 48px;
+  padding: 0 8px;
+  border-radius: 13px;
+  white-space: nowrap;
+  background: var(--panel);
+  box-shadow: var(--float-shadow);
+  translate: -50% 0;
+}
+
+.toolGroup {
+  display: flex;
+  align-items: center;
+}
+
+.tool {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  color: var(--text);
+}
+
+.tool[aria-pressed='true'] {
+  color: #ffffff;
+  background: var(--accent);
+}
+
+/* The arrow that opens the rest of a tool group sits beside the tool, outside its fill */
+.toolChevron {
+  width: 12px;
+  height: 12px;
+  margin-right: 2px;
+  color: var(--muted);
+  stroke-width: 2;
+}
+
+/* Draw, Design and Dev handoff: a segmented switch after a hairline */
+.modes {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  margin-left: 13px;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--field);
+}
+
+.modes::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -8px;
+  width: 1px;
+  height: 24px;
+  background: var(--line);
+  translate: 0 -50%;
+}
+
+.mode {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--muted);
+}
+
+.mode .icon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.2;
+}
+
+.mode[aria-checked='true'] {
+  color: var(--accent);
+  background: var(--raised);
+  box-shadow:
+    0 0 0 0.5px light-dark(rgb(0 0 0 / 0.12), rgb(255 255 255 / 0.08)),
+    0 1px 2px light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.3));
+}
+
+/* Help: a small round button in the canvas's corner */
+.help {
+  position: absolute;
+  right: 12px;
+  bottom: 16px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 600;
+  color: light-dark(#ffffff, #1e1e1e);
+  background: light-dark(#1e1e1e, #f5f5f5);
+}
+
+/* Right panel: people, Present and Share on top, then the Design tab's sections for the selection */
+.right {
+  grid-area: right;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border-left: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.rightHead {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  height: 48px;
+  padding: 0 8px 0 12px;
+}
+
+/* Everyone in the file: a ring in each collaborator's cursor color, and a ring in the panel color between faces */
+.people {
+  display: flex;
+  align-items: center;
+  margin-right: auto;
+}
+
+.avatar {
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px var(--panel);
+}
+
+.avatar + .avatar {
+  margin-left: -4px;
+}
+
+.avatarRing {
+  border: 2px solid var(--who);
+}
+
+.people .tinyChevron {
+  margin-left: 2px;
+}
+
+.present {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  border-radius: 5px;
+}
+
+.share {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  margin-left: 2px;
+  padding: 0 8px;
+  border-radius: 5px;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--accent);
+}
+
+.zoom {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding-left: 6px;
+  border-radius: 5px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sections: a title row, then groups of a small gray label over a row of 24px fields */
+.section {
+  display: grid;
+  gap: 8px;
+  padding: 0 8px 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  margin-bottom: -4px;
+  font-weight: 600;
+}
+
+/* An empty section is only its title, in gray, and a plus */
+.emptySection {
+  padding-bottom: 0;
+}
+
+.emptySection .sectionHead {
+  margin-bottom: 0;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.headTools {
+  display: flex;
+}
+
+.group {
+  display: grid;
+  gap: 2px;
+}
+
+.label {
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+/* Two fields and an icon button: the grid most rows share */
+.row,
+.labeled {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 8px;
+}
+
+.labeled {
+  gap: 2px 8px;
+}
+
+/* Number fields and dropdowns share one shape: a 24px gray well */
+.field,
+.select {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  background: var(--field);
+  font-variant-numeric: tabular-nums;
+}
+
+.key {
+  flex: none;
+  width: 12px;
+  color: var(--muted);
+}
+
+.fieldIcon {
+  width: 16px;
+  height: 16px;
+  margin-left: -3px;
+  color: var(--muted);
+  stroke-width: 1.5;
+}
+
+.selectChevron {
+  width: 16px;
+  height: 16px;
+  margin: 0 -4px 0 auto;
+  color: var(--muted);
+  stroke-width: 1.5;
+}
+
+/* The instance: its component's name (a menu that swaps it) and one dropdown per variant property */
+.instanceName {
+  display: flex;
+  align-items: center;
+  margin-left: -6px;
+  font-weight: 600;
+}
+
+.instanceIcon {
+  color: var(--component);
+}
+
+.propRow {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Alignment: left, center, right and top, middle, bottom, as two segmented groups */
+.iconGroup {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  place-items: center;
+  height: 24px;
+  border-radius: 5px;
+  background: var(--field);
+}
+
+.iconGroup .icon,
+.segment .icon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.2;
+}
+
+.segmented {
+  grid-column: 1 / 3;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: 24px;
+  padding: 1px;
+  border-radius: 5px;
+  background: var(--field);
+}
+
+.segment {
+  display: grid;
+  place-items: center;
+  border-radius: 4px;
+  color: var(--muted);
+}
+
+.segment[aria-checked='true'] {
+  color: var(--text);
+  background: var(--raised);
+  box-shadow:
+    0 0 0 0.5px light-dark(rgb(0 0 0 / 0.12), rgb(255 255 255 / 0.08)),
+    0 1px 1px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.3));
+}
+
+/* Alignment box on the left; gap, then horizontal and vertical padding, on the right */
+.spacing {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: 16px 24px 24px;
+  gap: 4px 8px;
+  margin-right: 32px;
+}
+
+.spacing .label:nth-child(2),
+.wide {
+  grid-column: 2 / 4;
+}
+
+.alignBox {
+  grid-row: 2 / 4;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  place-items: center;
+  border-radius: 5px;
+  background: var(--field);
+}
+
+.alignDot {
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: light-dark(#b3b3b3, #6b6b6b);
+}
+
+/* The chosen alignment: three bars, centered both ways */
+.alignOn {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.alignOn span {
+  width: 2px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--accent);
+}
+
+.alignOn span:nth-child(2) {
+  height: 10px;
+}
+
+/* Paint and effect rows: the well, then show and remove */
+.paintRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24px 24px;
+  align-items: center;
+  gap: 4px;
+}
+
+.paint {
+  display: flex;
+  min-width: 0;
+  height: 24px;
+  border-radius: 5px;
+  background: var(--field);
+}
+
+.hex {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 8px;
+}
+
+.swatch {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: #16181d;
+  box-shadow: inset 0 0 0 1px light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.14));
+}
+
+.opacity {
+  display: flex;
+  flex: none;
+  align-items: center;
+  width: 52px;
+  padding: 0 8px;
+  border-left: 1px solid var(--panel);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  margin-left: auto;
+  color: var(--muted);
+}
+
+.rowTool .icon,
+.headTool .icon,
+.panelToggle .icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Constraints that differ from the default (left and top) tint their button */
+.rowToolOn {
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+}
+
+/* Comment previews need room beside the frame; on smaller canvases the pin stays a closed bubble */
+@container (width < 1100px) {
+  .comment {
+    width: auto;
+    padding: 4px;
+  }
+
+  .commentPreview {
+    display: none;
+  }
+}
+
+/* Where the canvas is too narrow for Noor's whole tag, she's elsewhere in the file */
+@container (900px <= width < 1100px) {
+  .cursorNoor {
+    display: none;
+  }
+}
+
+@container (width < 860px) {
+  .cursorNoor {
+    display: none;
+  }
+}
+
+/* The mode switch steps aside first, so the tools keep their room */
+@container (width < 1000px) {
+  .modes {
+    display: none;
+  }
+}
+
+/* With both panels docked, under 1000px only a sliver of the error state would show, so it's left off */
+@container (900px <= width < 1000px) {
+  .frameNext {
+    display: none;
+  }
+}
+
+/*
+ * Below 900px the left panel minimizes into a floating bar with the file's name, as Minimize UI does, and the design
+ * moves down to make room for it.
+ */
+@container (width < 900px) {
+  .app {
+    --top: 84px;
+    grid-template-columns: minmax(0, 1fr) 240px;
+    grid-template-areas: 'canvas right';
+  }
+
+  .left {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 3;
+    max-width: calc(100% - 264px);
+    border: 0;
+    border-radius: 12px;
+    box-shadow: var(--float-shadow);
+  }
+
+  .fileHeader {
+    flex-direction: row;
+    align-items: center;
+    height: 40px;
+    padding: 0 4px;
+    border: 0;
+  }
+
+  .menuRow {
+    display: contents;
+  }
+
+  .panelToggle {
+    order: 1;
+  }
+
+  .fileName {
+    min-width: 0;
+    margin: 0;
+    padding: 0 0 0 6px;
+    font-size: 12px;
+  }
+
+  .project,
+  .leftBody {
+    display: none;
+  }
+}
+
+@container (width < 760px) {
+  .frameNext {
+    display: none;
+  }
+}
+
+/*
+ * Phone width: the Design panel minimizes too, leaving its top row (people, Present and Share) as a floating bar.
+ * The frame is centered, and only the tools that matter for a quick edit stay in the toolbar.
+ */
+@container (width < 640px) {
+  .app {
+    --pan: calc((100cqi - 390px * var(--zoom)) / 2);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'canvas';
+    height: 812px;
+  }
+
+  .left {
+    max-width: calc(100% - 232px);
+  }
+
+  .right {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 3;
+    border: 0;
+    border-radius: 12px;
+    box-shadow: var(--float-shadow);
+  }
+
+  .rightHead {
+    height: 40px;
+    padding: 0 4px 0 8px;
+  }
+
+  .rightTabs,
+  .props,
+  .help,
+  .toolExtra,
+  .toolGroup + .toolGroup .toolChevron {
+    display: none;
+  }
+}
+
+@container (width < 480px) {
+  .left {
+    max-width: calc(100% - 152px);
+  }
+
+  .people {
+    display: none;
+  }
+}
+
+@container (width < 400px) {
+  .left {
+    max-width: calc(100% - 104px);
+  }
+
+  .present {
+    display: none;
+  }
+
+  .rightHead {
+    padding-left: 4px;
+  }
+}

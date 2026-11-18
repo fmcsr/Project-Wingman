@@ -1,105 +1,194 @@
 /*
- * Vault follows the page theme with light-dark() pairs on iOS's grouped gray, in the iOS system font.
- * The brand indigo (#5b5bf6) and the card art read well on both themes, so they stay the same.
+ * Vault follows the page theme like the account overview it is modeled on. The top of the screen is a wash of the
+ * brand color, evergreen: in dark mode it starts bright and sinks into the black page, in light mode it starts deep
+ * and clears into the pale page. Everything on the wash is white, with see-through white circles and pills. Below it,
+ * the home screen's cards are white (dark gray in dark mode) with near-black or white type in the iOS system font and
+ * gray secondary text; the frosted tab bar lets them pass underneath.
  */
 .app {
+  --page: light-dark(#f1f4f2, #060b08);
+  --surface: light-dark(#fff, #141b17);
+  --ink: light-dark(#191c1f, #fff);
+  --ink-2: light-dark(#6c746f, #8e9a93);
+  --glass: rgb(255 255 255 / 0.2);
+
   position: relative;
   height: 100%;
   overflow: hidden;
   font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
-  font-size: 14px;
-  color: light-dark(#0b0b0f, #f5f5f7);
-  background: light-dark(#f2f2f7, #000);
+  font-size: 10.5px;
+  line-height: 14px;
+  color: var(--ink);
+  /* The wash: one hue, its stops in pixels so it ends where the cards begin */
+  background: linear-gradient(
+    light-dark(#04301a, #22a062) 0,
+    light-dark(#074424, #0e7d45) 70px,
+    light-dark(#0a572f, #075d32) 140px,
+    light-dark(#0f6a39, #043d20) 210px,
+    light-dark(#1a7a46, #022514) 265px,
+    light-dark(#2f8b57, #050f09) 305px,
+    light-dark(#c0dfcb, #060b08) 340px,
+    var(--page) 375px
+  );
 }
 
+/* Glyphs on a 24px grid: round strokes, or solid shapes where the reference uses filled icons */
 .app svg {
   fill: none;
   stroke: currentColor;
-  stroke-width: 2;
+  stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-/* Top bar: the account switcher on the left, the profile on the right */
+.app .solid,
+.app .dotGlyph {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* The status bar and everything on the wash is white in both themes */
+.onWash {
+  color: #fff;
+}
+
+/* Top bar: your photo, the search pill and two round buttons */
 .topBar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 2px;
-  padding: 0 16px;
-}
-
-.switcher {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  height: 30px;
-  padding: 0 10px 0 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  background: light-dark(#e3e3ea, #1c1c1e);
-}
-
-.switcher svg {
-  color: light-dark(#6b6b76, #9a9aa3);
+  gap: 5px;
+  height: 26px;
+  margin: 2px 11px 0;
+  color: #fff;
 }
 
 .avatar {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
+  position: relative;
+  flex: none;
+  width: 26px;
+  height: 26px;
+}
+
+.avatarPhoto {
+  display: block;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  font-size: 12px;
-  font-weight: 700;
-  color: light-dark(#c2410c, #fdba74);
-  background: light-dark(#ffe4d6, rgb(255 140 90 / 0.2));
+  object-fit: cover;
 }
 
-/* Balance: the biggest thing on screen, with the privacy toggle beside it */
-.balanceRow {
+/* Something waits in your profile: a red dot, no number */
+.avatarDot {
+  position: absolute;
+  top: 0;
+  right: -1px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff4d4f;
+}
+
+.search {
   display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  margin: 14px 16px 0;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: rgb(255 255 255 / 0.78);
+  background: var(--glass);
 }
 
-.balanceLabel {
-  font-size: 12.5px;
+.app .search svg {
+  stroke-width: 2.6;
+}
+
+.roundButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--glass);
+}
+
+/* The card glyph's stripe is cut out of it in the wash color, so it reads as a card, not a block */
+.app .cutout {
+  stroke: rgb(4 48 26 / 0.55);
+  stroke-width: 1.8;
+}
+
+/* Balance: centered on the wash, the account above it and the Accounts button under it */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 39px;
+  color: #fff;
+}
+
+.balance {
+  display: grid;
+  justify-items: center;
+}
+
+.accountName {
   font-weight: 500;
-  color: light-dark(#6b6b76, #9a9aa3);
+  color: rgb(255 255 255 / 0.9);
 }
 
-.balanceValue {
+.amountBig {
   font-size: 34px;
   font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
+  line-height: 40px;
+  letter-spacing: -0.02em;
 }
 
-/* The cents step down a size, so the dollars carry the number */
+/* The cents step down a size and keep the baseline, so the dollars carry the number */
 .cents {
   font-size: 20px;
   letter-spacing: -0.01em;
 }
 
-.eye {
+.accountsButton {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  margin-bottom: 3px;
-  border-radius: 50%;
-  color: light-dark(#6b6b76, #9a9aa3);
-  background: light-dark(#e3e3ea, #1c1c1e);
+  height: 27px;
+  margin-top: 8px;
+  padding: 0 15px;
+  border-radius: 999px;
+  font-weight: 600;
+  background: var(--glass);
 }
 
-/* Quick actions: four equal columns, icon above label */
+/* Page dots: this account is one of three; swiping the balance moves to the next */
+.pager {
+  display: flex;
+  gap: 3px;
+  margin-top: 24px;
+}
+
+.pagerDot,
+.pagerDotOn {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.45);
+}
+
+.pagerDotOn {
+  background: #fff;
+}
+
+/* Quick actions: four equal columns, a see-through circle over a label */
 .actions {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  margin: 14px 10px 0;
+  margin: 19px 8px 0;
+  color: #fff;
 }
 
 .action {
@@ -107,254 +196,222 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
   font-weight: 500;
-  line-height: 1.2;
 }
 
 .actionIcon {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: light-dark(#fff, #1c1c1e);
-}
-
-/* Only the most common action gets the brand color */
-.actionPrimary .actionIcon {
-  color: #fff;
-  background: #5b5bf6;
-}
-
-/* Card art and the chart side by side; the row is as tall as the card */
-.widgets {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin: 14px 16px 0;
-}
-
-/* A real card's proportions (ISO/IEC 7810 ID-1: 85.60 × 53.98 mm) */
-.card {
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 140px;
-  aspect-ratio: 85.6 / 53.98;
-  padding: 9px 10px;
-  border-radius: 10px;
-  line-height: 1.2;
-  color: #fff;
-  background:
-    radial-gradient(120% 90% at 100% 0%, rgb(255 255 255 / 0.28), transparent 55%),
-    linear-gradient(135deg, #4338ca 0%, #7c3aed 55%, #db2777 100%);
-  box-shadow: 0 8px 18px -8px rgb(76 29 149 / 0.6);
-}
-
-.cardTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.wordmark {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-
-.tag {
-  padding: 2px 6px;
-  border-radius: 999px;
-  font-size: 8.5px;
-  font-weight: 600;
-  background: rgb(255 255 255 / 0.22);
-}
-
-.chip {
-  width: 20px;
-  height: 15px;
-  border-radius: 3px;
-  background: linear-gradient(135deg, #f6dfa4, #c69a3f);
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
-}
-
-.cardNumber {
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Weekly spending: stretches to the card's height */
-.chart {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-self: stretch;
-  min-width: 0;
-  padding: 9px 9px 7px;
-  border-radius: 14px;
-  line-height: 1.2;
-  background: light-dark(#fff, #1c1c1e);
-}
-
-.chartLabel {
-  font-size: 10px;
-  color: light-dark(#6b6b76, #9a9aa3);
-}
-
-.chartValue {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-/* Bars grow up from a shared baseline; heights are inline percentages of the busiest day */
-.plot {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  align-items: end;
-  justify-items: center;
-  height: 24px;
-  margin-top: 6px;
-}
-
-.bar,
-.barToday,
-.barFuture {
-  width: 7px;
-  border-radius: 3px;
-}
-
-.bar {
-  background: light-dark(#b3b3e8, #4a4a7a);
-}
-
-.barToday {
-  background: #5b5bf6;
-}
-
-/* Days still to come: a flat stub instead of a gap */
-.barFuture {
-  height: 3px;
-  background: light-dark(#e9e9ef, #2a2a2e);
-}
-
-.days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  margin-top: 3px;
-  font-size: 8.5px;
-  text-align: center;
-  color: light-dark(#6b6b76, #9a9aa3);
-}
-
-.dayToday {
-  font-weight: 700;
-  color: light-dark(#4a4ae0, #9d9dff);
-}
-
-/* Section header: title on the left, link on the right */
-.sectionHeader {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin: 14px 16px 8px;
-}
-
-.sectionTitle {
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.seeAll {
-  font-size: 13px;
-  font-weight: 600;
-  color: light-dark(#4a4ae0, #9d9dff);
-}
-
-/* Transactions */
-.list {
-  margin: 0 16px;
-  padding: 0;
-  list-style: none;
-  border-radius: 16px;
-  background: light-dark(#fff, #1c1c1e);
-}
-
-.row {
-  display: grid;
-  grid-template-columns: 34px 1fr auto;
-  align-items: center;
-  column-gap: 10px;
-  padding: 7px 12px;
-}
-
-.merchant {
-  display: grid;
-  place-items: center;
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  font-size: 12px;
-  font-weight: 700;
+  background: var(--glass);
 }
 
-/* No logo to show: initials for people, a category icon for shops, on a pale tint of the category color */
-.person {
-  color: light-dark(#be185d, #f9a8d4);
-  background: light-dark(#fce7f3, rgb(236 72 153 / 0.2));
+.app .actionIcon svg {
+  stroke-width: 2.6;
 }
 
-.grocery {
-  color: light-dark(#15803d, #4ade80);
-  background: light-dark(#dcfce7, rgb(34 197 94 / 0.18));
+/* The home screen's cards: rounded panels on the page, one per kind of information */
+.widget {
+  margin: 13px 11px 0;
+  padding: 0 11px 4px;
+  border-radius: 14px;
+  background: var(--surface);
 }
 
-.coffee {
-  color: light-dark(#b45309, #fbbf24);
-  background: light-dark(#fef3c7, rgb(245 158 11 / 0.18));
+/* Transaction row: logo, what and when, how much */
+.row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  column-gap: 11px;
+  height: 52px;
 }
 
-.transit {
-  color: light-dark(#1d4ed8, #93c5fd);
-  background: light-dark(#dbeafe, rgb(59 130 246 / 0.2));
+/* A merchant's logo in its own colors: Fernwood's leaf on its orange */
+.merchant {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: #fff;
+  background: #d9622b;
+}
+
+.app .merchant svg {
+  stroke-width: 2.4;
+}
+
+/* An exchange shows both currencies' flags, the one you sold over the one you bought */
+.flags {
+  position: relative;
+  width: 28px;
+  height: 28px;
+}
+
+.flagFrom,
+.flagTo {
+  position: absolute;
+  width: 19px;
+  height: 19px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.flagFrom {
+  top: 0;
+  left: 0;
+}
+
+/* The ring in the card's color cuts the second flag out of the first */
+.flagTo {
+  right: -1.5px;
+  bottom: -1.5px;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--surface);
+}
+
+.app .flag {
+  display: block;
+  width: 100%;
+  height: 100%;
+  stroke: none;
 }
 
 .rowText {
   display: grid;
   min-width: 0;
-  line-height: 1.3;
 }
 
 .rowTitle {
   overflow: hidden;
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 15px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.rowDetail {
-  font-size: 11.5px;
-  color: light-dark(#6b6b76, #9a9aa3);
+.rowMeta {
+  font-size: 10px;
+  color: var(--ink-2);
 }
 
 .amount {
-  font-size: 13.5px;
-  font-weight: 600;
+  display: grid;
+  justify-items: end;
+  align-self: start;
+  margin-top: 11px;
   font-variant-numeric: tabular-nums;
 }
 
-/* Money in: green, and the plus sign says it without the color too */
-.amountIn {
-  color: light-dark(#15803d, #4ade80);
+.amountMain {
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 15px;
 }
 
-/* Bottom tab bar: translucent, so the list blurs as it passes underneath */
+/* The other side of an exchange, in gray: what arrived in the other currency */
+.amountOther {
+  font-size: 10px;
+  color: var(--ink-2);
+}
+
+/* See all: a centered text button that ends the short list */
+.seeAll {
+  display: grid;
+  place-items: center;
+  height: 34px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+/* The Cards widget: a gray title with a chevron, then a thumbnail for each card */
+.cardsWidget {
+  margin-top: 11px;
+  padding: 11px 11px 12px;
+}
+
+.widgetTitle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.app .widgetTitle svg {
+  stroke-width: 3;
+}
+
+.cardRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 8px;
+}
+
+.cardItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Card art at a real card's proportions (85.6 × 54 mm), the mark in the top corner */
+.cardThumb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 30px;
+  border-radius: 4px;
+}
+
+.cardMark {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
+.app .cardMark path {
+  fill: currentColor;
+  stroke: none;
+}
+
+.green {
+  color: #fff;
+  background: #0b6b3c;
+}
+
+.sand {
+  color: #3d3426;
+  background: #e6dac4;
+}
+
+.newCard {
+  color: var(--ink);
+  background: light-dark(#eef1ef, #252e29);
+}
+
+.app .newCard svg {
+  stroke-width: 2.6;
+}
+
+.cardName {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.cardMeta {
+  font-size: 10px;
+  color: var(--ink-2);
+}
+
+/* Tab bar: frosted, so the cards blur as they pass underneath; the current tab is in the ink color */
 .tabBar {
   position: absolute;
   right: 0;
@@ -362,12 +419,11 @@
   left: 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  height: 80px;
-  padding-top: 8px;
-  border-top: 1px solid light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.1));
-  background: light-dark(rgb(255 255 255 / 0.72), rgb(20 20 22 / 0.72));
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
+  height: 63px;
+  padding-top: 7px;
+  background: light-dark(rgb(248 250 249 / 0.86), rgb(30 36 33 / 0.86));
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
 }
 
 .tab,
@@ -375,20 +431,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  font-size: 10px;
+  gap: 4px;
+  font-size: 7.5px;
   font-weight: 500;
-  line-height: 1.2;
-  color: light-dark(#76767f, #8e8e93);
+  line-height: 10px;
+  color: var(--ink-2);
 }
 
-/* The selected tab: brand color and a filled icon; the rest stay outlined */
 .tabActive {
-  color: light-dark(#4a4ae0, #9d9dff);
+  font-weight: 600;
+  color: var(--ink);
 }
 
-.app .tabActive svg {
-  fill: currentColor;
+.app .tabBar svg {
+  stroke-width: 2.3;
 }
 
 .homeIndicator {

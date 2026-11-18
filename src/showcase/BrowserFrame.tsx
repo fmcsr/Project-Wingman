@@ -1,6 +1,7 @@
 import { useRef } from 'react';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { RevealContext } from '../inspector/Reveal';
+import { CompareHandle, CompareLayers, useCompareSplit } from './Compare';
 import { useScrollScene } from './useScrollScene';
 import styles from './BrowserFrame.module.css';
 
@@ -9,6 +10,10 @@ type BrowserFrameProps = {
   url: string;
   /** Header above the window, pinned along with it (e.g. the project name). */
   header?: ReactNode;
+  /** An AI slop version of the same site: the window then compares the two, with a line to drag between them. */
+  before?: ReactNode;
+  /** What the comparison shows, for screen readers, e.g. "Acme marketing site". */
+  label?: string;
   children: ReactNode;
 };
 
@@ -16,7 +21,7 @@ type BrowserFrameProps = {
  * Mock browser window that showcases the web examples. The content doesn't scroll on its own: the window is
  * pinned to the screen and the site inside moves as the page scrolls (like on Apple's product pages).
  */
-export function BrowserFrame({ url, header, children }: BrowserFrameProps) {
+export function BrowserFrame({ url, header, before, label, children }: BrowserFrameProps) {
   const sceneRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -29,12 +34,17 @@ export function BrowserFrame({ url, header, children }: BrowserFrameProps) {
     viewport: viewportRef,
     thumb: thumbRef,
   });
+  const compare = useCompareSplit(frameRef, Boolean(before));
 
   return (
     <div ref={sceneRef} className={styles.scene}>
       <div ref={stickyRef} className={styles.sticky}>
         {header}
-        <div ref={frameRef} className={styles.frame}>
+        <div
+          ref={frameRef}
+          className={styles.frame}
+          style={before ? ({ '--split': `${compare.split}%` } as CSSProperties) : undefined}
+        >
           <div className={styles.chrome} aria-hidden="true">
             <span className={styles.dots}>
               <span />
@@ -50,8 +60,15 @@ export function BrowserFrame({ url, header, children }: BrowserFrameProps) {
             </span>
           </div>
           <div ref={viewportRef} className={styles.viewport}>
-            <RevealContext value={reveal}>{children}</RevealContext>
+            <RevealContext value={reveal}>
+              {before ? <CompareLayers before={before}>{children}</CompareLayers> : children}
+            </RevealContext>
           </div>
+          {before && (
+            <div className={styles.compare}>
+              <CompareHandle split={compare.split} onMove={compare.move} label={label ?? url} />
+            </div>
+          )}
           <span className={styles.scrollbar} aria-hidden="true">
             <span ref={thumbRef} className={styles.thumb} />
           </span>
