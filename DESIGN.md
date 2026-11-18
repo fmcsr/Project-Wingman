@@ -122,6 +122,22 @@ Older library demos use `useInspectActivity()`, which holds the whole example: C
   - Color comes from the photos; the one accent, a cobalt blue, marks the saving. The photo looks the same in both themes, so the page dots drawn on it stay dark in both.
   - Motion: every 5 seconds the photo slides on to the next colorway (five, recolored from the one product photo), and the page dots, the color picker's ring and the colorway name in the category line follow, so the gallery and the picker tell one story.
 
+## Watch demos
+
+The watch examples are dark by design (the display is off where it's black), the same in both themes, set in SF Compact, with everything kept inside the screen's 50 px corners as watchOS does. Between them they cover the watch's own elements: the face and its complications, the Smart Stack, activity rings, notifications and Now Playing.
+
+- **Almanac:** An analog face made for complications, modeled on Infograph: hour markers and a minute track, four circular complications as subdials (the date, a timer, the moon phase, activity rings), the next event curved along the bezel, and a corner complication in each rounded corner with its text following the curve. The hands rest at 10:09:30, as in product photos.
+  - Motion: the second hand sweeps once a minute; the minute hand steps on the minute with a short spring; the timer counts down and the heart rate changes now and then.
+- **Glance:** The Smart Stack, as turning the Digital Crown up from the face brings it: the time small at the top, a row of three circular widgets, then rectangular widgets (194 × 80, Apple's size for 46 mm) as rounded cards, the weather one tinted by its app.
+  - Motion: every 3 seconds the crown scrolls one widget on with a spring that overshoots slightly; the widget leaving shrinks and fades, the next one grows in, and the scroll indicator shows by the crown while it moves.
+- **Kinetic:** The Activity app: three concentric rings (Move, Exercise, Stand), each over a dark track of its own hue with its start arrow, Exercise past its goal with its end cap casting a shadow onto the ring beneath; below, each figure with an hourly chart.
+  - Motion: the rings draw in, staggered, while the figures count up; the closed ring pulses once (no fireworks); the crown scrolls down to the figures and back.
+- **Nudge:** A message notification from our own messaging app. The Short Look (the app icon large, the app's name and the sender) turns into the Long Look: the icon in the header, the message on a platter, Reply and Mark as Read as glass capsules and Dismiss last.
+  - Motion: the notification arrives over the dimmed face, becomes the Long Look, scrolls down to its actions and back, and is dismissed.
+- **Encore:** Now Playing: a background tinted by the album art, the title (a marquee when it's too long) and the artist, previous, play/pause inside a progress ring and next, then AirPlay, volume and more as glass circles, and the Digital Crown's volume indicator by the crown.
+  - Motion: the ring advances each second and the title scrolls; the crown turns the volume up or down; once a loop the next song starts and the art and the background crossfade.
+- **Pace:** A running workout's metrics view: the workout's icon in its goal ring, the elapsed time in yellow and one metric per line with small uppercase units, the time ticking once a second.
+
 ## Color tokens
 
 All of them live in `src/styles/tokens.css` and are defined with `light-dark(light, dark)`; components use tokens only.

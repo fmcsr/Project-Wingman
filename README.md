@@ -55,6 +55,14 @@ And websites:
   <img alt="Six library sites: Stream (streaming like Netflix), Shelf (a store like Amazon), Glyph (a code editor like VS Code), Conduit (automations like Zapier), Cadence (a calendar like Notion Calendar) and Lanes (a board like Jira)" src="docs/screenshots/library-sites-light.png">
 </picture>
 
+And the watch's own elements: a face with its complications, the Smart Stack, activity rings, a notification and Now
+Playing:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/library-watch-dark.png">
+  <img alt="Six Apple Watch examples: Almanac (an analog face with complications, like Infograph), Glance (the Smart Stack of widgets), Kinetic (activity rings), Nudge (a notification's Long Look with its actions), Encore (Now Playing) and Pace (a running workout)" src="docs/screenshots/library-watch-light.png">
+</picture>
+
 ## Current status: landing page, sign-in, the library and the brief
 
 An English landing page with a sticky header (with a theme toggle), a hero, an element gallery, examples, feature cards,
@@ -157,7 +165,7 @@ src/
   auth/        Sign-in and sign-up pages, the session store (no backend yet) and the dev account
   workspace/   The signed-in area: the library's tabs, search and grids, and each example's page with its glossary
   brief/       The brief: its store (in localStorage), the Markdown writer, the Add to brief button and the brief page
-  library/     The library: types, the registry, and one folder per example (mobile/<id>, web/<id>)
+  library/     The library: types, the registry, and one folder per example (mobile/<id>, web/<id>, watch/<id>)
   demos/       The landing page's five examples: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ StatusBar),
                their motion (motion.ts: entrances, live parts that hold while inspected), and in slop/ the AI slop
                version each one is compared with

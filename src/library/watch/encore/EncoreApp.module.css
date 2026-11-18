@@ -1,0 +1,365 @@
+/*
+ * Encore follows the Now Playing screen on Apple Watch, which is dark by design: the same in both themes. The album
+ * art tints the whole screen, blurred and dimmed behind the controls, so each song brings its own color; the text
+ * and the glyphs stay white, and the controls are Liquid Glass over that color. System green marks the volume.
+ *
+ * The root's attributes drive the motion: data-paused holds the marquee, data-final turns off what plays once,
+ * data-skipping marks the second the next song starts, data-crown shows the volume indicator, and --volume is its
+ * level.
+ */
+.app {
+  --glass: rgb(255 255 255 / 0.16);
+  --glass-edge: inset 0 0.5px 0 rgb(255 255 255 / 0.35), inset 0 0 0 0.5px rgb(255 255 255 / 0.1);
+  --secondary: rgb(255 255 255 / 0.62);
+  --volume-fill: #30d158;
+  --spring: cubic-bezier(0.32, 0.72, 0, 1);
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'SF Compact', 'SF Compact Display', -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  color: #fff;
+  background: #000;
+}
+
+/* The artwork background: each song's art, blurred, saturated and dimmed; the current one shows, and they crossfade */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.backdropImage {
+  position: absolute;
+  /* Larger than the screen, so the blur's soft edge falls outside it */
+  inset: -40px;
+  width: calc(100% + 80px);
+  height: calc(100% + 80px);
+  object-fit: cover;
+  filter: blur(32px) saturate(1.3) brightness(0.45);
+  opacity: 0;
+  transition: opacity 900ms ease-in-out;
+}
+
+.backdropImage[data-current] {
+  opacity: 1;
+}
+
+/* Top row: the album art in the top-left corner, inside the curve, and the time in the top-right */
+.top {
+  position: absolute;
+  top: 9px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 30px;
+}
+
+.art {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  overflow: hidden;
+  border-radius: 7px;
+}
+
+/* A hairline around the art keeps a dark cover from melting into a dark background */
+.art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.18);
+}
+
+.artImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 900ms ease-in-out;
+}
+
+.artImage[data-current] {
+  opacity: 1;
+}
+
+.clock {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Title and artist, left-aligned under the art. A new song's pair fades in */
+.info {
+  position: absolute;
+  top: 45px;
+  left: 14px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  animation: arrive 450ms ease-out both;
+}
+
+.app[data-final] .info {
+  animation: none;
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/*
+ * The title's line: 6px of room on the left, and faded at both ends, so a scrolling title slides out of view instead
+ * of being cut. A title that fits never reaches the fades.
+ */
+.title {
+  display: block;
+  overflow: hidden;
+  padding-left: 6px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  white-space: nowrap;
+  mask-image: linear-gradient(to right, transparent, #000 6px, #000 calc(100% - 16px), transparent);
+}
+
+.marquee {
+  display: inline-flex;
+}
+
+/* The gap between the title and its repeat */
+.titleText {
+  padding-right: 28px;
+}
+
+/*
+ * Marquee: the title rests at its start, then scrolls left by one title and gap, where the repeat stands exactly
+ * where it began, so the loop starts over without a jump
+ */
+.title[data-marquee] .marquee {
+  animation: marquee 11s linear infinite;
+}
+
+.app[data-paused] .marquee {
+  animation-play-state: paused;
+}
+
+.app[data-final] .marquee {
+  animation: none;
+}
+
+@keyframes marquee {
+  0%,
+  24% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.artist {
+  overflow: hidden;
+  padding-left: 6px;
+  font-size: 15px;
+  line-height: 18px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--secondary);
+}
+
+/* Transport controls: previous, play/pause in its progress ring, next */
+.controls {
+  position: absolute;
+  top: 103px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 66px;
+}
+
+/* Previous and next are bare glyphs in a 44px target, with no button shape around them */
+.skip {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+}
+
+.skipGlyph {
+  display: block;
+  fill: #fff;
+  stroke: #fff;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.skipGlyph[data-forward] {
+  transform: scaleX(-1);
+}
+
+/* Pressed: a glass circle flashes behind the glyph as the next song starts */
+.skip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--glass);
+  opacity: 0;
+}
+
+.app[data-skipping] .next::before {
+  animation: press 600ms ease-out;
+}
+
+.app[data-final] .next::before {
+  animation: none;
+}
+
+@keyframes press {
+  from {
+    opacity: 1;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
+.play {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+}
+
+/* Progress ring: one circle's outline drawn as a single dash from twelve o'clock, as long as the share played */
+.ring {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+  fill: none;
+  stroke-width: 3;
+}
+
+.track {
+  stroke: rgb(255 255 255 / 0.25);
+}
+
+/* Each second's step glides over that second, so the ring moves on steadily; a new song sweeps it back to the start */
+.progress {
+  stroke: #fff;
+  stroke-linecap: round;
+  transition: stroke-dasharray 1s linear;
+}
+
+.app[data-skipping] .progress {
+  transition: stroke-dasharray 500ms var(--spring);
+}
+
+/* The button inside the ring: a 54px circle of Liquid Glass over the tinted background */
+.playButton {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--glass);
+  box-shadow: var(--glass-edge);
+  backdrop-filter: blur(10px) saturate(1.5);
+}
+
+.pauseGlyph {
+  display: block;
+  fill: #fff;
+}
+
+/* Bottom row: audio output, volume and more, in glass circles tucked into the lower corners */
+.bottom {
+  position: absolute;
+  top: 190px;
+  left: 26px;
+  right: 26px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.round {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--glass);
+  box-shadow: var(--glass-edge);
+  backdrop-filter: blur(10px) saturate(1.5);
+}
+
+.icon {
+  display: block;
+  fill: #fff;
+}
+
+.line {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+/*
+ * The Digital Crown volume indicator: a narrow capsule by the crown, filled green from the bottom to the volume. It
+ * shows while the crown turns and fades when it stops.
+ */
+.volume {
+  position: absolute;
+  top: 40px;
+  right: 3px;
+  width: 6px;
+  height: 52px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 0.28);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(3px);
+  transition:
+    opacity 400ms ease-out,
+    visibility 0s 400ms,
+    transform 400ms ease-out;
+}
+
+.app[data-crown] .volume {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 150ms ease-out,
+    transform 300ms var(--spring);
+}
+
+.level {
+  display: block;
+  height: 100%;
+  background: var(--volume-fill);
+  transform: translateY(calc((1 - var(--volume)) * 100%));
+  transition: transform 300ms var(--spring);
+}
