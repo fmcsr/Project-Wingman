@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 /*
- * Real photos live in a photos/ folder (each library example's, and src/demos/photos/<example>/ for the landing page),
- * and every file there is credited in that folder's CREDITS.md: one line per file, "<file>: <Unsplash URL> …,
- * Unsplash License".
+ * Real photos live in a photos/ folder (each library example's; for the landing page, src/demos/photos/<example>/ and
+ * the gallery's src/landing/gallery/photos/<family>/), and every file there is credited in that folder's CREDITS.md:
+ * one line per file, "<file>: <Unsplash URL> …, Unsplash License".
  */
 const files = Object.keys(import.meta.glob('./**/photos/**/*'));
 const credits = import.meta.glob<string>('./**/photos/**/CREDITS.md', {

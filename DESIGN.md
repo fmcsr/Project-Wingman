@@ -1,6 +1,6 @@
 # Project Wingman — Design decisions
 
-Last updated: 2026-10-28 · Status: Applied to the landing page
+Last updated: 2026-11-18 · Status: Applied to the landing page
 
 ## Decisions
 
@@ -24,11 +24,12 @@ Last updated: 2026-10-28 · Status: Applied to the landing page
 ## Page structure (information architecture)
 
 ```
-Header        Logo · Examples · Features · Support ········ Theme · Sign in   (sticky)
+Header        Logo · Elements · Examples · Features · Support ········ Theme · Sign in   (sticky)
 Hero          [ PROJECT WINGMAN ] · “Every PM needs a wingman.” · See examples / Get started free
-[01] Examples Before/after: Acme (marketing) · Orbit (analytics dashboard) · Wave (habits) · Muse (AI) · Stride (shopping)
-[02] Features A slowly moving marquee (with a pause button)
-[03] Support  A free account · Sponsor on GitHub
+[01] Elements A bento grid of fifteen live elements, each with its name: “You've seen them. Now name them.”
+[02] Examples Before/after: Acme (marketing) · Orbit (analytics dashboard) · Wave (habits) · Muse (AI) · Stride (shopping)
+[03] Features A slowly moving marquee (with a pause button)
+[04] Support  A free account · Sponsor on GitHub
 Footer        Text links · Back to top
 ```
 
@@ -36,6 +37,11 @@ Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the free-accoun
 
 - **The header isn't a bar, but it's sticky:** Fully transparent at the top of the page; as you scroll down it takes on a borderless frosted-glass background. Links go to sections, the logo goes back to the top, and the link of the section in view gets darker. Sections stop below the header thanks to `scroll-margin-top`.
 - **Footer:** Not a bar; text links sitting on the page background.
+- **Element gallery** (`src/landing/Gallery.tsx`, one file per tile in `src/landing/gallery/`): the first section to inspect, right under the hero, so the ways-to-explore guide sits here.
+  - Fifteen elements people meet in apps every day but rarely know the names of, from four families: iOS (Dynamic Island, wheel picker, bottom sheet, swipe actions), productivity tools (command palette, live cursors, mention menu, drag and drop), data (activity rings, calendar heatmap, marker clusters) and micro-interactions (one-time code field, slide to confirm, toast stack, skeleton screen). None repeats an element the examples below already explain.
+  - Each element is shown live where it lives (the top of an iPhone, a whiteboard, a kanban board, a map), in the same design type as the product people know it from, with our own names and data.
+  - A bento grid of 264 px rows: a tile takes one cell, two side by side, two stacked or a 2 × 2 block, and in four columns the order fills seven rows with no gaps. Two columns under 1024 px (`grid-auto-flow: dense` moves small tiles up into the gaps), one under 640 px.
+  - A tile is its element on a slightly darker ground over a caption: a mono index and the name. Every tile is an example of its own (its own tab stop); the descriptions are in `src/catalog/gallery/`, one file per family.
 - **The home page shows only five example projects:** The full library opens after sign-in.
 - **Example layout:**
   - Sites (Acme, Orbit): Each in its own scroll scene, full page width, one after another.
@@ -55,7 +61,7 @@ Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the free-accoun
 | --- | --- |
 | Mouse | On hover, the dashed green outline and the name tag appear at once; after a 2 s dwell, the summary balloon unrolls. Passing over the example only names things; resting on one explains it. While a preview is open, moving to another element updates the balloon without waiting. A click pins the full explanation, which unrolls the same way. |
 | Touch | A tap opens the full explanation; tapping another element switches to it; tapping outside closes it, scrolling doesn't. |
-| Keyboard | Each example is a single tab stop. Arrow keys and Home/End move between elements, Enter pins, Esc closes. A live region reads the element's name and summary to screen readers. In the sites, if the selected element isn't visible in the window, the page scrolls to where it shows. |
+| Keyboard | Each example is a single tab stop. Arrow keys and Home/End move between the elements showing (a part a demo has put away for the moment, such as a closed menu, is skipped, as it is on hover), Enter pins, Esc closes. A live region reads the element's name and summary to screen readers. In the sites, if the selected element isn't visible in the window, the page scrolls to where it shows. |
 
 The balloon is narrow in preview (name, summary, term chips) and wide when pinned (everyday names, plain-language explanations of each concept). It opens below the element, or above when there's no room below, and always stays on screen under the sticky page header. A tall balloon that fits on neither side takes the roomier side and scrolls inside; if even that side is short (a tall element in the middle of the screen), it covers part of the element instead, without an arrow. Since it's drawn on a shared layer that covers every frame, it never gets clipped at a frame's edge. It unrolls like a dropdown menu from the edge next to its element, arrow first (460 ms, an even slow-quick-slow ease); a click on a preview unrolls the details again.
 
@@ -168,9 +174,14 @@ Typefaces and metrics are taken one to one from LayerZero.
     - Acme: the product screenshot's roadmap bars grow into place and the Today line drops in; then every 6 s one small change (progress fills, a teammate joins, an item ships with a soft green flash), looping back after four. The logo strip drifts in a 70 s marquee, with a second row going the other way where the logos would wrap. The announcement badge catches a soft sheen every 6 s. The feature pictures grow in and "18%" counts up.
     - Orbit: the KPI figures count up and their sparklines draw in; the MRR chart wipes in from the left, and the launch flag, the crosshair and the tooltip fade in as the line reaches them; the bar lists grow from the left. Every 6.5 s a new payment slides in at the top of the table, the oldest leaves, Collected tweens to the new sum of paid rows and the page reads "Updated just now".
     - Wave, Muse and Stride: see Mobile demos.
+  - Element gallery: each tile plays its element's behavior in a loop of 6–15 s with rests between beats, starting when it comes into view; iOS tiles use springy ease-outs, web tiles snappy 150–250 ms transitions, and typing runs at about 95 ms a key.
+    - iOS: the island morphs from compact to expanded and back; the alarm's wheels are flicked and settle; the sheet steps through its detents (floating inset at partial heights, docked edge to edge at full height); a mail row swipes open on each side, and one all the way.
+    - Productivity: the palette opens, a query types out and the results filter; cursors glide on curves while one drags a note and another types a cursor chat; a mention is typed and becomes a chip; a card is lifted, carried to the next column and dropped while the cards there make room.
+    - Data: the rings draw in and Exercise wraps past its goal; a tooltip hops across the heatmap and today's cell steps up a shade; the map zooms into a cluster that splits into price markers, a callout opens, and on the way out they merge again.
+    - Micro-interactions: the code's digits arrive and verify; the thumb slides to confirm; toasts arrive, a loading toast resolves, and the stack spreads out as it does on hover; skeleton rows shimmer, then load in turn.
   - The inspection outline slides between elements in 120 ms.
   - Theme changes cross-fade smoothly with View Transitions where supported.
-  - With `prefers-reduced-motion`, the lines stay still and no shooting star appears, the before/after line doesn't sway, the examples show their finished state, the Features marquee doesn't move (the cards sit in rows) and windows don't grow into place; other animations and smooth scrolling stop too. In the site scenes the content still moves with the page, at the same speed as normal scrolling.
+  - With `prefers-reduced-motion`, the lines stay still and no shooting star appears, the before/after line doesn't sway, the examples and the gallery's tiles show their finished state, the Features marquee doesn't move (the cards sit in rows) and windows don't grow into place; other animations and smooth scrolling stop too. In the site scenes the content still moves with the page, at the same speed as normal scrolling.
 
 ## Accessibility notes
 

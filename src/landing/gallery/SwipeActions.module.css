@@ -1,0 +1,354 @@
+/*
+ * An inbox in iOS Mail's style, in iOS's light and dark colors: a white or black list, bold senders over gray
+ * previews, the system blue for unread, and the swipe actions in the system gray, orange, red and blue. From 680px
+ * wide it becomes the iPad's split view: the list in a column, the selected message beside it.
+ */
+.tile {
+  --label: light-dark(#000, #fff);
+  --secondary: light-dark(rgb(60 60 67 / 0.6), rgb(235 235 245 / 0.6));
+  --tertiary: light-dark(rgb(60 60 67 / 0.3), rgb(235 235 245 / 0.3));
+  --separator: light-dark(rgb(60 60 67 / 0.2), rgb(84 84 88 / 0.65));
+  --background: light-dark(#fff, #000);
+  --blue: light-dark(#007aff, #0a84ff);
+  --gray: #8e8e93;
+  --orange: light-dark(#ff9500, #ff9f0a);
+  --red: light-dark(#ff3b30, #ff453a);
+  /* Three rows fill the tile's 214px */
+  --row: 71px;
+  --ios: cubic-bezier(0.32, 0.72, 0, 1);
+
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+  container: swipe-actions / size;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  color: var(--label);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+}
+
+.list {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A row: its actions underneath, the content on top. Each row stacks on its own, so a later row can cover it */
+.row {
+  position: relative;
+  height: var(--row);
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 380ms var(--ios);
+}
+
+/* A deleted row's gap closes: the rows below it move up over it */
+.row[data-closing-gap] {
+  transform: translateY(calc(var(--row) * -1));
+}
+
+.content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  align-content: start;
+  padding: 8px 14px 0 28px;
+  background: var(--background);
+  transition: transform 420ms var(--ios);
+}
+
+/* Inset separator: from where the text starts to the edge */
+.content::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 28px;
+  height: 1px;
+  background: var(--separator);
+  transform: scaleY(0.5);
+  transform-origin: bottom;
+}
+
+/* Unread: a blue dot in the margin, level with the sender */
+.dot {
+  position: absolute;
+  top: 13px;
+  left: 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.sender {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.time {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--secondary);
+}
+
+.time svg {
+  width: 7px;
+  height: 11px;
+  fill: none;
+  stroke: var(--tertiary);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.subject,
+.preview {
+  overflow: hidden;
+  font-size: 14.5px;
+  line-height: 18px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.preview {
+  color: var(--secondary);
+}
+
+/*
+ * The actions: full-height buttons with a symbol over a label. They show only while their row is swiped (and until
+ * it has closed over them again), so no color can bleed past the content's edges.
+ */
+.leading,
+.trailing,
+.stretch {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  visibility: hidden;
+  transition: visibility 0s linear 420ms;
+}
+
+.row[data-swipe='leading'] .leading,
+.row[data-swipe='trailing'] .trailing,
+.row:is([data-swipe='full'], [data-swipe='removed']) .stretch {
+  visibility: visible;
+  transition: none;
+}
+
+.leading {
+  left: 0;
+}
+
+.trailing {
+  right: 0;
+}
+
+.action {
+  --tone: var(--blue);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 72px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 16px;
+  color: #fff;
+  background: var(--tone);
+}
+
+.leading .action {
+  width: 76px;
+}
+
+.action[data-tone='more'] {
+  --tone: var(--gray);
+}
+
+.action[data-tone='flag'] {
+  --tone: var(--orange);
+}
+
+.action[data-tone='trash'],
+.stretch .action {
+  --tone: var(--red);
+}
+
+.action svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+/* Parts of a symbol cut out of it show the button's color, as in SF Symbols' filled glyphs */
+.action .cutout {
+  fill: var(--tone);
+}
+
+.action .stroke,
+.action .cutoutStroke {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.action .stroke {
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.action .cutoutStroke {
+  stroke: var(--tone);
+  stroke-width: 1.6;
+}
+
+/* A full swipe: red comes in from the right as the content leaves, the trash symbol at its leading edge */
+.stretch {
+  right: 0;
+  left: 0;
+  z-index: 1;
+  background: var(--red);
+  transform: translateX(100%);
+  transition:
+    transform 420ms var(--ios),
+    visibility 0s linear 420ms;
+}
+
+/* Swiped open: past the three trailing buttons (3 × 72px), or the leading one */
+.row[data-swipe='trailing'] .content {
+  transform: translateX(-216px);
+}
+
+.row[data-swipe='leading'] .content {
+  transform: translateX(76px);
+}
+
+.row:is([data-swipe='full'], [data-swipe='removed']) .content {
+  transform: translateX(-100%);
+}
+
+.row:is([data-swipe='full'], [data-swipe='removed']) .stretch {
+  transform: none;
+  transition: transform 420ms var(--ios);
+}
+
+/* Put back while the row below covers it, so it's simply there again when the gap reopens */
+.row[data-swipe='reset'] :is(.content, .stretch) {
+  transition: none;
+}
+
+/* The reading pane: only in the split view */
+.pane {
+  display: none;
+  flex: 1;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  padding: 18px 24px;
+}
+
+.paneHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: light-dark(#a1a1a6, #636366);
+}
+
+.from {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.fromName {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 19px;
+}
+
+.to,
+.date {
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--secondary);
+}
+
+.date {
+  flex: none;
+  align-self: start;
+  margin-top: 2px;
+}
+
+.paneSubject {
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 25px;
+  letter-spacing: -0.02em;
+}
+
+.body,
+.signoff {
+  font-size: 15px;
+  line-height: 21px;
+}
+
+/* The iPad's split view: the list in a column with the selected row highlighted, the message beside it */
+@container swipe-actions (width >= 680px) {
+  .list {
+    flex: none;
+    width: clamp(300px, 40cqw, 380px);
+    border-right: 0.5px solid var(--separator);
+  }
+
+  .row[data-selected] .content {
+    background: light-dark(#e5e5ea, #2c2c2e);
+  }
+
+  .pane {
+    display: grid;
+  }
+}
+
+/* Reduced motion: the final state shows (see useDemoMotion), and nothing animates */
+@media (prefers-reduced-motion: reduce) {
+  .tile * {
+    transition: none !important;
+  }
+}

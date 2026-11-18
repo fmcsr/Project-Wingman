@@ -1,0 +1,436 @@
+/*
+ * A Stocks-style watchlist on an iPhone screen in iOS's own light and dark colors (white or black page, systemGreen
+ * and systemRed for the market), with a Business News sheet over it. The screen fills a picture shaped like a phone;
+ * a squarer or wider picture shows a phone up to 360px wide instead, cropped at the bottom, with its black border
+ * and band.
+ */
+.tile {
+  --label: light-dark(#000, #fff);
+  --secondary: light-dark(rgb(60 60 67 / 0.6), rgb(235 235 245 / 0.6));
+  --separator: light-dark(rgb(60 60 67 / 0.2), rgb(84 84 88 / 0.65));
+  --green: light-dark(#34c759, #30d158);
+  --red: light-dark(#ff3b30, #ff453a);
+  --band: light-dark(#c7c7cc, #48484a);
+  --ios: cubic-bezier(0.32, 0.72, 0, 1);
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container: bottom-sheet-tile / size;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  color: var(--label);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The screen: black behind the app, which shows when the app scales back */
+.screen {
+  /* The phone's size against a 402pt-wide iPhone, for the status bar (tan(atan2(a, b)) is a ÷ b as a number) */
+  --s: tan(atan2(100cqw, 402px));
+
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container: bottom-sheet-screen / size;
+  background: #000;
+}
+
+@container bottom-sheet-tile (aspect-ratio > 0.75) {
+  .screen {
+    top: 14px;
+    width: min(360px, 100cqw - 48px);
+    margin-inline: auto;
+    border-radius: 44px 44px 0 0;
+    box-shadow:
+      0 0 0 5px #000,
+      0 0 0 7.5px var(--band);
+  }
+}
+
+/* The app under the sheet. At the large detent it scales back and dims, like a card behind the sheet */
+.app {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: light-dark(#fff, #000);
+  transform-origin: 50% 0;
+  transition:
+    transform 520ms var(--ios),
+    border-radius 520ms var(--ios);
+}
+
+.dim {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 520ms var(--ios);
+}
+
+.tile[data-detent='large'] .app {
+  border-radius: 12px;
+  transform: translateY(calc(48px * var(--s))) scale(0.92);
+}
+
+.tile[data-detent='large'] .dim {
+  opacity: 1;
+}
+
+/* Large title with the date under it in gray, as Stocks has it */
+.appHeader {
+  display: grid;
+  padding: calc(54px * var(--s) + 2px) 16px 6px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 30px;
+  letter-spacing: -0.02em;
+}
+
+.appDate {
+  color: var(--secondary);
+}
+
+.watchlist {
+  margin: 0;
+  padding: 0 0 0 16px;
+  list-style: none;
+}
+
+/* Rows: symbol and company, the day's sparkline, the price over the change pill; hairlines inset from the left */
+.stock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 58px;
+  padding-right: 16px;
+  border-bottom: 0.5px solid var(--separator);
+}
+
+.name {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.symbol {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 21px;
+}
+
+.company {
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--secondary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* The day's prices, with the previous close dotted across; the line takes the day's color */
+.sparkline {
+  flex: none;
+  width: clamp(40px, 18cqw, 68px);
+  height: 28px;
+  overflow: visible;
+}
+
+.sparkline path {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.closeLine {
+  stroke: var(--secondary);
+  stroke-width: 1;
+  stroke-dasharray: 1.5 2.5;
+}
+
+.dayLine {
+  stroke: var(--green);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stock[data-trend='down'] .dayLine {
+  stroke: var(--red);
+}
+
+.quote {
+  display: grid;
+  flex: none;
+  gap: 3px;
+  justify-items: end;
+}
+
+.price {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The change pill: a fixed width, so the figures line up down the list */
+.change {
+  width: 66px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: right;
+  color: #fff;
+  background: var(--green);
+  font-variant-numeric: tabular-nums;
+}
+
+.stock[data-trend='down'] .change {
+  background: var(--red);
+}
+
+/*
+ * Status bar and Dynamic Island, drawn at an iPhone's 402pt width and scaled to the screen. Over the dark backdrop
+ * of the large detent the status bar turns white, as iOS turns it.
+ */
+.statusBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 402px;
+  height: 54px;
+  font-size: 17px;
+  font-weight: 600;
+  transform: scale(var(--s));
+  transform-origin: 0 0;
+  transition: color 520ms var(--ios);
+}
+
+.tile[data-detent='large'] .statusBar {
+  color: #fff;
+}
+
+/* The time and the icons, each centered in the 132pt nearest its edge, level with the island's middle */
+.time,
+.indicators {
+  position: absolute;
+  width: 132px;
+}
+
+.time {
+  top: 19px;
+  left: 0;
+  line-height: 21px;
+  letter-spacing: -0.02em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.indicators {
+  top: 23.5px;
+  right: 0;
+}
+
+.island {
+  position: absolute;
+  top: 11px;
+  left: 138px;
+  width: 126px;
+  height: 37px;
+  border-radius: 18.5px;
+  background: #000;
+}
+
+/*
+ * The sheet. At the small and medium detents it floats 8px in from the screen's edges with large round corners and
+ * a soft shadow; at the large detent it docks to the edges. The detents: the header alone (75px), the header and two
+ * stories (about half the screen), and everything below the status bar.
+ */
+.sheet {
+  --inset: 8px;
+  --inset-bottom: 8px;
+  /* A story's height: two lines of headline between the source and the time */
+  --story: 92.5px;
+  --small: calc(100cqh - var(--inset-bottom) - 75px);
+  --medium: calc(100cqh - var(--inset-bottom) - 75px - 2 * var(--story));
+  --large: calc(54px * var(--s) + 6px);
+
+  position: absolute;
+  top: var(--medium);
+  right: var(--inset);
+  bottom: var(--inset-bottom);
+  left: var(--inset);
+  z-index: 3;
+  overflow: hidden;
+  border-radius: 30px;
+  background: light-dark(#fff, #1c1c1e);
+  box-shadow:
+    0 8px 32px light-dark(rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.6)),
+    inset 0 0 0 0.5px light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.12));
+  transition-property: top, right, bottom, left, border-radius;
+  transition-duration: 520ms;
+  transition-timing-function: var(--ios);
+}
+
+.tile[data-detent='small'] .sheet {
+  top: var(--small);
+}
+
+.tile[data-detent='large'] .sheet {
+  top: var(--large);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 30px 30px 0 0;
+}
+
+/* On a short screen the medium detent holds one story, so the watchlist stays in view */
+@container bottom-sheet-screen (height < 420px) {
+  .sheet {
+    --medium: calc(100cqh - var(--inset-bottom) - 75px - var(--story));
+  }
+}
+
+/* On a cropped phone the sheet runs on past the picture's bottom edge, so its bottom corners don't show */
+@container bottom-sheet-tile (aspect-ratio > 0.75) {
+  .sheet {
+    --inset-bottom: 0px;
+  }
+
+  .sheet,
+  .tile[data-detent='large'] .sheet {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+/* The grabber: a 36 × 5 capsule, in a larger box that's easier to point at */
+.grabber {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 52px;
+  height: 17px;
+  margin-left: -26px;
+}
+
+.grabber::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  left: 8px;
+  height: 5px;
+  border-radius: 3px;
+  background: light-dark(rgb(60 60 67 / 0.3), rgb(235 235 245 / 0.3));
+}
+
+/* 75px tall: the small detent shows exactly this */
+.sheetHeader {
+  display: grid;
+  padding: 20px 18px 14px;
+}
+
+.sheetTitle {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: -0.02em;
+}
+
+.sheetSubtitle {
+  font-size: 13px;
+  line-height: 17px;
+  color: var(--secondary);
+}
+
+.stories {
+  margin: 0;
+  padding: 0 0 0 18px;
+  list-style: none;
+}
+
+.story {
+  display: flex;
+  gap: 12px;
+  padding: 10px 18px 10px 0;
+  border-top: 0.5px solid var(--separator);
+}
+
+.storyText {
+  display: grid;
+  flex: 1;
+  align-content: start;
+  gap: 2px;
+  min-width: 0;
+}
+
+.source {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 15px;
+}
+
+/* Two lines at most, cut with an ellipsis as Stocks does */
+.headline {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 19px;
+  letter-spacing: -0.01em;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.age {
+  font-size: 12px;
+  line-height: 15px;
+  color: var(--secondary);
+}
+
+.thumb {
+  flex: none;
+  width: 62px;
+  height: 62px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* On the narrowest screens the stories keep room for their headlines: smaller thumbnails, type and margins */
+@container bottom-sheet-screen (width < 260px) {
+  .sheet {
+    --story: 90.5px;
+  }
+
+  .sheetHeader {
+    padding-inline: 14px;
+  }
+
+  .stories {
+    padding-left: 14px;
+  }
+
+  .story {
+    gap: 10px;
+    padding-right: 14px;
+  }
+
+  .headline {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .thumb {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* Reduced motion: the sheet rests at the medium detent (see useDemoMotion), and nothing animates */
+@media (prefers-reduced-motion: reduce) {
+  .tile * {
+    transition: none !important;
+  }
+}

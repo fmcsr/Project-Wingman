@@ -72,7 +72,7 @@ export function Features() {
       <div className="container">
         <SectionHeader
           id="features-title"
-          index="[02]"
+          index="[03]"
           label="Features"
           title="Less guessing."
           muted="More shipping."

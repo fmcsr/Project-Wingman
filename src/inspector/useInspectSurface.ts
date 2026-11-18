@@ -18,6 +18,16 @@ export type InspectMode = 'closed' | 'preview' | 'pinned';
 export const TARGET_SELECTOR = '[data-inspect]';
 
 /**
+ * Whether an inspectable element is showing right now: laid out, and not hidden or faded out by its demo (a part a
+ * loop has put away for the moment, such as a closed menu, keeps its place in the page but can't be inspected).
+ */
+function isShown(element: Element) {
+  // Safari before 17.4 has no checkVisibility()
+  if (typeof element.checkVisibility !== 'function') return element.getClientRects().length > 0;
+  return element.checkVisibility({ opacityProperty: true, visibilityProperty: true });
+}
+
+/**
  * Once the cursor rests on an element this long, the summary balloon opens; the name tag and outline show right away.
  * Long enough that passing over the example only names things, short enough that resting on one explains it.
  */
@@ -59,7 +69,10 @@ export function useInspectSurface() {
   const findTarget = (node: EventTarget | null) => {
     const surface = surfaceRef.current;
     if (!surface || !(node instanceof Element)) return null;
-    const element = node.closest(TARGET_SELECTOR);
+    // The innermost inspectable element under the pointer that's showing; a faded-out part passes the pointer on to
+    // the element around it
+    let element = node.closest(TARGET_SELECTOR);
+    while (element && !isShown(element)) element = element.parentElement?.closest(TARGET_SELECTOR) ?? null;
     return element && surface.contains(element) ? element : null;
   };
 
@@ -136,11 +149,8 @@ export function useInspectSurface() {
     setMode('pinned');
   };
 
-  // Keyboard: the example is a single tab stop; arrow keys move between elements
-  const listTargets = () =>
-    [...(surfaceRef.current?.querySelectorAll(TARGET_SELECTOR) ?? [])].filter(
-      (element) => element.getClientRects().length > 0,
-    );
+  // Keyboard: the example is a single tab stop; arrow keys move between the elements showing
+  const listTargets = () => [...(surfaceRef.current?.querySelectorAll(TARGET_SELECTOR) ?? [])].filter(isShown);
 
   const activate = (index: number, nextMode: 'preview' | 'pinned') => {
     const list = listTargets();

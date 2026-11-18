@@ -1,0 +1,209 @@
+/*
+ * The fitness app's summary card is black in both themes, like the app itself: the day's figures in the ring colors
+ * on the left, the three rings on the right. Rings and figures grow with the tile; from 460px each figure also gets
+ * its day hour by hour, as on the app's detail screen.
+ */
+.tile {
+  height: 100%;
+  container-type: size;
+  background: #000;
+  color: #fff;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+}
+
+.card {
+  --rings: 108px;
+  --value: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  height: 100%;
+  padding-inline: 12px;
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: max-content;
+  align-items: end;
+  row-gap: 6px;
+  min-width: 0;
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.label {
+  font-size: calc(var(--value) * 0.78);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+/* The fitness app sets its figures in the rounded system font, the unit smaller right after the number */
+.value {
+  font-family: ui-rounded, 'SF Pro Rounded', 'SF Pro Display', -apple-system, system-ui, sans-serif;
+  font-size: var(--value);
+  font-weight: 600;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--ring);
+}
+
+.unit {
+  margin-left: 1px;
+  font-size: 0.72em;
+  letter-spacing: 0.02em;
+}
+
+/* Hour-by-hour bars on a faint baseline, 24 to a chart; shown on wide cards only */
+.chart {
+  display: none;
+  height: 26px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.16);
+}
+
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 100%;
+  transform-origin: bottom;
+}
+
+.bars > span {
+  flex: 1;
+  border-radius: 1.5px 1.5px 0 0;
+  background: var(--ring);
+}
+
+/* Times under the last chart, each at the start of its hour */
+.axis {
+  display: none;
+  position: relative;
+  grid-column: 2;
+  height: 12px;
+  margin-top: -3px;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 12px;
+  color: #8e8e93;
+}
+
+.axis > span {
+  position: absolute;
+  white-space: nowrap;
+}
+
+.axis > span:nth-child(2) {
+  left: 25%;
+}
+
+.axis > span:nth-child(3) {
+  left: 50%;
+}
+
+.axis > span:nth-child(4) {
+  left: 75%;
+}
+
+.rings {
+  flex: none;
+  width: var(--rings);
+  height: var(--rings);
+  overflow: visible;
+}
+
+.track,
+.arc {
+  fill: none;
+  stroke-width: 11.5;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+@container (min-width: 260px) {
+  .card {
+    --rings: 116px;
+    --value: 16px;
+
+    gap: 16px;
+  }
+}
+
+@container (min-width: 300px) {
+  .card {
+    --rings: 136px;
+    --value: 18px;
+
+    gap: 20px;
+  }
+
+  .figures {
+    row-gap: 8px;
+  }
+}
+
+@container (min-width: 380px) {
+  .card {
+    --rings: 158px;
+    --value: 21px;
+
+    gap: 30px;
+  }
+}
+
+/* Wide cards: the rings lead on the left, each figure with its chart beside it */
+@container (min-width: 460px) {
+  .card {
+    --rings: 150px;
+    --value: 19px;
+
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    gap: 24px;
+    padding-inline: 22px;
+  }
+
+  .figures {
+    flex: 1;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 16px;
+  }
+
+  .chart {
+    display: block;
+  }
+}
+
+/* The times fit under the charts from here */
+@container (min-width: 560px) {
+  .card {
+    --rings: 162px;
+    --value: 21px;
+
+    gap: 30px;
+    padding-inline: 26px;
+  }
+
+  .figures {
+    column-gap: 20px;
+  }
+
+  .bars {
+    gap: 3px;
+  }
+
+  .axis {
+    display: block;
+  }
+}

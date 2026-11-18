@@ -1,0 +1,433 @@
+/*
+ * The top of an iPhone, drawn at its real size in points (a 402pt screen with 55pt display corners) and scaled to
+ * the tile: a black border and a titanium band around the screen, the status bar and the Dynamic Island over a beach
+ * wallpaper. The island is black in both themes, as on the phone; the wallpaper dims in dark mode, as iOS dims it with
+ * the dark appearance. The ride's color is iOS yellow, in its dark variant since the island is always dark.
+ */
+.tile {
+  --ride: #ffd60a;
+  --island-secondary: rgb(235 235 245 / 0.6);
+  /* A spring with a little bounce (damping 0.75, about 3% overshoot), sampled for linear() */
+  --spring: linear(
+    0,
+    0.033,
+    0.115,
+    0.224,
+    0.344,
+    0.465,
+    0.577,
+    0.678,
+    0.764,
+    0.836,
+    0.894,
+    0.938,
+    0.972,
+    0.996,
+    1.012,
+    1.021,
+    1.027,
+    1.028,
+    1.028,
+    1.026,
+    1.023,
+    1.019,
+    1.016,
+    1.013,
+    1.01,
+    1.007,
+    1.005,
+    1.003,
+    1.002,
+    1.001,
+    1
+  );
+  --ios: cubic-bezier(0.32, 0.72, 0, 1);
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * The phone: 402pt of screen, a 5pt black border and a 2.5pt band on each side (417pt). It takes 90% of the tile's
+ * width, from 0.72 to 1.12 times its real size, and runs off the bottom of the tile. tan(atan2(a, b)) is a ÷ b as a
+ * plain number, which scale() needs.
+ */
+.device {
+  --band: light-dark(#c7c7cc, #48484a);
+  --scale: clamp(0.72, tan(atan2(90cqw - 24px, 417px)), 1.12);
+
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 417px;
+  height: 340px;
+  padding: 5px;
+  border: 2.5px solid var(--band);
+  border-radius: 62.5px;
+  background: #000;
+  box-shadow: 0 18px 40px -16px light-dark(rgb(0 0 0 / 0.28), rgb(0 0 0 / 0.7));
+  transform: translateX(-50%) scale(var(--scale));
+  transform-origin: 50% 0;
+}
+
+/* The buttons on the band: the Action button and volume up on the left, the side button on the right */
+.device::before,
+.device::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  background: var(--band);
+}
+
+.device::before {
+  top: 104px;
+  left: -5.5px;
+  height: 120px;
+  border-radius: 2px 0 0 2px;
+  background: linear-gradient(var(--band) 0 30px, transparent 30px 58px, var(--band) 58px);
+}
+
+.device::after {
+  top: 166px;
+  right: -5.5px;
+  height: 96px;
+  border-radius: 0 2px 2px 0;
+}
+
+.screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 55px;
+  color: #fff;
+}
+
+.wallpaper {
+  position: absolute;
+  inset: 0;
+}
+
+/* The horizon (36% down the photo) sits just under the expanded island */
+.wallpaper img {
+  position: absolute;
+  top: -112px;
+  left: 0;
+  width: 100%;
+  height: auto;
+}
+
+.wallpaper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.38));
+}
+
+/*
+ * Status bar: the time and the indicators each centered beside the compact island (91pt on each side), level with
+ * its middle. The expanded island covers them, so they fade out while it's open.
+ */
+.statusBar {
+  transition: opacity 300ms ease-out 320ms;
+}
+
+.time,
+.indicators {
+  position: absolute;
+  width: 91px;
+}
+
+.time {
+  top: 19px;
+  left: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 21px;
+  letter-spacing: -0.02em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.indicators {
+  top: 23.5px;
+  right: 0;
+}
+
+.tile[data-presentation='expanded'] .statusBar {
+  opacity: 0;
+  transition: opacity 120ms ease-out;
+}
+
+/*
+ * The island: 220 × 37pt compact, 380 × 144pt expanded, 11pt from the top and the sides of the screen. Expanded, its
+ * corners (44pt) are the display's (55pt) less that inset, so the two curves run parallel. It changes size rather
+ * than scale, so the corners stay round while it grows; it's positioned on its own, so only it lays out again.
+ */
+.island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  width: 220px;
+  height: 37px;
+  overflow: hidden;
+  border-radius: 18.5px;
+  background: #000;
+  transform: translateX(-50%);
+  transition-property: width, height, border-radius;
+  transition-duration: 560ms;
+  transition-timing-function: var(--spring);
+  /* Shrinking waits for the expanded content to fade out */
+  transition-delay: 90ms;
+}
+
+.tile[data-presentation='expanded'] .island {
+  width: 380px;
+  height: 144px;
+  border-radius: 44px;
+  transition-duration: 640ms;
+  transition-delay: 0s;
+}
+
+/* Compact presentation: the leading side left of the camera, the trailing side right of it */
+.compactLeading,
+.compactTrailing {
+  position: absolute;
+  transition: opacity 260ms ease-out 420ms;
+}
+
+.compactLeading {
+  top: 11px;
+  left: 14px;
+  width: 22px;
+  height: 14.7px;
+  fill: var(--ride);
+}
+
+.compactTrailing {
+  top: 8px;
+  right: 15px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 21px;
+  color: var(--ride);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.tile[data-presentation='expanded'] :is(.compactLeading, .compactTrailing) {
+  opacity: 0;
+  transition: opacity 100ms ease-out;
+}
+
+/* Expanded presentation: laid out at full size and centered, so the growing island reveals it */
+.expanded {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 380px;
+  height: 144px;
+  margin-left: -190px;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.94);
+  transform-origin: 50% 0;
+  transition:
+    opacity 120ms ease-out,
+    transform 120ms ease-out,
+    visibility 0s linear 120ms;
+}
+
+/* The content fades in just after the shape starts to grow */
+.tile[data-presentation='expanded'] .expanded {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 280ms ease-out 170ms,
+    transform 480ms var(--ios) 120ms,
+    visibility 0s linear 120ms;
+}
+
+/* Leading and trailing: beside the camera, kept clear of the rounded corners */
+.leading {
+  position: absolute;
+  top: 16px;
+  left: 25px;
+}
+
+.leadingCar {
+  display: block;
+  width: 33px;
+  height: 22px;
+  fill: var(--ride);
+}
+
+.trailing {
+  position: absolute;
+  top: 10px;
+  right: 25px;
+  font-family: 'SF Pro Display', -apple-system, system-ui, sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 30px;
+  letter-spacing: -0.01em;
+  color: var(--ride);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  margin-left: 3px;
+  font-size: 17px;
+  letter-spacing: 0;
+}
+
+/* Center: below the camera, the driver with the car and its plate */
+.center {
+  position: absolute;
+  top: 52px;
+  right: 25px;
+  left: 23px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.driver {
+  display: grid;
+  flex: 1;
+  gap: 1px;
+  min-width: 0;
+}
+
+.driverName {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 19px;
+}
+
+.car {
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--island-secondary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.plate {
+  flex: none;
+  padding: 3px 7px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 17px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  background: rgb(255 255 255 / 0.14);
+}
+
+/* Bottom: the route from the car to the pickup, under the whole width */
+.bottom {
+  position: absolute;
+  top: 104px;
+  right: 25px;
+  left: 25px;
+}
+
+.route {
+  position: relative;
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.2);
+}
+
+/* The car's progress: the done part scales from the left, the car's dot rides at its end */
+.routeDone,
+.routeCar {
+  position: absolute;
+  inset: 0;
+  /* Back to the start only once the expanded content is hidden */
+  transition: transform 0s linear 200ms;
+}
+
+.routeDone {
+  border-radius: inherit;
+  background: var(--ride);
+  transform: scaleX(0.58);
+  transform-origin: left;
+}
+
+.routeCar {
+  transform: translateX(58%);
+}
+
+.routeCar::before,
+.routeEnd {
+  content: '';
+  position: absolute;
+  top: 50%;
+  border-radius: 50%;
+}
+
+.routeCar::before {
+  left: -7px;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  border: 3px solid #000;
+  background: #fff;
+}
+
+.routeEnd {
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  border: 2.5px solid #fff;
+  background: #000;
+}
+
+.tile[data-presentation='expanded'] .routeDone {
+  transform: scaleX(0.66);
+}
+
+.tile[data-presentation='expanded'] .routeCar {
+  transform: translateX(66%);
+}
+
+.tile[data-presentation='expanded'] :is(.routeDone, .routeCar) {
+  transition: transform 2600ms ease-in-out 900ms;
+}
+
+.routeCaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--island-secondary);
+  white-space: nowrap;
+}
+
+/* Reduced motion: the island rests expanded (see useDemoMotion), and nothing animates */
+@media (prefers-reduced-motion: reduce) {
+  .tile * {
+    transition: none !important;
+  }
+}

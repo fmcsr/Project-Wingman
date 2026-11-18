@@ -1,0 +1,38 @@
+/* Status bar icons at an iPhone's size in points; the battery's outline and cap are see-through, as in iOS */
+.icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 12px;
+}
+
+.icons svg {
+  display: block;
+  fill: currentColor;
+}
+
+.signal {
+  width: 17px;
+  height: 11px;
+}
+
+.wifi {
+  width: 15.5px;
+  height: 11.6px;
+}
+
+.battery {
+  width: 25px;
+  height: 12px;
+}
+
+.battery .case {
+  fill: none;
+  stroke: currentColor;
+  stroke-opacity: 0.4;
+}
+
+.battery .cap {
+  fill-opacity: 0.4;
+}

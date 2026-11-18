@@ -11,8 +11,17 @@ understand. Next, it will write that brief from everyday descriptions like “th
 
 ## A look inside
 
-Each example on the landing page is a before/after: drag the line to compare the AI slop a vague prompt produces with
-the same product built from a Wingman brief. Hover anything on either side to learn what it's called. Click to pin the
+Right under the hero, a gallery runs fifteen elements from apps people use every day, each working the way it does
+there: the Dynamic Island, a command palette, live cursors, marker clusters, a toast stack and more. Every part of each
+one can be inspected:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/gallery-dark.png">
+  <img alt="The landing page's element gallery: fifteen live elements in a bento grid, each with its name under it: Dynamic Island, command palette, wheel picker, activity rings, bottom sheet, calendar heatmap, one-time code field, slide to confirm, swipe actions, marker clusters, live cursors, mention menu, toast stack, drag and drop and skeleton screen" src="docs/screenshots/gallery-light.png">
+</picture>
+
+Each example further down is a before/after: drag the line to compare the AI slop a vague prompt produces with the
+same product built from a Wingman brief. Hover anything on either side to learn what it's called. Click to pin the
 full explanation: how it looks, how it behaves, and the exact CSS behind it. The examples switch to dark mode with the
 page (products that are dark by design stay dark), and the balloons show the values for the theme you're in.
 
@@ -48,13 +57,16 @@ And websites:
 
 ## Current status: landing page, sign-in, the library and the brief
 
-An English landing page with a sticky header (with a theme toggle), a hero, examples, feature cards, a support section
-and a footer. The examples section has five projects (a marketing site, an analytics dashboard and three mobile apps),
-each a before/after comparison with a line to drag: on the left, the AI slop a vague prompt produces; on the right, the
-same product built from a Wingman brief. On both sides nearly every element shows its name on hover, a summary after a
-two-second pause and the full explanation on click; on the slop side, the explanation says what makes it read as AI
-slop. The Wingman versions move like real products (charts draw in, payments arrive, the chat answer streams, the
-gallery slides) and hold still while you inspect them.
+An English landing page with a sticky header (with a theme toggle), a hero, an element gallery, examples, feature cards,
+a support section and a footer. Right under the hero, the gallery runs fifteen elements people meet in apps every day
+but rarely know the names of (the Dynamic Island, a command palette, live cursors, marker clusters, a toast stack and
+more), each live in a tile of a bento grid with its name under it and every part of it inspectable. The examples section
+has five projects (a marketing site, an analytics dashboard and three mobile apps), each a before/after comparison with
+a line to drag: on the left, the AI slop a vague prompt produces; on the right, the same product built from a Wingman
+brief. On both sides nearly every element shows its name on hover, a summary after a two-second pause and the full
+explanation on click; on the slop side, the explanation says what makes it read as AI slop. The Wingman versions move
+like real products (charts draw in, payments arrive, the chat answer streams, the product photos slide) and hold still
+while you inspect them.
 
 Wingman is free: an account opens the library and the brief builder. People who find it useful can sponsor it on
 GitHub (`SPONSOR_HREF` in `src/landing/links.ts`; GitHub Sponsors has to be set up on that account).
@@ -140,7 +152,8 @@ setting (light or dark) and can be switched from the header. All visual decision
 
 ```
 src/
-  landing/     Landing page sections: header, theme toggle, hero, examples, feature cards, support, footer
+  landing/     Landing page sections: header, theme toggle, hero, element gallery (one file per tile in gallery/),
+               examples, feature cards, support, footer
   auth/        Sign-in and sign-up pages, the session store (no backend yet) and the dev account
   workspace/   The signed-in area: the library's tabs, search and grids, and each example's page with its glossary
   brief/       The brief: its store (in localStorage), the Markdown writer, the Add to brief button and the brief page
@@ -148,7 +161,8 @@ src/
   demos/       The landing page's five examples: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ StatusBar),
                their motion (motion.ts: entrances, live parts that hold while inspected), and in slop/ the AI slop
                version each one is compared with
-  catalog/     Element descriptions (English, typed data) for those five, plus elements every phone shares
+  catalog/     Element descriptions (English, typed data) for those five, the gallery's tiles (gallery/, one file per
+               family) and elements every phone shares
   inspector/   The “inspect element” layer: InspectSurface, explainer balloon, positioning
   showcase/    Frames and the interaction guide: the browser frame as a scroll scene (useScrollScene), a scalable phone
   brand/       Logo and the hero's animated line art (with the shooting star)
@@ -187,9 +201,9 @@ src/library/<mobile|web|watch>/<id>/
 
 ## Adding a UI element
 
-1. Write the description: add a `UiElementSpec` to the example's `specs.ts` (for the landing page's five, the
-   matching file in `src/catalog/`), with the demo's real CSS values in its `value` fields. A color that differs by
-   theme is `{ light, dark }`.
+1. Write the description: add a `UiElementSpec` to the example's `specs.ts` (for the landing page's five, the matching
+   file in `src/catalog/`; for a gallery tile, its family's file in `src/catalog/gallery/`), with the demo's real CSS
+   values in its `value` fields. A color that differs by theme is `{ light, dark }`.
 2. Mark it in the demo: add a `data-inspect="<id>"` attribute to the element.
 
 Hover, click, touch, keyboard, outline, balloon, the element counter and the glossary all work automatically. An id
@@ -199,6 +213,6 @@ with no description logs a warning to the console during development.
 
 | Input | Preview (summary) | Pinned (full explanation) | Closes |
 | --- | --- | --- | --- |
-| Mouse | Hover, wait 280 ms | Click | Click outside, click the same element again, Esc |
+| Mouse | Hover (the name shows at once), wait 2 s | Click | Click outside, click the same element again, Esc |
 | Touch | — | Tap | Tap outside (scrolling doesn't close it) |
 | Keyboard | Tab into an example, move with the arrow keys | Enter | Esc, Tab out |

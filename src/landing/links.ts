@@ -1,5 +1,6 @@
 /** Section links shared by the header and the footer. */
 export const SECTION_LINKS = [
+  { href: '#elements', label: 'Elements' },
   { href: '#examples', label: 'Examples' },
   { href: '#features', label: 'Features' },
   { href: '#support', label: 'Support' },
