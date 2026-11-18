@@ -1,0 +1,218 @@
+/*
+ * A settings card in Material 3, with its own color scheme from a blue seed in light and dark: an elevated card on
+ * the surface, on-surface text, and the primary blue for the filled button. Roboto, as on Android.
+ */
+.tile {
+  --surface: light-dark(#f9f9ff, #111318);
+  --card: light-dark(#f3f3fa, #1d2024);
+  --on-surface: light-dark(#191c20, #e2e2e9);
+  --on-surface-variant: light-dark(#44474e, #c4c6d0);
+  --primary: light-dark(#415f91, #aac7ff);
+  --on-primary: light-dark(#fff, #0a305f);
+  /* Material's standard easing, for the ripple's growth */
+  --standard: cubic-bezier(0.2, 0, 0, 1);
+
+  display: grid;
+  place-items: center;
+  height: 100%;
+  container-type: size;
+  font-family: 'Roboto Variable', Roboto, ui-sans-serif, system-ui, sans-serif;
+  color: var(--on-surface);
+  background: var(--surface);
+}
+
+/* An elevated card: 12px corners and Material's level-1 shadow; it clips the ripples to its corners */
+.card {
+  width: min(100cqw - 24px, 380px);
+  overflow: hidden;
+  padding: 4px 0 12px;
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.3),
+    0 1px 3px 1px rgb(0 0 0 / 0.15);
+}
+
+/* A two-line list item: a 24px icon, the setting over its current value */
+.row {
+  --pressed: var(--on-surface);
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 64px;
+  padding-inline: 16px;
+  overflow: hidden;
+  container-type: size;
+}
+
+.icon {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: var(--on-surface-variant);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.text {
+  display: grid;
+  min-width: 0;
+}
+
+.headline,
+.supporting {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.headline {
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.5px;
+}
+
+.supporting {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  color: var(--on-surface-variant);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 16px 0;
+}
+
+/* The filled button: a 40px pill in the primary color, its ripple in the label's color */
+.button {
+  --pressed: var(--on-primary);
+
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 132px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+  color: var(--on-primary);
+  background: var(--primary);
+  container-type: size;
+}
+
+/* The state layer: the pressed surface tinted with its content's color at 8% */
+.stateLayer {
+  position: absolute;
+  inset: 0;
+  background: var(--pressed);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 375ms linear,
+    visibility 0s linear 375ms;
+}
+
+/*
+ * The ripple: a soft-edged circle as wide as the surface's diagonal plus 10px. It starts 15px across at the press
+ * point and grows to full size as its center drifts to the middle, in 450ms; it shows the content's color at 12%.
+ */
+.ripple {
+  --d: calc(hypot(100cqw, 100cqh) + 10px);
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--d);
+  height: var(--d);
+  margin: calc(var(--d) / -2) 0 0 calc(var(--d) / -2);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--pressed) max(100% - 30px, 72%), transparent 100%);
+  opacity: 0;
+  visibility: hidden;
+  translate: calc((var(--x) - 50) * 1cqw) calc((var(--y) - 50) * 1cqh);
+  scale: tan(atan2(15px, var(--d)));
+}
+
+/* The press point: where the finger is, drawn as a small touch */
+.origin {
+  position: absolute;
+  top: calc(var(--y) * 1%);
+  left: calc(var(--x) * 1%);
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border: 1.5px solid rgb(255 255 255 / 0.85);
+  border-radius: 50%;
+  background: light-dark(rgb(25 28 32 / 0.25), rgb(226 226 233 / 0.3));
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.2);
+  opacity: 0;
+  visibility: hidden;
+  scale: 0.8;
+  transition:
+    opacity 200ms ease,
+    scale 200ms ease,
+    visibility 0s linear 200ms;
+}
+
+/* Pressed: the state layer comes up fast, and the ripple spreads */
+:is(.row, .button):is([data-press='down'], [data-press='mid']) .stateLayer {
+  opacity: 0.08;
+  visibility: visible;
+  transition:
+    opacity 105ms linear,
+    visibility 0s;
+}
+
+:is(.row, .button):is([data-press='down'], [data-press='mid']) .ripple {
+  opacity: 0.12;
+  visibility: visible;
+}
+
+:is(.row, .button)[data-press='down'] .ripple {
+  translate: none;
+  scale: none;
+  transition:
+    translate 450ms var(--standard),
+    scale 450ms var(--standard),
+    opacity 105ms linear;
+}
+
+/* The still picture: the ripple on its way out, still a circle, its center a quarter of the way to the middle */
+:is(.row, .button)[data-press='mid'] .ripple {
+  translate: calc((var(--x) - 50) * 0.75cqw) calc((var(--y) - 50) * 0.75cqh);
+  scale: 0.3;
+}
+
+:is(.row, .button):is([data-press='down'], [data-press='mid']) .origin {
+  opacity: 1;
+  visibility: visible;
+  scale: none;
+  transition:
+    opacity 100ms ease,
+    scale 150ms ease,
+    visibility 0s;
+}
+
+/* Let go: the ripple stays full size and fades out with the state layer in 375ms */
+:is(.row, .button)[data-press='up'] .ripple {
+  translate: none;
+  scale: none;
+  transition:
+    opacity 375ms linear,
+    visibility 0s linear 375ms;
+}
+
+@container (min-width: 300px) {
+  .card {
+    padding-top: 6px;
+  }
+}

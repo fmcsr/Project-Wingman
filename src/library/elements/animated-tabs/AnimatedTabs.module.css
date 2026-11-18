@@ -1,0 +1,694 @@
+/*
+ * A hosting dashboard's project page in the idiom of the developer platforms it's modeled on: white (near-black in
+ * dark mode), a breadcrumb with thin slashes, 14px gray tabs over a hairline, and the page below on a slightly
+ * darker ground with bordered cards. The tab bar is monochrome, as in those apps: a gray highlight under the pointer
+ * and a 2px underline in the text color. The one accent, a blue, is kept for the chart.
+ */
+.tile {
+  --bg: light-dark(#ffffff, #0a0a0a);
+  --page: light-dark(#fafafa, #000000);
+  --line: light-dark(#ebebeb, #242424);
+  --line-strong: light-dark(#d4d4d4, #383838);
+  --text: light-dark(#171717, #ededed);
+  --text-2: light-dark(#666666, #a1a1a1);
+  --text-3: light-dark(#8f8f8f, #737373);
+  --hover: light-dark(#f0f0f0, #1f1f1f);
+  --press: light-dark(#e3e3e3, #2e2e2e);
+  --accent: light-dark(#1a6ce8, #4b8ef7);
+  --ready: light-dark(#1a9c5b, #3fcf8e);
+  --error: light-dark(#e5484d, #ff6369);
+  --header: 44px;
+  --bar: 40px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.icon {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The breadcrumb: logo / team and plan / project, each with its switcher; the account on the right */
+.header {
+  display: flex;
+  align-items: center;
+  height: var(--header);
+  padding: 0 14px 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.logo {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.logo circle {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 1.5;
+}
+
+.logo path {
+  fill: var(--text);
+}
+
+.slash {
+  flex: none;
+  width: 16px;
+  height: 22px;
+  margin: 0 6px;
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.team,
+.project {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.teamAvatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+}
+
+.plan {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  color: var(--text-2);
+  background: var(--hover);
+}
+
+.switcher {
+  width: 14px;
+  height: 14px;
+  margin-left: -2px;
+  color: var(--text-3);
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+  color: var(--text-2);
+}
+
+.feedback {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.bell {
+  width: 16px;
+  height: 16px;
+}
+
+.avatar {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* The tab bar: clips the strip of tabs, which scrolls (a transform) when it's wider than the tile */
+.bar {
+  position: relative;
+  height: var(--bar);
+  overflow: hidden;
+}
+
+/* The hairline under the tabs; the underline covers it under the active tab */
+.bar::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--line);
+}
+
+.strip {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: max-content;
+  min-width: 100%;
+  height: 100%;
+  padding: 0 8px;
+  transition: transform 250ms var(--ease);
+}
+
+/* Inactive tabs let the pointer through, so the highlight under them is what gets inspected */
+.tab {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 12px;
+  font-size: 14px;
+  white-space: nowrap;
+  color: var(--text-2);
+  pointer-events: none;
+  transition: color 150ms var(--ease);
+}
+
+.tab[data-hovered],
+.tab[aria-selected='true'] {
+  color: var(--text);
+}
+
+.tab[aria-selected='true'] {
+  pointer-events: auto;
+}
+
+/*
+ * The hover highlight: a gray pill that follows the pointer from tab to tab, moving a beat after it crosses over.
+ * It changes width rather than scale, so its 6px corners keep their shape. Hidden, it waits where it shows next.
+ */
+.highlight {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  height: 30px;
+  border-radius: 6px;
+  background: var(--hover);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 0s 150ms,
+    width 0s 150ms,
+    opacity 150ms var(--ease),
+    visibility 0s 150ms,
+    background-color 100ms;
+}
+
+.tile[data-hovered] .highlight {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    transform 180ms var(--ease) 90ms,
+    width 180ms var(--ease) 90ms,
+    opacity 150ms var(--ease),
+    visibility 0s,
+    background-color 100ms;
+}
+
+.tile[data-press] .highlight {
+  background: var(--press);
+}
+
+/* The underline: a 100px bar moved and scaled to the active tab, 8px in from each side */
+.indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  width: 100px;
+  height: 2px;
+  background: var(--text);
+  transform-origin: 0 0;
+  transition: transform 260ms var(--ease);
+}
+
+/* A taller target than the 2px line, so it can be pointed at */
+.indicator::before {
+  content: '';
+  position: absolute;
+  inset: -6px 0 0;
+}
+
+/* The overflow fades: the page color fading in over the tabs at an edge with more, and a chevron to scroll there */
+.fade {
+  position: absolute;
+  top: 0;
+  bottom: 1px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  width: 56px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 150ms var(--ease),
+    visibility 150ms;
+}
+
+.fade[data-edge='start'] {
+  left: 0;
+  padding-left: 4px;
+  background: linear-gradient(to left, transparent, var(--bg) 55%);
+}
+
+.fade[data-edge='end'] {
+  right: 0;
+  justify-content: flex-end;
+  padding-right: 4px;
+  background: linear-gradient(to right, transparent, var(--bg) 55%);
+}
+
+.fade[data-shown] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.scroll {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  color: var(--text-2);
+}
+
+.scroll .icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* The tab panel: each tab's page lies in the same place and the active one fades in as the last one fades out */
+.panel {
+  position: absolute;
+  top: calc(var(--header) + var(--bar));
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--page);
+}
+
+.page {
+  position: absolute;
+  inset: 0;
+  padding: 12px 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 200ms var(--ease),
+    visibility 200ms;
+}
+
+.page[data-shown] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.card,
+.table {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.card {
+  padding: 9px 12px 10px;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardTitle {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.visit {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bg);
+  background: var(--text);
+}
+
+.visit .icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* Facts in rows, each with its label in a gray column; two columns of them on wider tiles */
+.facts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px 20px;
+  margin: 8px 0 0;
+}
+
+.facts > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  height: 20px;
+}
+
+.facts dt {
+  flex: none;
+  width: 52px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.facts dd {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.facts dd > .icon {
+  width: 13px;
+  height: 13px;
+  margin-right: -2px;
+  color: var(--text-2);
+}
+
+.more {
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--text-2);
+  background: var(--hover);
+}
+
+.commit {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-2);
+}
+
+.hash {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.92em;
+}
+
+.face {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ready);
+}
+
+.dot[data-status='error'] {
+  background: var(--error);
+}
+
+.wideOnly,
+.facts > .wideOnly {
+  display: none;
+}
+
+/* Deployments: one row each, the columns fewer on narrow tiles */
+.table {
+  overflow: hidden;
+}
+
+.deployment {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) auto;
+  column-gap: 12px;
+  align-items: center;
+  height: 26px;
+  padding: 0 12px;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.deployment + .deployment {
+  border-top: 1px solid var(--line);
+}
+
+.deployId,
+.state,
+.source {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.env,
+.took,
+.age {
+  color: var(--text-2);
+}
+
+.age {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.source {
+  display: none;
+}
+
+.source > .icon {
+  width: 13px;
+  height: 13px;
+  color: var(--text-2);
+}
+
+.branch {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 11.5px;
+}
+
+.message {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-2);
+}
+
+/* Analytics: the totals over a line of visitors a day */
+.analytics {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.metrics {
+  display: flex;
+  gap: 28px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric.wideOnly {
+  display: none;
+}
+
+.metricLabel {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-2);
+}
+
+.metricValue {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 25px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.up {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ready);
+}
+
+.chart {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  margin-top: 8px;
+  overflow: visible;
+}
+
+.line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.75;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.area {
+  fill: light-dark(rgb(26 108 232 / 0.09), rgb(75 142 247 / 0.16));
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--text-3);
+}
+
+/*
+ * The pointer: an arrow over the page, a pointing hand over the tabs (they're links). It moves the way a hand moves a
+ * mouse, slow out, quick through the middle, gentle landing; the hand dips a little as it clicks.
+ */
+.pointer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  pointer-events: none;
+  transition: transform 420ms cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.arrow,
+.hand {
+  position: absolute;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.3));
+  stroke-linejoin: round;
+  transition:
+    opacity 100ms,
+    scale 120ms var(--ease);
+}
+
+.arrow {
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 20px;
+  fill: #1d1d1f;
+  stroke: #fff;
+  stroke-width: 1.4;
+}
+
+.hand {
+  top: -2px;
+  left: -10px;
+  width: 24px;
+  height: 24px;
+  fill: #fff;
+  stroke: #1d1d1f;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  opacity: 0;
+  transform-origin: 10px 2px;
+}
+
+.hand path + path {
+  fill: none;
+}
+
+.tile[data-hovered] .arrow {
+  opacity: 0;
+}
+
+.tile[data-hovered] .hand {
+  opacity: 1;
+}
+
+.tile[data-press] .hand {
+  scale: 0.9;
+}
+
+/* Desktop and wider: two columns of facts, the source of each deployment and the bounce rate */
+@container (width >= 470px) {
+  .facts {
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  }
+
+  .wideOnly,
+  .facts > .wideOnly,
+  .metric.wideOnly {
+    display: flex;
+  }
+
+  .deployment {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.8fr) minmax(0, 1.7fr) auto;
+  }
+
+  .source {
+    display: flex;
+  }
+}
+
+/* Phones: the project alone in the breadcrumb, no feedback button */
+@container (width < 470px) {
+  .team,
+  .feedback {
+    display: none;
+  }
+}
+
+@container (width < 600px) {
+  .feedback {
+    display: none;
+  }
+}

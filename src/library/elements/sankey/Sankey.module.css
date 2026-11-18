@@ -1,0 +1,146 @@
+/*
+ * An income statement chart on a plain page (white, near-black in dark mode): revenue flows in a cool slate, profit
+ * in green and costs in red, each flow a see-through band of its target's color and each node a solid bar. Labels
+ * stay in the text colors; the tooltip is dark in both themes.
+ */
+.tile {
+  --page: light-dark(#fff, #15171c);
+  --ink: light-dark(#16181d, #f2f3f5);
+  --muted: light-dark(#6b7079, #9ba0a9);
+  --revenue: light-dark(oklch(0.56 0.04 258), oklch(0.68 0.035 258));
+  --profit: light-dark(#0b8f68, #22b07f);
+  --cost: light-dark(#d33a3c, #e5534f);
+  --tip: light-dark(#1d2026, #33373f);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  height: 100%;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--page);
+}
+
+.chart {
+  position: relative;
+  height: 100%;
+}
+
+.diagram {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tile [data-kind='revenue'] {
+  --color: var(--revenue);
+}
+
+.tile [data-kind='profit'] {
+  --color: var(--profit);
+}
+
+.tile [data-kind='cost'] {
+  --color: var(--cost);
+}
+
+/* A flow: its color at 32%, fading to 10% while a path is walked */
+.link {
+  fill: var(--color);
+  fill-opacity: 0.32;
+  transition: fill-opacity 300ms var(--ease);
+}
+
+.diagram[data-walking] .links .link {
+  fill-opacity: 0.1;
+}
+
+/* The walked path's flows light up one after another, at 62% */
+.path .link {
+  fill-opacity: 0;
+  visibility: hidden;
+  transition:
+    fill-opacity 250ms var(--ease),
+    visibility 0s linear 250ms;
+}
+
+.path .link[data-lit] {
+  fill-opacity: 0.62;
+  visibility: visible;
+  transition: fill-opacity 250ms var(--ease);
+}
+
+.node {
+  fill: var(--color);
+  transition: opacity 300ms var(--ease);
+}
+
+.label {
+  font-size: 11px;
+  dominant-baseline: central;
+  transition: opacity 300ms var(--ease);
+}
+
+.label tspan {
+  dominant-baseline: central;
+}
+
+/* Nodes off the walked path step back */
+.node[data-off],
+.label[data-off] {
+  opacity: 0.4;
+}
+
+.name {
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.value {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  fill: var(--muted);
+}
+
+/* A small dark badge on the flow itself: its amount, and its share of revenue under it */
+.tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3px 8px 4px;
+  border-radius: 6px;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--tip);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.24);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 250ms var(--ease),
+    opacity 150ms var(--ease),
+    visibility 0s linear 150ms;
+}
+
+.tooltip[data-shown] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    transform 250ms var(--ease),
+    opacity 150ms var(--ease);
+}
+
+.figure {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.share {
+  font-size: 10.5px;
+  line-height: 12px;
+  color: rgb(255 255 255 / 0.72);
+}

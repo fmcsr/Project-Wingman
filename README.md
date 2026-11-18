@@ -11,19 +11,20 @@ understand. Next, it will write that brief from everyday descriptions like “th
 
 ## A look inside
 
-Right under the hero, a gallery runs fifteen elements from apps people use every day, each working the way it does
-there: the Dynamic Island, a command palette, live cursors, marker clusters, a toast stack and more. Every part of each
-one can be inspected:
+Right under the hero, the examples open on their With Wingman tab: a gallery of fifteen elements from apps people use
+every day, each working the way it does there (the Dynamic Island, a command palette, live cursors, marker clusters, a
+toast stack and more). Every part of each one can be inspected:
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/gallery-dark.png">
   <img alt="The landing page's element gallery: fifteen live elements in a bento grid, each with its name under it: Dynamic Island, command palette, wheel picker, activity rings, bottom sheet, calendar heatmap, one-time code field, slide to confirm, swipe actions, marker clusters, live cursors, mention menu, toast stack, drag and drop and skeleton screen" src="docs/screenshots/gallery-light.png">
 </picture>
 
-Each example further down is a before/after: drag the line to compare the AI slop a vague prompt produces with the
-same product built from a Wingman brief. Hover anything on either side to learn what it's called. Click to pin the
-full explanation: how it looks, how it behaves, and the exact CSS behind it. The examples switch to dark mode with the
-page (products that are dark by design stay dark), and the balloons show the values for the theme you're in.
+The other tab, Without Wingman, has two sites and three phones as before/afters: drag the line to compare the AI slop a
+vague prompt produces with the same product built from a Wingman brief. Hover anything on either side to learn what it's
+called. Click to pin the full explanation: how it looks, how it behaves, and the exact CSS behind it. The examples
+switch to dark mode with the page (products that are dark by design stay dark), and the balloons show the values for the
+theme you're in.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/phones-dark.png">
@@ -33,8 +34,10 @@ page (products that are dark by design stay dark), and the balloons show the val
 ### The library
 
 Behind sign-in, the library holds more than thirty apps, sites and watch apps, each modeled on a product people use
-every day: the same layout and component shapes, with its own name, colors, copy and real photos. Every element can be
-inspected the same way and added to a brief. Here Lanes, a board in the style of Jira, explains its WIP limit:
+every day: the same layout and component shapes, with its own name, colors, copy and real photos. An Elements tab adds
+single elements: the gallery's fifteen and forty more, from forms, navigation, charts and micro-interactions. Every
+element can be inspected the same way and added to a brief. Here Lanes, a board in the style of Jira, explains its WIP
+limit:
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/inspect-dark.png">
@@ -55,12 +58,28 @@ And websites:
   <img alt="Six library sites: Stream (streaming like Netflix), Shelf (a store like Amazon), Glyph (a code editor like VS Code), Conduit (automations like Zapier), Cadence (a calendar like Notion Calendar) and Lanes (a board like Jira)" src="docs/screenshots/library-sites-light.png">
 </picture>
 
+And the watch's own elements: a face with its complications, the Smart Stack, activity rings, a notification and Now
+Playing:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/library-watch-dark.png">
+  <img alt="Six Apple Watch examples: Almanac (an analog face with complications, like Infograph), Glance (the Smart Stack of widgets), Kinetic (activity rings), Nudge (a notification's Long Look with its actions), Encore (Now Playing) and Pace (a running workout)" src="docs/screenshots/library-watch-light.png">
+</picture>
+
+And single elements: the Elements tab holds fifty-five, filtered by family (data, forms, iOS, micro-interactions,
+navigation, productivity), each live in the gallery's bento grid and with its own page listing its parts:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/library-elements-dark.png">
+  <img alt="The library's Elements tab: the Mobile, Web, Watch and Elements tabs, family chips and a bento grid of live elements: activity rings, a bottom sheet, breadcrumbs with their overflow menu open, a bubble chart, a calendar heatmap, a candlestick chart, a character counter and a context menu with its submenu" src="docs/screenshots/library-elements-light.png">
+</picture>
+
 ## Current status: landing page, sign-in, the library and the brief
 
-An English landing page with a sticky header (with a theme toggle), a hero, an element gallery, examples, feature cards,
-a support section and a footer. Right under the hero, the gallery runs fifteen elements people meet in apps every day
-but rarely know the names of (the Dynamic Island, a command palette, live cursors, marker clusters, a toast stack and
-more), each live in a tile of a bento grid with its name under it and every part of it inspectable. The examples section
+An English landing page with a sticky header (with a theme toggle), a hero, the examples in two tabs, feature cards, a
+support section and a footer. The examples open on With Wingman: a gallery of fifteen elements people meet in apps every
+day but rarely know the names of (the Dynamic Island, a command palette, live cursors, marker clusters, a toast stack
+and more), each live in a tile of a bento grid with its name under it and every part of it inspectable. Without Wingman
 has five projects (a marketing site, an analytics dashboard and three mobile apps), each a before/after comparison with
 a line to drag: on the left, the AI slop a vague prompt produces; on the right, the same product built from a Wingman
 brief. On both sides nearly every element shows its name on hover, a summary after a two-second pause and the full
@@ -71,13 +90,14 @@ while you inspect them.
 Wingman is free: an account opens the library and the brief builder. People who find it useful can sponsor it on
 GitHub (`SPONSOR_HREF` in `src/landing/links.ts`; GitHub Sponsors has to be set up on that account).
 
-Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to the library (`/app/mobile`, `/app/web`, `/app/watch`):
-mobile apps, websites and Apple Watch apps in three tabs, each a fictional product built from the patterns of
-well-known ones (“inspired by” Spotify, Airbnb, Stripe, Notion, Figma, VS Code and others). Phones and watches can be
-inspected right in the grid; every example also has its own page (`/app/<platform>/<id>`) with all of its elements
-written out. A search finds examples by name or by
-element (“bottom sheet”, “toast”). There's no auth backend yet: email and password sign-in only works with the development
-account below, and Google sign-in and sign-ups show a “not connected yet” message.
+Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to the library (`/app/mobile`, `/app/web`, `/app/watch`,
+`/app/elements`): mobile apps, websites and Apple Watch apps in three tabs, each a fictional product built from the
+patterns of well-known ones (“inspired by” Spotify, Airbnb, Stripe, Notion, Figma, VS Code and others), and a fourth tab
+of single elements in the gallery's bento grid, filtered by family (forms, navigation, data, micro-interactions, iOS,
+productivity). Phones, watches and elements can be inspected right in the grid; every example also has its own page
+(`/app/<platform>/<id>`) with all of its elements written out. A search finds examples by name or by element (“bottom
+sheet”, “toast”). There's no auth backend yet: email and password sign-in only works with the development account below,
+and Google sign-in and sign-ups show a “not connected yet” message.
 
 Any element in the library can go into a brief: choose **Add to brief** in its pinned explanation or in the example's
 element list. The brief page (`/app/brief`) adds what you're building and a note per element, and turns it all into
@@ -152,19 +172,21 @@ setting (light or dark) and can be switched from the header. All visual decision
 
 ```
 src/
-  landing/     Landing page sections: header, theme toggle, hero, element gallery (one file per tile in gallery/),
-               examples, feature cards, support, footer
+  landing/     Landing page sections: header, theme toggle, hero, the examples (Examples.tsx: the With Wingman tab's
+               gallery, Gallery.tsx, and the Without Wingman tab's comparisons, Comparisons.tsx), feature cards,
+               support, footer
   auth/        Sign-in and sign-up pages, the session store (no backend yet) and the dev account
   workspace/   The signed-in area: the library's tabs, search and grids, and each example's page with its glossary
   brief/       The brief: its store (in localStorage), the Markdown writer, the Add to brief button and the brief page
-  library/     The library: types, the registry, and one folder per example (mobile/<id>, web/<id>)
+  library/     The library: types, the registry, and one folder per example (mobile/<id>, web/<id>, watch/<id>,
+               elements/<id>; elements share their photos in elements/photos/)
   demos/       The landing page's five examples: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ StatusBar),
                their motion (motion.ts: entrances, live parts that hold while inspected), and in slop/ the AI slop
                version each one is compared with
-  catalog/     Element descriptions (English, typed data) for those five, the gallery's tiles (gallery/, one file per
-               family) and elements every phone shares
+  catalog/     Element descriptions (English, typed data) for those five, plus elements every phone shares
   inspector/   The “inspect element” layer: InspectSurface, explainer balloon, positioning
-  showcase/    Frames and the interaction guide: the browser frame as a scroll scene (useScrollScene), a scalable phone
+  showcase/    Frames and the interaction guide: the browser frame as a scroll scene (useScrollScene), a scalable phone,
+               the watch, and the elements' bento grid (TileGrid.module.css)
   brand/       Logo and the hero's animated line art (with the shooting star)
   styles/      Design tokens (light-dark) and global styles
   router.tsx   A tiny client-side router: current path, links, redirects, page titles
@@ -179,7 +201,7 @@ docs/
 Create a folder; the library picks it up on its own (`import.meta.glob` in `src/library/index.ts`):
 
 ```
-src/library/<mobile|web|watch>/<id>/
+src/library/<mobile|web|watch|elements>/<id>/
   <Name>.tsx         the demo (a named export)
   <Name>.module.css  its styles
   specs.ts           a UiElementSpec for every data-inspect id the demo uses
@@ -192,18 +214,37 @@ src/library/<mobile|web|watch>/<id>/
 - **Mobile** fills a 280 × 600 phone screen and starts with the shared `<StatusBar />`; reuse the `statusBar` and
   `homeIndicator` specs from `src/catalog`. **Watch** fills a 208 × 248 Apple Watch screen (46 mm). **Web** sets
   `container-type: inline-size` and works from about 340 px to 1150 px wide; it can be taller than the window.
+  **Elements** set `size` (see below) and fill their tile with `container-type: size`.
 - **Names are fictional;** real products go in `inspiredBy`.
 - **Same design type, our own identity:** follow one familiar product's real screen closely (layout, type scale, color
   scheme, component shapes) so people recognize it, with our own name, logo, accent hue, copy and data. No real logos,
   mascots or brand marks.
 - **Real photos:** anything that stands for a photo (avatars, video frames, food, places) is a free-license Unsplash
-  photo, stored in the example's `photos/` folder and listed in its `CREDITS.md`.
+  photo, stored in the example's `photos/` folder and listed in its `CREDITS.md`. Elements share
+  `src/library/elements/photos/`, where a portrait's file name is the person's first name everywhere it appears.
+
+### Adding an element
+
+An element is a library example with `platform: 'elements'`, its family as the `category` (Data, Forms, iOS,
+Micro-interactions, Navigation, Productivity) and a `size` that says how much of the bento grid its tile takes. The
+grid is the same on the landing page and in the library, so a tile must look right across these picture sizes (CSS
+px); its own page shows it at the desktop size, or full width on a phone:
+
+| `size` | Width | Height | Desktop (4 columns) | Tablet (2 columns) | Phone (1 column) |
+| --- | --- | --- | --- | --- | --- |
+| `small` | 230–606 | 214 | 230–274 | 286–478 | 328–606 |
+| `wide` | 328–973 | 214 | 476–564 | 592–973 | 328–606 |
+| `tall` | 230–606 | 374–494 | 230–274 × 494 | 286–478 × 494 | 328–606 × 374 |
+| `big` | 328–973 | 374–494 | 476–564 × 494 | 592–973 × 494 | 328–606 × 374 |
+
+To show one on the landing page too, add it to `src/landing/gallery/tiles.ts` and check that the four-column grid
+still fills its rows.
 
 ## Adding a UI element
 
 1. Write the description: add a `UiElementSpec` to the example's `specs.ts` (for the landing page's five, the matching
-   file in `src/catalog/`; for a gallery tile, its family's file in `src/catalog/gallery/`), with the demo's real CSS
-   values in its `value` fields. A color that differs by theme is `{ light, dark }`.
+   file in `src/catalog/`), with the demo's real CSS values in its `value` fields. A color that differs by theme is
+   `{ light, dark }`.
 2. Mark it in the demo: add a `data-inspect="<id>"` attribute to the element.
 
 Hover, click, touch, keyboard, outline, balloon, the element counter and the glossary all work automatically. An id

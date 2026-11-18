@@ -1,0 +1,437 @@
+/*
+ * Glance follows the watch's Smart Stack, dark by design: the same in both themes. Widgets are rounded cards in the
+ * watch's widget material, a translucent fill with a hairline of light along the edge, except where an app tints
+ * its own (the weather's sky blue). Each app keeps its color: orange for the timer, yellow for this calendar, the
+ * ring colors for activity.
+ */
+.screen {
+  --material: rgb(255 255 255 / 0.13);
+  --edge: inset 0 0.5px 0 rgb(255 255 255 / 0.22), inset 0 0 0 0.5px rgb(255 255 255 / 0.07);
+  --rounded: 'SF Compact Rounded', ui-rounded, 'SF Compact', 'SF Compact Display', -apple-system, 'SF Pro Display',
+    system-ui, sans-serif;
+  /* Crown scrolling: a spring that runs about 4% past the stop, then settles back */
+  --crown: 0.55s cubic-bezier(0.34, 1.36, 0.64, 1);
+  --spring: 0.55s cubic-bezier(0.32, 0.72, 0, 1);
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'SF Compact', 'SF Compact Display', -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  color: #fff;
+  background: #000;
+}
+
+.screen svg {
+  display: block;
+}
+
+/* The time, small in the top-right corner, kept inside the screen's curve; the stack scrolls under it */
+.time {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  right: 20px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The stack's window: from under the time to the bottom of the screen, where the next widget peeks */
+.stack {
+  position: absolute;
+  inset: 40px 0 0;
+}
+
+/* The list moves as one piece; 194px wide, the size of a Smart Stack widget on a 46 mm watch */
+.list {
+  position: absolute;
+  top: 0;
+  left: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 194px;
+  transition: translate var(--crown);
+}
+
+/*
+ * Each item shrinks a little toward the edge it's near, as list items do on the watch: the one peeking at the
+ * bottom grows to full size as it comes in, and one scrolled past the time shrinks and fades out.
+ */
+.row,
+.card {
+  transform-origin: 50% 0;
+  transition:
+    opacity 0.3s ease,
+    scale var(--spring),
+    visibility 0.3s;
+}
+
+[data-place='next'] {
+  scale: 0.94;
+}
+
+[data-place='past'] {
+  opacity: 0;
+  scale: 0.9;
+  visibility: hidden;
+}
+
+/* Circular widgets: three in a row, spread across the width of the widgets below */
+.row {
+  display: flex;
+  justify-content: space-between;
+  height: 52px;
+}
+
+.circular {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--material);
+  box-shadow: var(--edge);
+}
+
+/* The workout shortcut: the app's glyph in its neon green, in thick round strokes */
+.runner {
+  fill: none;
+  stroke: #a6ff00;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.runner circle {
+  fill: #a6ff00;
+}
+
+/* Gauges fill their circle; only a band along the arc answers to the pointer */
+.gauge {
+  position: absolute;
+  inset: 0;
+  fill: none;
+  pointer-events: none;
+}
+
+.gaugeHit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 9;
+  pointer-events: stroke;
+}
+
+/* Timer: a closed gauge in the timer's orange, the time left inside */
+.timerTrack {
+  stroke: rgb(255 159 10 / 0.3);
+  stroke-width: 3.6;
+}
+
+.timerLeft {
+  stroke: #ff9f0a;
+  stroke-width: 3.6;
+  stroke-linecap: round;
+}
+
+.timerTime {
+  position: relative;
+  font-family: var(--rounded);
+  font-size: 13.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Air quality: an open gauge from good (green) to bad (red), its label in the gap at the bottom */
+.aqiArc {
+  stroke-width: 3.6;
+  stroke-linecap: round;
+}
+
+.aqiMarker {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 1.2;
+}
+
+.aqiValue {
+  position: relative;
+  font-family: var(--rounded);
+  font-size: 15px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.aqiLabel {
+  position: absolute;
+  bottom: 4px;
+  font-family: var(--rounded);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #30d158;
+}
+
+/* A rectangular widget: 194 × 80, the watch's widget material, corners rounded to match the screen's */
+.card {
+  position: relative;
+  height: 80px;
+  border-radius: 22px;
+  background: var(--material);
+  box-shadow: var(--edge);
+}
+
+/* Weather tints its own card with the sky it describes: a clear daytime blue, lighter at the top */
+.weather {
+  padding: 9px 12px 0 13px;
+  background: linear-gradient(#3f84d6, #2d67b2);
+}
+
+.weatherTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 14px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.place {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.arrow {
+  fill: #fff;
+}
+
+.condition {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: rgb(255 255 255 / 0.85);
+}
+
+.weatherMain {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.now {
+  display: flex;
+  flex-direction: column;
+}
+
+.temp {
+  font-family: var(--rounded);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 31px;
+  letter-spacing: -0.02em;
+}
+
+.range {
+  font-family: var(--rounded);
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 12px;
+  color: rgb(255 255 255 / 0.85);
+}
+
+/* Hourly forecast: four columns, each the hour, the sky and the temperature */
+.hours {
+  display: flex;
+  gap: 4px;
+}
+
+.hour {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 24px;
+}
+
+.hourTime {
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 11px;
+  color: rgb(255 255 255 / 0.75);
+}
+
+.hourTemp {
+  font-family: var(--rounded);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 14px;
+}
+
+/* Weather glyphs in the multicolor style: the sun yellow, clouds white */
+.sunDisc {
+  fill: #ffd60a;
+}
+
+.sunRays {
+  fill: none;
+  stroke: #ffd60a;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.cloud {
+  fill: #fff;
+}
+
+/* Up next: the event's calendar color as a bar down the left, its time in that color, the title large */
+.event {
+  --calendar: #ffd60a;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 14px 0 24px;
+}
+
+.eventBar {
+  position: absolute;
+  top: 13px;
+  bottom: 13px;
+  left: 13px;
+  width: 3.5px;
+  border-radius: 2px;
+  background: var(--calendar);
+}
+
+.eventTime {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--rounded);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 15px;
+  color: var(--calendar);
+}
+
+.eventSoon {
+  font-weight: 500;
+  color: rgb(255 255 255 / 0.6);
+}
+
+.eventTitle {
+  margin-top: 1px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.eventPlace {
+  font-size: 12px;
+  line-height: 15px;
+  color: rgb(255 255 255 / 0.6);
+}
+
+/* Activity: the rings on the left, each ring's figure in its color on the right */
+.activity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px 0 13px;
+}
+
+.rings {
+  flex: none;
+  transform: rotate(-90deg);
+  fill: none;
+}
+
+.move {
+  --ring: #ff2f69;
+  --track: #3b0b18;
+}
+
+.exercise {
+  --ring: #b2f51c;
+  --track: #22380b;
+}
+
+.stand {
+  --ring: #31e4f0;
+  --track: #0b3439;
+}
+
+.ringTrack {
+  stroke: var(--track);
+  stroke-width: 5.6;
+}
+
+.ringFill {
+  stroke: var(--ring);
+  stroke-width: 5.6;
+  stroke-linecap: round;
+}
+
+.figures {
+  display: flex;
+  flex-direction: column;
+}
+
+.figure {
+  font-family: var(--rounded);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 17px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ring);
+}
+
+.figureUnit {
+  margin-left: 2px;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+/*
+ * The Digital Crown scroll indicator, level with the crown: a short track with a thumb for where the list is. It
+ * shows while the crown turns and fades out once the stack rests.
+ */
+.indicator {
+  position: absolute;
+  top: 46px;
+  right: 2px;
+  width: 4px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.25);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.4s ease,
+    visibility 0.4s;
+}
+
+.indicator[data-shown] {
+  opacity: 1;
+  visibility: visible;
+  transition-duration: 0.15s;
+}
+
+.thumb {
+  display: block;
+  height: 24px;
+  border-radius: 2px;
+  background: #fff;
+  transition: translate var(--crown);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen * {
+    transition: none !important;
+  }
+}

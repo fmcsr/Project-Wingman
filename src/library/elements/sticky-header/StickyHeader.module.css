@@ -1,0 +1,335 @@
+/*
+ * A product page in the idiom of the big tech stores: a white page (black in dark mode), near-black ink, a bold name and
+ * a short tagline over the product on a pale studio stage, which stays the same in both themes. The compact bar is the
+ * stores' frosted material: white (or near-black) at 72% with blur(20px) saturate(180%) and a hairline. One accent, a
+ * blue, for the Buy button. The page's stops (--photo, --details) are measured by the component.
+ */
+.tile {
+  --page: light-dark(#ffffff, #000000);
+  --ink: light-dark(#1d1d1f, #f5f5f7);
+  --ink-2: light-dark(#6e6e73, #a1a1a6);
+  --glass: light-dark(rgb(255 255 255 / 0.72), rgb(22 22 23 / 0.72));
+  --hairline: light-dark(rgb(0 0 0 / 0.14), rgb(255 255 255 / 0.16));
+  --accent: light-dark(#0a6be8, #2d88ff);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* The compact bar and the tall header: the header gives up the difference, 68px, the scroll threshold */
+  --bar-h: 52px;
+  --tall-h: 120px;
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--page);
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The page: it scrolls under the header, a little way down, further, and back up */
+.page {
+  position: absolute;
+  inset: 0 0 auto;
+  padding: calc(var(--tall-h) + 4px) 16px 36px;
+  translate: 0 calc(-1 * var(--y, 0px));
+}
+
+.page[data-ready] {
+  transition: translate 750ms cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+.tile[data-scroll='top'] .page[data-ready] {
+  transition-duration: 1000ms;
+}
+
+.tile[data-scroll='photo'] .page {
+  --y: var(--photo, 0px);
+}
+
+.tile[data-scroll='details'] .page {
+  --y: var(--details, 0px);
+}
+
+.tagline {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: -0.02em;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* The studio shot fills its rounded card edge to edge, the same in both themes */
+.stage {
+  width: min(100%, 300px);
+  height: 216px;
+  margin: 16px auto 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #f4f4f4;
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 45%;
+}
+
+.price {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--ink-2);
+}
+
+.swatches {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
+}
+
+.feature {
+  margin-top: 30px;
+}
+
+.featureTitle {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.015em;
+}
+
+.featureText {
+  margin: 6px 0 0;
+  font-size: 13.5px;
+  line-height: 20px;
+  color: var(--ink-2);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hairline);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-2);
+}
+
+.stat strong {
+  margin-bottom: 2px;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+/* The threshold: the band the tall header gives up. It paints nothing; an outline shows it when inspected */
+.threshold {
+  position: absolute;
+  z-index: 1;
+  top: var(--bar-h);
+  right: 0;
+  left: 0;
+  height: calc(var(--tall-h) - var(--bar-h));
+}
+
+/*
+ * The header. Its box is the 52px bar; at the top of the page the name hangs below it in big type and the bar has no
+ * background. Compact, the name shrinks into the bar, the frosted backdrop and the hairline fade in, and Buy takes
+ * the place of the search and bag icons. It turns compact a moment into a scroll down and tall again near the end
+ * of a scroll back up, when the page passes the threshold.
+ */
+.header {
+  position: absolute;
+  z-index: 2;
+  inset: 0 0 auto;
+  height: var(--bar-h);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--glass);
+  backdrop-filter: saturate(180%) blur(20px);
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* The bar lets the pointer through to the backdrop between its items, so the frosted glass can be pointed at */
+.bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 100%;
+  padding: 0 16px;
+  pointer-events: none;
+}
+
+.bar > * {
+  pointer-events: auto;
+}
+
+.mark {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: var(--ink);
+  fill-rule: evenodd;
+}
+
+.title {
+  position: absolute;
+  top: 60px;
+  left: 16px;
+  margin: 0;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 40px;
+  letter-spacing: -0.022em;
+  white-space: nowrap;
+  transform-origin: 0 0;
+}
+
+.links {
+  display: none;
+  gap: 18px;
+  margin-left: auto;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+
+.end {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.tools {
+  display: flex;
+  gap: 16px;
+}
+
+.buy {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  display: flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 13px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #fff;
+  background: var(--accent);
+  translate: 0 -50%;
+  opacity: 0;
+  visibility: hidden;
+  scale: 0.9;
+}
+
+.backdrop,
+.tools,
+.buy {
+  transition:
+    opacity 250ms var(--ease) 600ms,
+    visibility 250ms 600ms,
+    scale 250ms var(--ease) 600ms;
+}
+
+.title {
+  transition: transform 380ms cubic-bezier(0.3, 0.7, 0.2, 1) 600ms;
+}
+
+.tile[data-compact] .backdrop,
+.tile[data-compact] .buy {
+  opacity: 1;
+  visibility: visible;
+  scale: 1;
+}
+
+.tile[data-compact] .tools {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* 34px down to 19px, sliding up into the bar next to the logo */
+.tile[data-compact] .title {
+  transform: translate(30px, -45px) scale(0.56);
+}
+
+.tile[data-compact] :is(.backdrop, .tools, .buy, .title) {
+  transition-delay: 160ms;
+}
+
+/* Room for the page's own links in the bar */
+@container (width >= 420px) {
+  .links {
+    display: flex;
+  }
+
+  .end {
+    margin-left: 6px;
+  }
+
+  .stage {
+    height: 240px;
+  }
+}
+
+@container (width >= 560px) {
+  .page {
+    padding-inline: 28px;
+  }
+
+  .bar {
+    padding-inline: 24px;
+  }
+
+  .title {
+    left: 24px;
+    font-size: 40px;
+    line-height: 44px;
+  }
+
+  /* 40px down to 20px */
+  .tile[data-compact] .title {
+    transform: translate(30px, -45px) scale(0.5);
+  }
+}

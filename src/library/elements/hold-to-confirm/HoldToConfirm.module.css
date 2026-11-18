@@ -1,0 +1,269 @@
+/*
+ * How far the hold has come, from 0 to 1. Registered as a number so it can transition: the fill and the label's
+ * white part both follow this one value, so the label turns white exactly where the fill passes.
+ */
+@property --hold-to-confirm {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+/*
+ * A web app's confirmation dialog over the dimmed page: a white card (zinc in dark mode) with a hairline and a soft
+ * shadow. The one color is the destructive red: the button's tint, its fill and the ring while it's held.
+ */
+.tile {
+  --scrim: light-dark(#e6e6e9, #070708);
+  --card: light-dark(#fff, #18181b);
+  --card-line: light-dark(#e4e4e7, #27272a);
+  --ink: light-dark(#18181b, #fafafa);
+  --muted: light-dark(#71717a, #a1a1aa);
+  --danger: light-dark(#dc2626, #e5484d);
+  --danger-ink: light-dark(#b91c1c, #ff8a8a);
+  --tint: light-dark(#fef2f2, #2a1517);
+  --tint-line: light-dark(#fecaca, #5c2326);
+  --ring: light-dark(rgb(220 38 38 / 0.22), rgb(229 72 77 / 0.35));
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 12px;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--scrim);
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 340px;
+  padding: 16px 16px 8px;
+  border: 1px solid var(--card-line);
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: 0 8px 24px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.5));
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+}
+
+.body {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 18px;
+  text-wrap: pretty;
+  color: var(--muted);
+}
+
+.action {
+  position: relative;
+  margin-top: 14px;
+}
+
+/*
+ * The button. Pressed, it shrinks to 97% in 150ms; let go, it springs back. While it's held the progress climbs at
+ * the hold's own pace, linear, so 45% takes 0.45 × 1.5 s; let go early, it drains back in 450ms, easing out.
+ */
+.hold {
+  position: relative;
+  display: block;
+  height: 40px;
+  transition: transform 300ms var(--spring);
+}
+
+.hold[data-pressed] {
+  transform: scale(0.97);
+}
+
+.hold[data-phase='hold'] {
+  transition:
+    transform 150ms var(--ease),
+    --hold-to-confirm var(--hold-ms) linear;
+}
+
+.hold[data-phase='drain'] {
+  transition:
+    transform 300ms var(--spring),
+    --hold-to-confirm 450ms var(--ease);
+}
+
+/* The pressed state: a 3px ring 2px outside the button, there only while it's held */
+.ring {
+  position: absolute;
+  inset: -5px;
+  border: 3px solid var(--ring);
+  border-radius: 15px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 150ms ease,
+    visibility 0s linear 150ms;
+}
+
+.hold[data-pressed] .ring {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* The button's face: the red tint with a hairline drawn inside, so the fill can cover it */
+.face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--tint);
+  box-shadow: inset 0 0 0 1px var(--tint-line);
+}
+
+/* The fill: solid red from the left edge to the progress, cut with a straight edge */
+.fill {
+  position: absolute;
+  inset: 0;
+  background: var(--danger);
+  clip-path: inset(0 calc((1 - var(--hold-to-confirm)) * 100%) 0 0);
+  transition: opacity 300ms ease;
+}
+
+.hold[data-empty] .fill {
+  visibility: hidden;
+}
+
+.hold[data-fading] .fill {
+  opacity: 0;
+}
+
+/*
+ * The label is painted with a two-stop gradient clipped to its letters: white up to the progress, red after it. The
+ * gradient spans the whole button, so its edge lines up with the fill's.
+ */
+.labels {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: transparent;
+  background: linear-gradient(
+    90deg,
+    #fff calc(var(--hold-to-confirm) * 100%),
+    var(--danger-ink) calc(var(--hold-to-confirm) * 100%)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.hold[data-done] .labels {
+  opacity: 0;
+  transition-duration: 120ms;
+}
+
+/*
+ * Fading back, the label returns in plain red while the fill fades out, so "Deleted" crossfades into "Hold to
+ * delete"; the gradient takes over again once the progress is back at 0, where it's all red anyway
+ */
+.hold[data-fading] .labels {
+  color: var(--danger-ink);
+  background: none;
+  opacity: 1;
+}
+
+/*
+ * Done: white "Deleted" on the full red, once the instruction has gone (100ms later, so the two never overlap), the
+ * check popping in with a little overshoot
+ */
+.success {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  height: 20px;
+  margin: auto;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: #fff;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 200ms ease,
+    visibility 0s linear 200ms;
+}
+
+.success svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform: scale(0.4);
+  transition: transform 350ms var(--spring);
+}
+
+.hold[data-done]:not([data-fading]) .success {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 200ms ease 100ms,
+    visibility 0s;
+}
+
+.hold[data-done]:not([data-fading]) .success svg {
+  transform: none;
+  transition-delay: 100ms;
+}
+
+.cancel {
+  align-self: center;
+  margin-top: 6px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--muted);
+}
+
+/*
+ * The pointer rests on the right part of the button, clear of the label; away, it's out of view below the tile, so
+ * it comes in from the edge. Black with a white rim, as on a Mac in either theme.
+ */
+.pointer {
+  position: absolute;
+  top: calc(22px - 1.2px);
+  left: calc(80% - 1.2px);
+  width: 14px;
+  height: 20px;
+  fill: #1d1d1f;
+  stroke: #fff;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.3));
+  pointer-events: none;
+  transform: translate(36px, 110px);
+  transition: transform 650ms cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+.tile[data-pointer] .pointer {
+  transform: none;
+}

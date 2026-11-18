@@ -1,0 +1,544 @@
+/*
+ * An upload panel in the cloud-storage idiom: a white page (near-black in dark mode), a dashed drop area with a
+ * quiet prompt, and file rows as hairline cards with a thumbnail, the name, the size and one action. The accent blue
+ * lights the zone while a file is over it and fills the progress bars; green marks a finished upload, red a refused
+ * one.
+ */
+.tile {
+  --page: light-dark(#ffffff, #18191c);
+  --zone: light-dark(#fafafb, #1e1f23);
+  --zone-line: light-dark(#c4c7cf, #4a4c54);
+  --text: light-dark(#1c1d21, #ececee);
+  --text-2: light-dark(#50535b, #b5b8bf);
+  --muted: light-dark(#7a7e87, #888c96);
+  --line: light-dark(#e4e5e9, #2f3137);
+  --fill: light-dark(#eff0f3, #2a2c31);
+  --accent: light-dark(#1e6bf0, #6ea4ff);
+  --accent-tint: light-dark(rgb(30 107 240 / 0.06), rgb(110 164 255 / 0.09));
+  --accent-soft: light-dark(#dfe9fd, rgb(110 164 255 / 0.18));
+  --success: light-dark(#15924a, #3ccf7a);
+  --danger: light-dark(#d92d20, #ff7a6e);
+  --danger-tint: light-dark(#fef5f4, rgb(255 122 110 / 0.07));
+  --danger-line: light-dark(#f5cdc9, rgb(255 122 110 / 0.3));
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  line-height: 17px;
+  color: var(--text);
+  background: var(--page);
+}
+
+/* Everything the pointer moves over; its spots are measured from here */
+.scene {
+  /* Side by side: the zone takes 42% of the content, which is at most 760px wide and centered */
+  --content: min(100cqw - 28px, 760px);
+  --zone-x: calc((100cqw - var(--content)) / 2 + (var(--content) - 12px) * 0.21);
+  --zone-y: 42cqh;
+  --row: 56px;
+  --pitch: 62px;
+
+  position: relative;
+  height: 100%;
+  padding: 14px;
+}
+
+.icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 21fr) minmax(0, 29fr);
+  gap: 12px;
+  max-width: 760px;
+  height: 100%;
+  margin: 0 auto;
+}
+
+/* The dropzone: a 1.5px dashed outline with 12px corners on a faint gray */
+.zone {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: 12px;
+  border: 1.5px dashed var(--zone-line);
+  border-radius: 12px;
+  background: var(--zone);
+  transition:
+    border-color 150ms var(--ease),
+    background-color 150ms var(--ease);
+}
+
+/* A file over it: the outline turns to the accent and the inside takes a tint */
+.tile[data-over] .zone {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+}
+
+.idle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  transition:
+    opacity 150ms var(--ease),
+    visibility 150ms;
+}
+
+.tile[data-over] .idle {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.badge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: var(--text-2);
+  background: var(--fill);
+}
+
+/* Where the zone is narrow the two lines wrap, evenly */
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-wrap: balance;
+}
+
+.prompt {
+  font-weight: 500;
+}
+
+/* The click-to-choose fallback, for people who don't drag */
+.browse {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.hint {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--muted);
+}
+
+/* The drag-over banner: an accent pill at the bottom of the zone, rising in as a file comes over it */
+.banner {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px 0 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #fff;
+  background: light-dark(#1e6bf0, #3f7ef5);
+  box-shadow: 0 4px 12px -2px light-dark(rgb(30 107 240 / 0.35), rgb(0 0 0 / 0.5));
+  opacity: 0;
+  visibility: hidden;
+  translate: -50% 6px;
+  transition:
+    opacity 150ms var(--ease),
+    translate 200ms var(--ease),
+    visibility 150ms;
+}
+
+.banner .icon {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2;
+}
+
+.tile[data-over] .banner {
+  opacity: 1;
+  visibility: visible;
+  translate: -50% 0;
+}
+
+/* The list: rows sit in slots, newest at the top; a new one pushes the rest down and the oldest out of sight */
+.list {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.row {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: grid;
+  /* The name, the size or the reason, and the bar; a row without a bar leaves the third one empty, 0px tall */
+  grid-template-rows: repeat(3, auto);
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  column-gap: 9px;
+  align-content: center;
+  align-items: center;
+  height: var(--row);
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--page);
+  transform: translateY(calc(var(--slot) * var(--pitch)));
+  transition:
+    transform 260ms var(--ease),
+    opacity 300ms var(--ease);
+  animation: row-in 260ms var(--ease);
+}
+
+.tile[data-still] .row {
+  animation: none;
+}
+
+@keyframes row-in {
+  from {
+    opacity: 0;
+    translate: 0 -6px;
+  }
+}
+
+/* Starting over: the rows that came in fade out first */
+.row[data-dip] {
+  opacity: 0;
+}
+
+.thumb {
+  grid-row: 1 / -1;
+  width: 36px;
+  height: 36px;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+/* A PDF: a page with a folded corner and a red type label */
+.doc {
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: var(--fill);
+}
+
+.doc svg {
+  width: 20px;
+  height: 24px;
+}
+
+.page {
+  fill: var(--page);
+  stroke: var(--muted);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+}
+
+.fold {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+}
+
+.type {
+  position: absolute;
+  bottom: 7px;
+  left: 5px;
+  padding: 0 2px;
+  border-radius: 2px;
+  font-size: 7px;
+  font-weight: 700;
+  line-height: 10px;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: #e5484d;
+}
+
+.name {
+  grid-column: 2;
+  overflow: hidden;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.meta,
+.error {
+  grid-column: 2;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The progress bar: 4px, the accent filling a gray track as the upload's events come in */
+.bar {
+  grid-column: 2;
+  height: 4px;
+  margin-top: 5px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--fill);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transform-origin: left;
+  transition: transform 250ms var(--ease);
+}
+
+/* Cancel: a × in a 24px round target while the file is still going up */
+.cancel {
+  display: grid;
+  grid-row: 1 / -1;
+  grid-column: 3;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--muted);
+  background: var(--fill);
+}
+
+.cancel .icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+
+.done {
+  grid-row: 1 / -1;
+  grid-column: 3;
+  color: var(--success);
+}
+
+/* Refused: a red-tinted card, the reason in red and a way to try again with another file */
+.row[data-state='error'] {
+  border-color: var(--danger-line);
+  background: var(--danger-tint);
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--danger);
+}
+
+.error .icon {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2;
+}
+
+.replace {
+  grid-row: 1 / -1;
+  grid-column: 3;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* The pointer, drawn: it travels between spots in the time each beat gives it */
+.pointer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+  transform: translate(var(--x), var(--y));
+  transition: transform var(--move) cubic-bezier(0.3, 0.6, 0.25, 1);
+}
+
+.pointer[data-spot='off'] {
+  --x: calc(100cqw + 30px);
+  --y: calc(100cqh + 24px);
+}
+
+.pointer[data-spot='zone'] {
+  --x: var(--zone-x);
+  --y: var(--zone-y);
+}
+
+.pointer[data-spot='hover'] {
+  --x: calc(var(--zone-x) + 8px);
+  --y: calc(var(--zone-y) + 6px);
+}
+
+.arrow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 20px;
+  fill: #1d1d1f;
+  stroke: #fff;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.3));
+}
+
+/* Over a target that takes files, a green + joins the pointer: letting go will copy them there */
+.plus {
+  position: absolute;
+  top: 14px;
+  left: 10px;
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+  background: #22a447;
+  opacity: 0;
+  transform: scale(0.5);
+  transition:
+    opacity 120ms var(--ease),
+    transform 160ms var(--ease);
+}
+
+.plus svg {
+  width: 10px;
+  height: 10px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+}
+
+.tile[data-over] .plus {
+  opacity: 1;
+  transform: none;
+}
+
+/* The dragged file: a see-through copy of its thumbnail and name, held a little above and left of the tip */
+.ghost {
+  position: absolute;
+  top: -22px;
+  left: -30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.88;
+  transition:
+    opacity 200ms var(--ease),
+    transform 200ms var(--ease);
+}
+
+.ghost .thumb {
+  box-shadow: 0 6px 14px -4px rgb(0 0 0 / 0.35);
+}
+
+.ghostPhoto {
+  width: 56px;
+  height: 42px;
+  border: 2px solid #fff;
+  border-radius: 6px;
+  object-fit: cover;
+  box-shadow: 0 6px 14px -4px rgb(0 0 0 / 0.35);
+}
+
+.ghostName {
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 15px;
+  white-space: nowrap;
+  color: #fff;
+  background: light-dark(#1e6bf0, #3f7ef5);
+}
+
+/* Let go: the copy shrinks into the zone and fades */
+.ghost[data-dropped] {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+/* Phones: the zone becomes a 64px strip over the list, its prompt on one row, the banner at its right end */
+@container (width < 460px) {
+  .scene {
+    --zone-x: 30cqw;
+    --zone-y: 46px;
+    --row: 52px;
+    --pitch: 58px;
+  }
+
+  .layout {
+    grid-template-rows: 64px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .zone {
+    padding: 0 12px;
+  }
+
+  .idle {
+    flex-direction: row;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .badge {
+    width: 34px;
+    height: 34px;
+  }
+
+  .copy {
+    gap: 1px;
+  }
+
+  .banner {
+    top: 50%;
+    right: 12px;
+    bottom: auto;
+    left: auto;
+    translate: 6px -50%;
+  }
+
+  .tile[data-over] .banner {
+    translate: 0 -50%;
+  }
+
+  /* A smaller copy without its name, so it stays inside the strip */
+  .ghost {
+    top: -15px;
+    left: -24px;
+  }
+
+  .ghostPhoto {
+    width: 40px;
+    height: 30px;
+    border-width: 1.5px;
+    border-radius: 5px;
+  }
+
+  .ghostName {
+    display: none;
+  }
+}

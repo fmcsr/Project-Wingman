@@ -2,148 +2,52 @@
   padding-block: 96px 64px;
 }
 
-/* The balloon layer covers all frames, so a balloon can overflow outside its frame */
-.stage {
-  position: relative;
-  margin-top: 28px;
-}
-
-.layer {
-  position: absolute;
-  inset: 0;
-  z-index: 20;
-  pointer-events: none;
-}
-
-/* First the two sites (each in its own scroll scene), then the three phones in one row */
-.scenes {
-  display: grid;
-  /* Keep the column from growing with its content: phones and sites fit the container width */
-  grid-template-columns: minmax(0, 1fr);
-  gap: 72px;
-}
-
-/* Phones stay in one row at any width; if they don't fit, they shrink together (--phone-scale, Examples.tsx) */
-.phones {
-  display: flex;
-  justify-content: center;
-  gap: clamp(12px, 3vw, 40px);
-}
-
-.phoneProject {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: calc(300px * var(--phone-scale, 1));
-  container-type: inline-size;
-}
-
-/* Phone headings stay on one line so all three phones start at the same height; a long kind is cut short */
-.phoneProject .meta {
-  flex-wrap: nowrap;
-}
-
-.phoneProject .name,
-.phoneProject .count {
-  flex: none;
-}
-
-.phoneProject .kind {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* When the phone gets very small, only the index and name remain in its heading */
-@container (width < 200px) {
-  .phoneProject .kind,
-  .phoneProject .count {
-    display: none;
-  }
-}
-
-.meta {
+/* The tabs and the ways to explore share a row; when it gets narrow, the tabs sit above the guide */
+.controls {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 12px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
 }
 
-.index {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--color-text-subtle);
-}
-
-.name {
-  font-size: 16px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-
-.kind {
-  font-size: 14px;
-  color: var(--color-text-subtle);
-}
-
-.count {
-  margin-left: auto;
-  padding: 2px 10px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--color-text-muted);
-}
-
-/* A site's heading: the project line, then the vague prompt behind its AI slop side */
-.siteHeader {
-  display: grid;
-  gap: 6px;
-}
-
-.prompt {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  min-width: 0;
-  font-size: 13px;
-  color: var(--color-text-subtle);
-}
-
-.promptLabel {
+/* A segmented control, like the library's platform tabs */
+.tabs {
+  display: inline-flex;
   flex: none;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  text-transform: uppercase;
-  color: var(--color-text-faint);
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-fill-secondary);
 }
 
-.promptText {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.tab {
+  height: 36px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--radius-full);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-subtle);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    color 150ms,
+    background-color 150ms;
 }
 
-/* Under a phone the label sits above the prompt, and the prompt may wrap onto a second line */
-.phoneProject .prompt {
-  flex-direction: column;
-  gap: 2px;
+.tab:hover {
+  color: var(--color-text);
 }
 
-.phoneProject .promptText {
-  white-space: normal;
+.tab[aria-selected='true'] {
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: 0 1px 2px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.4));
 }
 
-@container (width < 200px) {
-  .phoneProject .prompt {
-    display: none;
-  }
-}
-
-/* After the examples: the way into the full library (sign-in comes first if needed) */
+/* After the examples: the way into the library (sign-in comes first if needed) */
 .more {
   display: flex;
   flex-direction: column;
@@ -154,7 +58,7 @@
 }
 
 .moreText {
-  max-width: 40ch;
+  max-width: 44ch;
   font-size: 18px;
   color: var(--color-text-muted);
   text-wrap: balance;

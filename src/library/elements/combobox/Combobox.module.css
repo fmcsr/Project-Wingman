@@ -1,0 +1,348 @@
+/*
+ * A settings page in the payments-dashboard idiom: white (near-black in dark mode), navy-gray type, 36px fields with
+ * 6px corners and semibold labels above them. The open list is a popover over the fields below, with small caps
+ * region labels, a neutral highlight and the accent for the check, the focus ring and the caret.
+ */
+.tile {
+  --page: light-dark(#ffffff, #1a1b1f);
+  --text: light-dark(#1a1f36, #e8e9ed);
+  --text-2: light-dark(#414552, #c2c6cf);
+  --muted: light-dark(#687385, #8c93a1);
+  --line: light-dark(#d5dbe1, #3a3d45);
+  --fill: light-dark(#eef1f5, #2b2e36);
+  --accent: light-dark(#2c5fd4, #7ea6ff);
+  --ring: light-dark(rgb(44 95 212 / 0.2), rgb(126 166 255 / 0.25));
+  --selection: light-dark(#cddcfb, #2f4677);
+  --popover: light-dark(#ffffff, #24262c);
+  --popover-line: light-dark(rgb(26 31 54 / 0.1), rgb(255 255 255 / 0.09));
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  height: 100%;
+  overflow: hidden;
+  padding: 20px 18px 0;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text);
+  background: var(--page);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 22px;
+  letter-spacing: -0.01em;
+}
+
+.description {
+  margin-top: 3px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--muted);
+}
+
+.fieldLabel {
+  margin: 18px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--text-2);
+}
+
+.icon,
+.chevron {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  stroke-width: 1.5;
+  color: var(--muted);
+}
+
+/* A closed select, for the fields around the combobox */
+.select,
+.input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 9px 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  white-space: pre;
+  background: var(--page);
+  box-shadow: 0 1px 1px light-dark(rgb(26 31 54 / 0.04), rgb(0 0 0 / 0.2));
+}
+
+.anchor {
+  position: relative;
+  z-index: 1;
+}
+
+/* The combobox's input: focused while the list is open, with the accent border and a 3px ring */
+.input {
+  transition:
+    border-color 150ms var(--ease),
+    box-shadow 150ms var(--ease);
+}
+
+.tile[data-open] .input {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* Opened, the value is selected, so the first letter typed replaces it */
+.selection {
+  margin-left: -1px;
+  padding: 0 1px;
+  border-radius: 2px;
+  background: var(--selection);
+}
+
+.query {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Blinks like a text caret; solid while keys are being typed, and holds when the tile does */
+.caret {
+  flex: none;
+  width: 1.5px;
+  height: 17px;
+  margin-left: 1px;
+  background: var(--accent);
+  animation: caret-blink 1060ms steps(1) infinite;
+}
+
+.tile[data-typing] .caret,
+.tile[data-still] .caret {
+  animation: none;
+}
+
+.tile[data-paused] .caret {
+  animation-play-state: paused;
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/*
+ * The listbox: a popover 4px under the input, as wide as it, over the fields below. At most 200px tall (176px on
+ * phones), so it ends above the buttons; longer lists scroll, which here is the content moving up.
+ */
+.listbox {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  max-height: 200px;
+  overflow: hidden;
+  padding: 4px;
+  border: 1px solid var(--popover-line);
+  border-radius: 8px;
+  background: var(--popover);
+  box-shadow:
+    0 1px 2px light-dark(rgb(26 31 54 / 0.06), rgb(0 0 0 / 0.3)),
+    0 12px 28px -6px light-dark(rgb(26 31 54 / 0.2), rgb(0 0 0 / 0.6));
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 -4px;
+  transition:
+    opacity 120ms var(--ease),
+    translate 120ms var(--ease),
+    visibility 120ms;
+}
+
+.tile[data-open] .listbox {
+  opacity: 1;
+  visibility: visible;
+  translate: none;
+  transition-duration: 150ms;
+}
+
+.scroller {
+  transform: translateY(var(--scroll));
+}
+
+/* A region's label: 24px tall, small caps in the muted gray */
+.group {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* An option: 32px, the city, its offset and the check slot */
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 6px 0 8px;
+  border-radius: 5px;
+  font-size: 13.5px;
+  white-space: nowrap;
+  color: var(--text-2);
+}
+
+.city {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The letters that match the query: bold and in full ink */
+.match {
+  font-weight: 650;
+  color: var(--text);
+}
+
+.offset {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.checkSlot {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+}
+
+/* The current value: a check in the accent */
+.check {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.option[data-current] {
+  color: var(--text);
+}
+
+/* The highlighted option, the one ↵ picks: a neutral fill that the arrow keys move */
+.option[aria-selected='true'] {
+  color: var(--text);
+  background: var(--fill);
+}
+
+/* ↵: the row flashes in the accent before the list closes */
+.tile[data-chosen] .option[aria-selected='true'] {
+  animation: option-chosen 240ms var(--ease);
+}
+
+@keyframes option-chosen {
+  0%,
+  45% {
+    background: var(--selection);
+  }
+}
+
+.helper {
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 17px;
+  color: var(--muted);
+}
+
+.segmented {
+  display: flex;
+  align-self: flex-start;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--fill);
+}
+
+.segment {
+  display: grid;
+  place-items: center;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.segment[data-on] {
+  color: var(--text);
+  background: var(--page);
+  box-shadow: 0 1px 2px light-dark(rgb(26 31 54 / 0.12), rgb(0 0 0 / 0.4));
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.button {
+  display: grid;
+  place-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--page);
+  box-shadow: 0 1px 1px light-dark(rgb(26 31 54 / 0.04), rgb(0 0 0 / 0.2));
+}
+
+.primary {
+  border-color: transparent;
+  color: #fff;
+  background: light-dark(#2c5fd4, #3d6be0);
+}
+
+/* Phones: a shorter tile, so no description and no last field, and a shorter list */
+@container (height < 440px) {
+  .form {
+    margin-top: -6px;
+  }
+
+  .description,
+  .week {
+    display: none;
+  }
+
+  .fieldLabel {
+    margin-top: 12px;
+  }
+
+  .listbox {
+    max-height: 176px;
+  }
+}

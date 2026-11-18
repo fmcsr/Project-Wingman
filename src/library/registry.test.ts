@@ -8,14 +8,19 @@ const CATEGORIES: Record<Category, true> = {
   Analytics: true,
   Commerce: true,
   Communication: true,
+  Data: true,
   Design: true,
   Developer: true,
   Education: true,
   Finance: true,
   Food: true,
+  Forms: true,
   Health: true,
+  iOS: true,
   Marketing: true,
   Media: true,
+  'Micro-interactions': true,
+  Navigation: true,
   Productivity: true,
   Social: true,
   Travel: true,
@@ -59,6 +64,13 @@ describe('library registry', () => {
       expect(typeof example.Component).toBe('function');
       expect(example.specs.length).toBeGreaterThan(0);
     });
+  });
+
+  it('gives every element a tile size, and only elements', () => {
+    const elements = LIBRARY.filter((example) => example.platform === 'elements');
+    expect(elements.length).toBeGreaterThan(0);
+    expect(elements.filter((element) => !element.size).map(label)).toEqual([]);
+    expect(LIBRARY.filter((example) => example.platform !== 'elements' && example.size).map(label)).toEqual([]);
   });
 
   it('gives every site a domain for the address bar', () => {

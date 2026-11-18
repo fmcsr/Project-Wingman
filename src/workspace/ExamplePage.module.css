@@ -81,6 +81,42 @@
   top: 88px;
 }
 
+/*
+ * Elements: the tile at the width the gallery's desktop grid gives its size class (one column or two of 1200px) and
+ * the height of its picture there, then the glossary
+ */
+.elementLayout {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+}
+
+.elementColumn {
+  position: sticky;
+  top: 88px;
+}
+
+.elementTile {
+  position: relative;
+  width: 274px;
+  height: 214px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--color-surface-2);
+}
+
+.elementTile[data-size='wide'],
+.elementTile[data-size='big'] {
+  width: 564px;
+}
+
+.elementTile[data-size='tall'],
+.elementTile[data-size='big'] {
+  height: 494px;
+}
+
 .pager {
   display: flex;
   justify-content: space-between;
@@ -124,5 +160,27 @@
 
   .phoneColumn {
     position: static;
+  }
+}
+
+/* Elements stack sooner, as wide tiles need the room; on a phone the tile takes the full width, as in the gallery */
+@media (max-width: 1023px) {
+  .elementLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .elementColumn {
+    position: static;
+  }
+}
+
+@media (max-width: 639px) {
+  .elementTile[data-size] {
+    width: 100%;
+  }
+
+  .elementTile[data-size='tall'],
+  .elementTile[data-size='big'] {
+    height: 374px;
   }
 }

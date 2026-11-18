@@ -1,0 +1,310 @@
+/*
+ * Almanac follows an analog watch face made to carry complications, dark by design: the same in both themes. The
+ * black is the display switched off, so the dial has no edge of its own; only its marks, the hands and the
+ * complications light up. White is the time, each complication brings its own app's color, and the face's own
+ * orange is kept for the second hand.
+ */
+.face {
+  --accent: #ff9f0a;
+  --heart: #ff375f;
+  --rounded: 'SF Compact Rounded', ui-rounded, 'SF Compact', 'SF Compact Display', -apple-system, 'SF Pro Display',
+    system-ui, sans-serif;
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  /* Complications set their text in the rounded system font */
+  font-family: var(--rounded);
+  color: #fff;
+  background: #000;
+}
+
+.face svg {
+  display: block;
+}
+
+/* Hit areas: invisible shapes that give an odd-shaped part (a corner, the bezel's band) its own patch of the screen */
+.hit {
+  fill: transparent;
+  pointer-events: all;
+}
+
+/* The dial: a circle as wide as the screen, centered on it (its center is 104, 124) */
+.dial {
+  position: absolute;
+  top: 23px;
+  left: 3px;
+  width: 202px;
+  height: 202px;
+  border-radius: 50%;
+}
+
+/* Minute track: a fine tick for every minute and a heavier marker for every hour, all on one outer edge */
+.minuteTick {
+  stroke: rgb(255 255 255 / 0.5);
+  stroke-width: 1;
+}
+
+.hourMarker {
+  stroke: #fff;
+  stroke-width: 2.6;
+}
+
+/* The minutes in fives around the bezel, small and gray so they stay behind the time */
+.numeral {
+  font-size: 9px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  fill: rgb(255 255 255 / 0.6);
+}
+
+/* Bezel complication: its box covers the top third of the dial's edge; only the band its text runs in is its own */
+.bezel {
+  position: absolute;
+  top: 22px;
+  left: 30px;
+  width: 148px;
+  height: 46px;
+  pointer-events: none;
+}
+
+.bezelText {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  fill: #fff;
+}
+
+/* Corner complications: each box is a corner of the screen; the dial keeps the part of it that it covers */
+.corner {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* The large value in the corner, and the small text that runs along the gauge or the dial */
+.cornerValue {
+  font-size: 16px;
+  font-weight: 600;
+  fill: #fff;
+}
+
+.cornerLabel {
+  font-size: 11px;
+  font-weight: 600;
+  fill: #fff;
+}
+
+.low {
+  fill: #30d158;
+}
+
+.high {
+  fill: #ff9f0a;
+}
+
+.dim {
+  fill: rgb(255 255 255 / 0.6);
+}
+
+.bpm {
+  fill: var(--heart);
+}
+
+.sunsetLabel {
+  letter-spacing: 0.06em;
+  fill: #ff9f0a;
+}
+
+/* Gauge: a thick arc along the corner, its range in color; a white dot marks the value now */
+.gauge {
+  fill: none;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+/* A segmented gauge: one flat-ended piece per band, so the bands read as steps */
+.segment {
+  stroke-linecap: butt;
+}
+
+.gaugeMarker {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 1.2;
+}
+
+.sun {
+  fill: #ffd60a;
+}
+
+.rays {
+  fill: none;
+  stroke: #ffd60a;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.heart {
+  fill: var(--heart);
+}
+
+/* Subdial: a circular complication, 51px across, centered on its spoke (left and top place its center) */
+.subdial {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 51px;
+  height: 51px;
+  margin: -25.5px 0 0 -25.5px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.12);
+}
+
+/* Date: the weekday in the calendar's red, small and spaced, over the day of the month */
+.weekday {
+  font-size: 9.5px;
+  font-weight: 600;
+  line-height: 10px;
+  letter-spacing: 0.04em;
+  color: #ff453a;
+}
+
+.day {
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Rings in a subdial are drawn from 12 o'clock, so the picture turns a quarter back */
+.ring {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+  fill: none;
+}
+
+/* Timer: the ring is a closed gauge in the timer's orange; the time left sits inside it */
+.timerTrack {
+  stroke: rgb(255 159 10 / 0.3);
+  stroke-width: 3.4;
+}
+
+.timerLeft {
+  stroke: #ff9f0a;
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+
+.timerTime {
+  position: relative;
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Moon: the dark part of the disc stays faintly visible, as the moon does; its seas show only where it's lit */
+.moonDark {
+  fill: #2c2c2e;
+}
+
+.moonLit {
+  fill: #e5e5ea;
+}
+
+/* The seas are soft-edged, as they look through the air */
+.maria {
+  fill: #cacacf;
+  filter: blur(0.4px);
+}
+
+/* Activity rings, outermost first: move, exercise, stand, each over a dark track of its own color */
+.move {
+  --ring: #ff2f69;
+  --track: #3b0b18;
+}
+
+.exercise {
+  --ring: #b2f51c;
+  --track: #22380b;
+}
+
+.stand {
+  --ring: #31e4f0;
+  --track: #0b3439;
+}
+
+.ringTrack {
+  stroke: var(--track);
+  stroke-width: 4.6;
+}
+
+.ringFill {
+  stroke: var(--ring);
+  stroke-width: 4.6;
+  stroke-linecap: round;
+}
+
+/*
+ * Hands: each one's box runs from its tip to just past the pivot, and turns around the dial's center. A soft dark
+ * edge keeps a white hand legible where it crosses a complication.
+ */
+.hand {
+  position: absolute;
+  filter: drop-shadow(0 0 1px rgb(0 0 0 / 0.9));
+}
+
+/* The hour and minute hands step: each minute they turn on with a quick watchOS spring */
+.hourHand {
+  top: 72px;
+  left: 99.5px;
+  transform-origin: 4.5px 52px;
+  fill: #fff;
+  transition: rotate 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.minuteHand {
+  top: 38px;
+  left: 99px;
+  transform-origin: 5px 86px;
+  fill: #fff;
+  transition: rotate 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* The second hand sweeps: one smooth turn a minute, held still while the face is inspected */
+.secondHand {
+  top: 34px;
+  left: 100px;
+  transform-origin: 4px 90px;
+  fill: var(--accent);
+}
+
+.secondHand[data-sweep] {
+  animation: sweep 60s linear infinite;
+}
+
+.face[data-paused] .secondHand {
+  animation-play-state: paused;
+}
+
+.pinion {
+  fill: #000;
+}
+
+@keyframes sweep {
+  from {
+    rotate: 0deg;
+  }
+
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hand {
+    transition: none;
+  }
+}

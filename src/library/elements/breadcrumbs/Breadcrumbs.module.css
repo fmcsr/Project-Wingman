@@ -1,0 +1,461 @@
+/*
+ * A page in a team workspace, in the idiom of wikis and issue trackers: a white page (near-black in dark mode), 14px
+ * gray crumbs over a big bold title, hairline tables and small uppercase status lozenges. One accent, a violet, for
+ * the workspace's icon, the Share button and the status in progress. The vertical rhythm is fixed (a 28px trail row,
+ * a 34px title, 30px and 36px table rows), so the tile's 214px end exactly where the second row starts.
+ */
+.tile {
+  --page: light-dark(#ffffff, #1b1b1d);
+  --text: light-dark(#1d2129, #e7e8eb);
+  --text-2: light-dark(#5b616e, #a1a5ae);
+  --text-3: light-dark(#9299a6, #6d727c);
+  --line: light-dark(#e9ebef, #2d2e33);
+  --head: light-dark(#f7f8fa, #222327);
+  --fill: light-dark(#eef0f3, #2f3136);
+  --hover: light-dark(rgb(16 24 40 / 0.06), rgb(255 255 255 / 0.07));
+  --selected: light-dark(rgb(16 24 40 / 0.1), rgb(255 255 255 / 0.13));
+  --menu: light-dark(#ffffff, #27282c);
+  --menu-line: light-dark(rgb(16 24 40 / 0.09), rgb(255 255 255 / 0.09));
+  /* Fills that carry white: the workspace icon and the Share button */
+  --accent: light-dark(#6a4be4, #7158ea);
+  --accent-text: light-dark(#5534d1, #b3a4ff);
+  --accent-soft: light-dark(#efebfd, #302a52);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text);
+  background: var(--page);
+}
+
+.icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.page {
+  position: absolute;
+  inset: 0;
+  padding: 16px 20px 0;
+}
+
+/* The row above the title: the trail on the left, the page's actions on the right */
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 28px;
+}
+
+.trail {
+  min-width: 0;
+  padding: 2px 0;
+}
+
+.list {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+  list-style: none;
+}
+
+/*
+ * A crumb: muted until the pointer is on it, then darker and underlined. The underline is always there in a clear
+ * color, so it can fade in
+ */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 2px;
+  color: var(--text-2);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition:
+    color 150ms var(--ease),
+    text-decoration-color 150ms var(--ease);
+}
+
+.tile[data-pointer='design'] [data-spot='design'] {
+  color: var(--text);
+  text-decoration-color: currentColor;
+}
+
+/* The workspace's own icon on the first crumb */
+.workspace {
+  width: 16px;
+  height: 16px;
+  fill: var(--accent);
+}
+
+.workspace .workspaceCut {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 1px;
+  color: var(--text-3);
+}
+
+.separator .icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+
+/* The ellipsis: a small button for the levels that don't fit; it stays filled while its menu is open */
+.more {
+  position: relative;
+  display: flex;
+}
+
+.ellipsis {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 24px;
+  border-radius: 6px;
+  color: var(--text-2);
+  transition:
+    background-color 120ms var(--ease),
+    scale 120ms var(--ease);
+}
+
+.dots {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.tile[data-pointer='ellipsis'] .ellipsis {
+  background: var(--hover);
+}
+
+.tile[data-open] .ellipsis {
+  color: var(--text);
+  background: var(--selected);
+}
+
+.tile[data-click][data-pointer='ellipsis'] .ellipsis {
+  scale: 0.92;
+}
+
+/* The overflow menu: the hidden levels in order, each a folder; it drops in from its top-left corner */
+.menu {
+  position: absolute;
+  z-index: 2;
+  top: calc(100% + 6px);
+  left: -4px;
+  display: flex;
+  flex-direction: column;
+  min-width: 176px;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--menu);
+  box-shadow:
+    0 0 0 1px var(--menu-line),
+    0 4px 8px -2px light-dark(rgb(16 24 40 / 0.1), rgb(0 0 0 / 0.35)),
+    0 14px 28px -6px light-dark(rgb(16 24 40 / 0.18), rgb(0 0 0 / 0.5));
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.96);
+  transform-origin: 16px 0;
+  transition:
+    opacity 120ms var(--ease),
+    transform 120ms var(--ease),
+    visibility 120ms;
+}
+
+.tile[data-open] .menu {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-duration: 150ms;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 5px;
+  color: var(--text);
+  transition: background-color 100ms var(--ease);
+}
+
+.menuItem .icon {
+  color: var(--text-3);
+}
+
+.tile[data-pointer='planning'] [data-spot='planning'] {
+  background: var(--hover);
+}
+
+/* The current page: the end of the trail, in bold, as plain text */
+.current {
+  padding: 2px 2px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.actions {
+  display: none;
+  flex: none;
+  align-items: center;
+  gap: 14px;
+  color: var(--text-2);
+}
+
+.faces {
+  display: flex;
+  padding-left: 6px;
+}
+
+.faces img {
+  width: 22px;
+  height: 22px;
+  margin-left: -6px;
+  border: 2px solid var(--page);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.share {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+}
+
+.title {
+  margin: 22px 0 0;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 34px;
+  letter-spacing: -0.02em;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 20px;
+  margin-top: 10px;
+  font-size: 13px;
+  white-space: nowrap;
+  color: var(--text-2);
+}
+
+.owner {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.ownerName {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.ownerName::after {
+  content: '·';
+  margin-left: 8px;
+  color: var(--text-3);
+}
+
+.table {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 128px 72px 112px;
+  align-items: center;
+  height: 36px;
+  border-bottom: 1px solid var(--line);
+}
+
+.row[data-head] {
+  height: 30px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--head);
+}
+
+.cell {
+  overflow: hidden;
+  padding: 0 10px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.status {
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.status[data-status='active'] {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.status[data-status='planned'] {
+  color: var(--text-2);
+  background: var(--fill);
+}
+
+/* The pointer: on the page, a crumb, the ellipsis or an item in its menu; it dips a little when it clicks */
+.pointer {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 20px;
+  fill: #1d1d1f;
+  stroke: #fff;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.3));
+  transform-origin: 0 0;
+  translate: var(--px, -40px) var(--py, 0);
+}
+
+.page[data-ready] .pointer {
+  transition:
+    translate 460ms cubic-bezier(0.45, 0, 0.25, 1),
+    scale 120ms var(--ease);
+}
+
+.tile[data-click] .pointer {
+  scale: 0.88;
+}
+
+.tile[data-pointer='rest'] .page {
+  --px: 64cqw;
+  --py: 84px;
+}
+
+.tile[data-pointer='design'] .page {
+  --px: calc(var(--design-x, 0px) - 6px);
+  --py: calc(var(--design-y, 0px) + 1px);
+}
+
+.tile[data-pointer='ellipsis'] .page {
+  --px: calc(var(--ellipsis-x, 0px) - 2px);
+  --py: calc(var(--ellipsis-y, 0px) + 1px);
+}
+
+.tile[data-pointer='planning'] .page {
+  --px: calc(var(--planning-x, 0px) - 30px);
+  --py: calc(var(--planning-y, 0px) - 2px);
+}
+
+/* Phones: the trail and the table's two main columns */
+@container (width < 460px) {
+  .page {
+    padding-inline: 16px;
+  }
+
+  .trail {
+    font-size: 13.5px;
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr) 112px;
+  }
+
+  .cell:nth-child(2),
+  .cell:nth-child(3) {
+    display: none;
+  }
+}
+
+/* The narrowest phones: a slightly smaller trail, so it still fits on one line */
+@container (width < 360px) {
+  .page {
+    padding-inline: 14px;
+  }
+
+  .trail {
+    font-size: 13px;
+  }
+
+  .list {
+    gap: 0;
+  }
+
+  .separator .icon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .ellipsis {
+    width: 24px;
+  }
+}
+
+@container (width >= 460px) and (width < 600px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) 120px 112px;
+  }
+
+  .cell:nth-child(3) {
+    display: none;
+  }
+}
+
+/* Room for the page's actions next to the trail */
+@container (width >= 560px) {
+  .actions {
+    display: flex;
+  }
+}
+
+@container (width >= 720px) {
+  .page {
+    padding-inline: 28px;
+  }
+}

@@ -1,0 +1,428 @@
+/*
+ * A product board's prioritization matrix on a white card (a near-black one in dark mode): hairline axes, dashed
+ * quadrant guides and one teal for every bubble, a light wash with a solid edge so overlaps stay readable.
+ */
+.tile {
+  --page: light-dark(#fff, #16171b);
+  --ink: light-dark(#1c2024, #eceef2);
+  --muted: light-dark(#697077, #9aa0aa);
+  --axis: light-dark(#c9cdd3, #3a3e46);
+  --guide: light-dark(#d5d9de, #353940);
+  --bubble: light-dark(oklch(0.6 0.1 190), oklch(0.68 0.1 192));
+  --tip: light-dark(#1c2024, #33363e);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--page);
+}
+
+/*
+ * Geometry: the plot runs from 38px under the top to 32px above the bottom, between the impact title on the left and
+ * a 14px margin on the right. Bubbles sit at fractions of it, so it stretches with the tile; the pointer travels in
+ * the same terms.
+ */
+.card {
+  --left: 34px;
+  --right: 14px;
+  --top: 38px;
+  --bottom: 32px;
+
+  position: relative;
+  height: 100%;
+  padding: 11px 12px 0;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  height: 18px;
+  white-space: nowrap;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.period {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+/* "Impact →", reading upward along the left of the plot */
+.yTitle {
+  position: absolute;
+  top: calc(var(--top) + (100cqh - var(--top) - var(--bottom)) / 2);
+  left: 17px;
+  font-size: 10px;
+  line-height: 12px;
+  white-space: nowrap;
+  color: var(--muted);
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.plot {
+  position: absolute;
+  inset: var(--top) var(--right) var(--bottom) var(--left);
+}
+
+/* The axes: hairlines along the left and the bottom, each with a wider edge to point at */
+.xAxis,
+.yAxis,
+.guideX,
+.guideY {
+  position: absolute;
+}
+
+.xAxis {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-bottom: 1px solid var(--axis);
+}
+
+.yAxis {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-left: 1px solid var(--axis);
+}
+
+:is(.xAxis, .yAxis, .guideX, .guideY)::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+
+/* The guides split effort and impact at 5, dashed because they mark a threshold, not a value */
+.guideX {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  border-left: 1px dashed var(--guide);
+}
+
+.guideY {
+  top: 50%;
+  right: 0;
+  left: 0;
+  border-top: 1px dashed var(--guide);
+}
+
+.quadrant {
+  position: absolute;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 12px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.quadrant[data-corner^='top'] {
+  top: 5px;
+}
+
+.quadrant[data-corner^='bottom'] {
+  bottom: 5px;
+}
+
+.quadrant[data-corner$='left'] {
+  left: 6px;
+}
+
+.quadrant[data-corner$='right'] {
+  right: 6px;
+}
+
+/* A bubble: as wide as its radius says, centered on its effort and impact */
+.bubble {
+  position: absolute;
+  top: calc(var(--y) * 100%);
+  left: calc(var(--x) * 100%);
+  width: calc(2 * var(--r));
+  height: calc(2 * var(--r));
+  transform: translate(-50%, -50%);
+}
+
+/* A little more to point at than the smallest bubbles show */
+.bubble::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+}
+
+.disc {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--bubble);
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--bubble) 26%, transparent);
+  transform: scale(0);
+  transition:
+    transform 260ms cubic-bezier(0.4, 0, 1, 1),
+    background-color 150ms var(--ease);
+}
+
+/* Settling in: each bubble springs to its size, 70ms after the one before; Slack alerts keeps growing with its votes */
+.tile[data-settled] .disc {
+  transform: scale(var(--grow, 1));
+  transition:
+    transform 520ms cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i) * 70ms),
+    background-color 150ms var(--ease);
+}
+
+/* Under the pointer the bubble deepens */
+.tile[data-hover] .bubble[data-target] .disc {
+  background: color-mix(in oklab, var(--bubble) 55%, transparent);
+}
+
+/* On wider tiles each bubble is named beside it, on the left near the right edge */
+.name {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 5px);
+  font-size: 10px;
+  line-height: 12px;
+  white-space: nowrap;
+  color: var(--muted);
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity 200ms var(--ease);
+}
+
+.name[data-side='left'] {
+  right: calc(100% + 5px);
+  left: auto;
+}
+
+.tile[data-settled] .name {
+  opacity: 1;
+  transition: opacity 300ms var(--ease) calc(var(--i) * 70ms + 300ms);
+}
+
+/* Votes coming in: a ring pulses out from the bubble once and the new count rises over it */
+.pulse,
+.votes {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pulse {
+  inset: 0;
+  border: 1.5px solid var(--bubble);
+  border-radius: 50%;
+}
+
+.votes {
+  bottom: calc(100% + 3px);
+  left: 50%;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 12px;
+  color: var(--ink);
+  transform: translateX(-50%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pulse {
+    animation: pulse 900ms var(--ease);
+  }
+
+  .votes {
+    animation: rise 1000ms var(--ease);
+  }
+
+  .tile[data-paused] :is(.pulse, .votes) {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+@keyframes rise {
+  20%,
+  60% {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+}
+
+/* The tooltip hangs below CSV export, its arrow at the bubble's edge, reaching right over the empty middle */
+.tooltip {
+  position: absolute;
+  top: calc(var(--y) * 100%);
+  left: calc(var(--x) * 100%);
+  pointer-events: none;
+}
+
+.tip {
+  position: absolute;
+  top: calc(var(--r) + 8px);
+  left: -22px;
+  display: flex;
+  flex-direction: column;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 14px;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--tip);
+  box-shadow: 0 4px 12px light-dark(rgb(16 24 40 / 0.16), rgb(0 0 0 / 0.4));
+  pointer-events: auto;
+  transition:
+    opacity 150ms var(--ease),
+    visibility 0s;
+}
+
+.tip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 17px;
+  border: 5px solid transparent;
+  border-top-width: 0;
+  border-bottom-color: var(--tip);
+}
+
+.tile:not([data-hover]) .tip {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 150ms var(--ease),
+    visibility 0s linear 150ms;
+}
+
+.tipValue {
+  font-weight: 600;
+}
+
+.tipDetail {
+  color: rgb(255 255 255 / 0.7);
+}
+
+/*
+ * The pointer comes in from the right edge to CSV export and leaves the same way. Black with a white rim, as on a Mac
+ * in either theme.
+ */
+.pointer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 13px;
+  height: 18px;
+  fill: #000;
+  stroke: #fff;
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.25));
+  transform: translate(
+    calc(100cqw - var(--left) - var(--right) + 16px),
+    calc((100cqh - var(--top) - var(--bottom)) * 0.62)
+  );
+  transition: transform 750ms cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+.tile[data-hover] .pointer {
+  transform: translate(
+    calc((100cqw - var(--left) - var(--right)) * 0.2 + 2px),
+    calc((100cqh - var(--top) - var(--bottom)) * 0.25 - 2px)
+  );
+}
+
+/* Under the plot: the effort title on the left, the size legend on the right */
+.footer {
+  position: absolute;
+  right: var(--right);
+  bottom: 8px;
+  left: var(--left);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  height: 22px;
+  font-size: 10px;
+  line-height: 12px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.xTitle {
+  align-self: center;
+}
+
+/* The size legend: two sample bubbles nested on a shared bottom, each with its number of requests */
+.legend {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.samples {
+  position: relative;
+  width: calc(2 * 10.6px);
+  height: calc(2 * 10.6px);
+}
+
+.sample {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: calc(2 * var(--r));
+  height: calc(2 * var(--r));
+  border: 1px solid var(--muted);
+  border-radius: 50%;
+  transform: translateX(-50%);
+}
+
+.sampleLabels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(2 * 10.6px);
+  font-size: 9.5px;
+  line-height: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+@container (min-width: 400px) {
+  .card {
+    --left: 38px;
+    --right: 18px;
+
+    padding-inline: 16px;
+  }
+
+  .yTitle {
+    left: 20px;
+  }
+
+  .name {
+    display: block;
+  }
+}

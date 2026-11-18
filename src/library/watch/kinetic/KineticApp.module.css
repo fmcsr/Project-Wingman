@@ -1,0 +1,233 @@
+/*
+ * Kinetic follows the watch's activity app, which is dark by design: the same in both themes. The black is the
+ * display switched off, so the rings seem to glow on their own. Color belongs to the rings alone (Move red, Exercise
+ * green, Stand cyan), and each figure below takes its ring's color, so the colors are the legend.
+ */
+.app {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'SF Compact', 'SF Compact Display', -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  color: #fff;
+  background: #000;
+}
+
+/*
+ * The app's one column, the rings and then the figures, which the Digital Crown moves as a whole. A turn settles
+ * with a slight overshoot, like the crown's own scrolling; the way back up is longer, so it takes longer.
+ */
+.content {
+  padding: 12px 18px 24px;
+  transition: transform 650ms cubic-bezier(0.3, 1.25, 0.45, 1);
+}
+
+.app[data-scroll='figures'] .content {
+  transform: translateY(-146px);
+}
+
+.app[data-scroll='end'] .content {
+  transform: translateY(-244px);
+}
+
+.app[data-scroll='top'] .content {
+  transition-duration: 900ms;
+}
+
+/* Three rings 18px wide, 2px apart: 156px across, which leaves the corner to the time */
+.rings {
+  display: block;
+  width: 156px;
+  height: 156px;
+  margin: 0 auto;
+}
+
+.track,
+.arc {
+  fill: none;
+  stroke-width: 18px;
+}
+
+.glyph {
+  fill: none;
+  stroke-width: 2.3px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shadow {
+  pointer-events: none;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+/* A closed ring pulses once: no fireworks, just a moment brighter */
+.pulse {
+  animation: pulse 700ms ease-out;
+}
+
+@keyframes pulse {
+  35% {
+    filter: brightness(1.35);
+  }
+}
+
+/* The figures: what's done over the goal in the ring's color, with the day hour by hour below */
+.stats {
+  margin: 8px 0 0;
+}
+
+.stat + .stat {
+  margin-top: 14px;
+}
+
+.label {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 17px;
+}
+
+/* Rounded digits, as the activity app sets its figures; equal-width digits keep the figure still as it counts */
+.value {
+  margin: 0;
+  font-family: 'SF Compact Rounded', ui-rounded, 'SF Pro Rounded', 'SF Compact', -apple-system, system-ui, sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ring);
+}
+
+/* Its own line height, so the smaller unit doesn't make the line taller */
+.unit {
+  margin-left: 1px;
+  font-size: 17px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.chart {
+  display: block;
+  margin: 4px 0 0;
+}
+
+/* One bar per hour on a faint baseline, over dotted lines at midnight, 6 AM, noon and 6 PM */
+.plot {
+  position: relative;
+  display: block;
+  height: 24px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.25);
+}
+
+.plot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(to right, rgb(255 255 255 / 0.3) 0 1px, transparent 1px 25%);
+  mask: repeating-linear-gradient(#000 0 1px, transparent 1px 3px);
+}
+
+.bars {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  align-items: end;
+  height: 100%;
+  transform-origin: bottom;
+}
+
+.bars > span {
+  justify-self: center;
+  width: 3.5px;
+  border-radius: 2px;
+  background: var(--ring);
+}
+
+/* Times under the chart, each at the start of its hour */
+.axis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 3px;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 12px;
+  color: #8e8e93;
+}
+
+/*
+ * The scroll edge: content fades out as it passes under the time, so the time stays readable. It ends just above
+ * where the figures stop when scrolled, so it never dims them. On the way back up it stays until the rings are
+ * nearly in place.
+ */
+.edge {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 32px;
+  background: linear-gradient(#000 24px, rgb(0 0 0 / 0));
+  opacity: 0;
+  transition: opacity 300ms 300ms;
+  pointer-events: none;
+}
+
+.app:not([data-scroll='top']) .edge {
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+/* The time: the watch's, in the top-right corner, inside the screen's curve */
+.time {
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * The Digital Crown scroll indicator: a short track beside the crown with a thumb that moves as the crown turns,
+ * sized to how much of the column is on screen. It shows while the crown turns and fades soon after it stops.
+ */
+.indicator {
+  position: absolute;
+  top: 44px;
+  right: 4px;
+  width: 4px;
+  height: 44px;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.25);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 400ms,
+    visibility 0s 400ms;
+}
+
+.app[data-crown='on'] .indicator {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 200ms;
+}
+
+.thumb {
+  display: block;
+  height: 22px;
+  border-radius: 2px;
+  background: #fff;
+  transition: transform 650ms cubic-bezier(0.3, 1.25, 0.45, 1);
+}
+
+.app[data-scroll='figures'] .thumb {
+  transform: translateY(13px);
+}
+
+.app[data-scroll='end'] .thumb {
+  transform: translateY(22px);
+}
+
+.app[data-scroll='top'] .thumb {
+  transition-duration: 900ms;
+}

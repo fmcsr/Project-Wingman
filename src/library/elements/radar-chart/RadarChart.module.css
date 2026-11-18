@@ -1,0 +1,362 @@
+/*
+ * A survey report's comparison card on a white page (a near-black one in dark mode): hexagonal grid rings and spokes
+ * in hairline gray, our product in a blue and the competitor in an orange, a pair that stays apart for color-blind
+ * readers too. Each polygon is a translucent wash with a solid edge, so the overlap stays readable.
+ */
+.tile {
+  --page: light-dark(#fff, #16171b);
+  --ink: light-dark(#1c2024, #eceef2);
+  --muted: light-dark(#697077, #9aa0aa);
+  --grid: light-dark(#e3e6ea, #2e3138);
+  --kite: light-dark(oklch(0.55 0.17 258), oklch(0.64 0.15 256));
+  --harbor: light-dark(oklch(0.66 0.16 50), oklch(0.65 0.15 50));
+  --tip: light-dark(#1c2024, #33363e);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--page);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 11px 12px 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 18px;
+  white-space: nowrap;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+/* The chart sits high, leaving room under it for the tooltip to hang below the Support point */
+.body {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  min-height: 0;
+  padding-top: 3px;
+}
+
+/* The chart at its own size, 216 × 160, so its text and lines stay crisp; overlays use the same units */
+.figure {
+  position: relative;
+  flex: none;
+  width: 216px;
+  height: 160px;
+}
+
+.chart {
+  display: block;
+  overflow: visible;
+}
+
+.grid polygon {
+  fill: none;
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+/* The outer ring is the 100 line, a step darker; the whole web inside it can be pointed at */
+.grid polygon:last-child {
+  stroke: light-dark(#cfd3d8, #3b3f47);
+  pointer-events: all;
+}
+
+.spoke line {
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+/* A wider, invisible line along each spoke, so the hairline is easy to point at */
+.spoke .hit {
+  stroke: transparent;
+  stroke-width: 9;
+}
+
+.label {
+  font-size: 10.5px;
+  fill: var(--muted);
+}
+
+/*
+ * A series: the polygon and its points, grown out of the center (the middle of the picture), Kite first. Its color
+ * comes from --c.
+ */
+.series {
+  transform: scale(0);
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  transition:
+    transform 450ms cubic-bezier(0.4, 0, 1, 1),
+    opacity 200ms var(--ease);
+}
+
+.series[data-series='kite'] {
+  --c: var(--kite);
+}
+
+.series[data-series='harbor'] {
+  --c: var(--harbor);
+}
+
+.tile[data-grown] .series {
+  transform: scale(1);
+  transition:
+    transform 750ms cubic-bezier(0.2, 0.9, 0.3, 1) calc(var(--order) * 160ms),
+    opacity 200ms var(--ease);
+}
+
+.shape {
+  fill: var(--c);
+  fill-opacity: 0.16;
+  stroke: var(--c);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  transition: fill-opacity 200ms var(--ease);
+}
+
+/* A point: a dot in the series color with a ring in the page color, so it reads where lines cross */
+.vertex {
+  fill: var(--c);
+  stroke: var(--page);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 180ms var(--ease);
+}
+
+/* The scores on Kite's points, shown while Kite is highlighted */
+.pill {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 180ms var(--ease),
+    visibility 0s linear 180ms;
+}
+
+.pill rect {
+  fill: var(--kite);
+  stroke: var(--page);
+  stroke-width: 1.5;
+}
+
+.pill text {
+  font-size: 9.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-anchor: middle;
+  fill: #fff;
+}
+
+/* On Kite's area: Kite comes forward with its scores, Harbor fades back, here and in the legend */
+.tile[data-pointer='area'] .series[data-series='kite'] .shape {
+  fill-opacity: 0.28;
+}
+
+.tile[data-pointer='area'] .series[data-series='harbor'],
+.tile[data-pointer='area'] .item[data-series='harbor'] {
+  opacity: 0.35;
+}
+
+.tile[data-pointer='area'] .pill {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 180ms var(--ease),
+    visibility 0s;
+}
+
+/* On a point: it grows a little */
+.tile[data-pointer='vertex'] .vertex[data-hovered] {
+  transform: scale(1.6);
+}
+
+/*
+ * The tooltip hangs below and right of the point, in the chart's empty corner under the Support label, clear of
+ * the polygons, and lists both products' scores.
+ */
+.tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.bubble {
+  position: absolute;
+  top: 18px;
+  left: -27px;
+  display: flex;
+  flex-direction: column;
+  min-width: 84px;
+  padding: 4px 8px 5px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 14px;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--tip);
+  box-shadow: 0 4px 12px light-dark(rgb(16 24 40 / 0.16), rgb(0 0 0 / 0.4));
+  pointer-events: auto;
+  transition:
+    opacity 150ms var(--ease),
+    visibility 0s;
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 22px;
+  border: 5px solid transparent;
+  border-top-width: 0;
+  border-bottom-color: var(--tip);
+}
+
+.tile:not([data-pointer='vertex']) .bubble {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 150ms var(--ease),
+    visibility 0s linear 150ms;
+}
+
+.tipTitle {
+  color: rgb(255 255 255 / 0.7);
+}
+
+/* Each row keyed by a short stroke of its series color; the score leads in bold at the right */
+.tipRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.key {
+  width: 10px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--c);
+}
+
+.tipRow[data-series='kite'],
+.item[data-series='kite'] {
+  --c: var(--kite);
+}
+
+.tipRow[data-series='harbor'],
+.item[data-series='harbor'] {
+  --c: var(--harbor);
+}
+
+.tipValue {
+  margin-left: auto;
+  padding-left: 6px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The legend: a swatch like the polygons (a wash with an edge) and the name, in a row or heading a score table */
+.legend {
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.legend[data-variant='row'] {
+  display: flex;
+  gap: 10px;
+}
+
+.legend[data-variant='table'] {
+  display: none;
+  grid-template-columns: auto auto auto;
+  column-gap: 14px;
+  row-gap: 3px;
+  align-items: center;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: opacity 200ms var(--ease);
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--c);
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--c) 22%, transparent);
+}
+
+.row {
+  display: contents;
+}
+
+.axisName {
+  color: var(--muted);
+}
+
+.score {
+  justify-self: end;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* The higher score on each axis */
+.score[data-best] {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/*
+ * The pointer: it rests in the picture's empty corner, comes onto Kite's area and then onto its Support point. Black
+ * with a white rim, as on a Mac in either theme.
+ */
+.pointer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 13px;
+  height: 18px;
+  fill: #000;
+  stroke: #fff;
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.25));
+  transition: transform 650ms cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+/* Room for a score table beside the chart; it takes over from the legend in the header */
+@container (min-width: 400px) {
+  .card {
+    padding-inline: 16px;
+  }
+
+  .header .legend {
+    display: none;
+  }
+
+  .legend[data-variant='table'] {
+    display: grid;
+  }
+}

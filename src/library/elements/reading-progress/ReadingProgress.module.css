@@ -1,0 +1,382 @@
+/*
+ * A publishing site's article page in the idiom of the reading platforms it's modeled on: white (near-black in dark
+ * mode), a sans title and byline over a serif body, a sticky header with the wordmark, and a floating round button.
+ * The one accent, a raspberry pink, marks reading progress: the bar under the header and the ring around the button.
+ */
+.tile {
+  --bg: light-dark(#ffffff, #141414);
+  --text: light-dark(#242424, #e8e8e8);
+  --text-2: light-dark(#6b6b6b, #a8a8a8);
+  --line: light-dark(#ebebeb, #2b2b2b);
+  --accent: light-dark(#d6336c, #f06595);
+  --track: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.12));
+  --button: light-dark(#ffffff, #262626);
+  --button-hover: light-dark(#f2f2f2, #323232);
+  --header: 44px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* A wheel or trackpad scroll: eases in and out, as smooth scrolling does */
+  --scroll: 600ms cubic-bezier(0.45, 0, 0.25, 1);
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* The back-to-top click scrolls a long way, so it takes a little longer */
+.tile[data-up] {
+  --scroll: 800ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The page under the header; the article moves up through it as it's read */
+.page {
+  position: absolute;
+  top: var(--header);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+/*
+ * Scrolled a block at a time (a transform). The body is a serif, as on the reading sites, for long text; titles and
+ * the byline are in the sans.
+ */
+.article {
+  position: relative;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 18px 18px 24px;
+  font-family: Charter, 'Iowan Old Style', Georgia, ui-serif, serif;
+  font-size: 15px;
+  line-height: 24px;
+  transition: transform var(--scroll);
+}
+
+.article p {
+  margin: 0 0 14px;
+}
+
+.title {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 27px;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14.5px;
+  line-height: 20px;
+  color: var(--text-2);
+}
+
+.article .subtitle {
+  margin: 6px 0 14px;
+}
+
+.byline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.face {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 17px;
+  white-space: nowrap;
+}
+
+.author {
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.meta {
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+
+.figure {
+  margin: 0 0 18px;
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.figure figcaption {
+  margin-top: 8px;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 12.5px;
+  line-height: 17px;
+  text-align: center;
+  color: var(--text-2);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 12.5px;
+  line-height: 1;
+}
+
+.tags span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: light-dark(#f2f2f2, #242424);
+}
+
+.heading {
+  margin: 22px 0 6px;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 23px;
+  letter-spacing: -0.01em;
+}
+
+/* The sticky header: the wordmark, the time left and a bookmark */
+.header {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: var(--header);
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.logo {
+  font-family: Georgia, 'Times New Roman', ui-serif, serif;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  font-size: 12.5px;
+  white-space: nowrap;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.left .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.header > .icon {
+  color: var(--text-2);
+}
+
+/* The progress bar: 3px on the header's bottom edge, scaled to how far the article has been read */
+.track {
+  position: absolute;
+  top: calc(var(--header) - 2px);
+  right: 0;
+  left: 0;
+  z-index: 2;
+  height: 3px;
+}
+
+/* A taller target than the 3px line, so it can be pointed at */
+.track::after {
+  content: '';
+  position: absolute;
+  inset: -5px 0 -3px;
+}
+
+.bar {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform: scaleX(var(--read));
+  transform-origin: 0 50%;
+  transition: transform var(--scroll);
+}
+
+/* Back to top: a round floating button that comes in past a quarter of the article */
+.toTop {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--text);
+  background: var(--button);
+  box-shadow:
+    0 0 0 1px var(--line),
+    0 4px 12px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.5));
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.85);
+  transition:
+    opacity 200ms var(--ease),
+    transform 200ms var(--ease),
+    visibility 200ms,
+    background-color 120ms;
+}
+
+.tile[data-button] .toTop {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.tile[data-button][data-on-button] .toTop {
+  background: var(--button-hover);
+}
+
+.tile[data-button][data-press] .toTop {
+  transform: scale(0.94);
+}
+
+/* The ring: the same progress as the bar, drawn around the button from twelve o’clock */
+.ring {
+  position: absolute;
+  inset: -4px;
+  width: 48px;
+  height: 48px;
+  rotate: -90deg;
+  pointer-events: none;
+}
+
+.ring circle {
+  fill: none;
+}
+
+.ringTrack {
+  stroke: var(--track);
+  stroke-width: 2.5;
+}
+
+.ringFill {
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: calc(100 - 100 * var(--read));
+  transition: stroke-dashoffset var(--scroll);
+}
+
+/* An invisible 8px band over the ring, so the ring can be pointed at apart from the button */
+.ringTarget {
+  stroke: transparent;
+  stroke-width: 8;
+  pointer-events: stroke;
+}
+
+/*
+ * The pointer: resting over the text while the reader scrolls, then on the button (a pointing hand while the button
+ * is there). It moves the way a hand moves a mouse.
+ */
+.pointer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  pointer-events: none;
+  transform: translate(58cqw, calc(100cqh - 82px));
+  transition: transform 450ms cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.tile[data-on-button] .pointer {
+  transform: translate(calc(100cqw - 34px), calc(100cqh - 39px));
+}
+
+.arrow,
+.hand {
+  position: absolute;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.3));
+  stroke-linejoin: round;
+  transition:
+    opacity 100ms,
+    scale 120ms var(--ease);
+}
+
+.arrow {
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 20px;
+  fill: #1d1d1f;
+  stroke: #fff;
+  stroke-width: 1.4;
+}
+
+.hand {
+  top: -2px;
+  left: -10px;
+  width: 24px;
+  height: 24px;
+  fill: #fff;
+  stroke: #1d1d1f;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  opacity: 0;
+  transform-origin: 10px 2px;
+}
+
+.hand path + path {
+  fill: none;
+}
+
+.tile[data-button][data-on-button] .arrow {
+  opacity: 0;
+}
+
+.tile[data-button][data-on-button] .hand {
+  opacity: 1;
+}
+
+.tile[data-press] .hand {
+  scale: 0.9;
+}

@@ -1,0 +1,366 @@
+/*
+ * An issue's conversation in the idiom of the code hosts and social apps it's modeled on: white (GitHub-dark blue-black
+ * in dark mode), 13px text, bold blue mentions. The hover card is a white panel with a hairline, 12px corners, a soft
+ * shadow and an arrow pointing back at the mention; its Follow button is a solid pill in the text color. The link blue
+ * is the one accent.
+ */
+.tile {
+  --bg: light-dark(#ffffff, #0d1117);
+  --card: light-dark(#ffffff, #151b23);
+  --line: light-dark(#d1d9e0, #3d444d);
+  --text: light-dark(#1f2328, #f0f6fc);
+  --text-2: light-dark(#59636e, #9198a1);
+  --link: light-dark(#0a64d6, #4a96f8);
+  --button: light-dark(#0f1419, #eff3f4);
+  --button-hover: light-dark(#30353a, #d7dbdc);
+  --button-press: light-dark(#4a5056, #c2c6c8);
+  --on-button: light-dark(#ffffff, #0f1419);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* The card's right edge: the pointer finds the Follow button with it */
+  --card-right: calc(8px + min(300px, 100cqw - 16px));
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The comment: who wrote it and when, the text with the mention in it, its reactions */
+.comment {
+  padding: 12px 14px 0;
+}
+
+.byline {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 20px;
+  white-space: nowrap;
+}
+
+.face {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.author {
+  font-weight: 600;
+}
+
+.time {
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+
+.verb {
+  display: none;
+}
+
+.byline .icon {
+  margin-left: auto;
+  color: var(--text-2);
+}
+
+/* Roomy lines, so the card's top edge falls in the gap under the mention's line and covers the next one whole */
+.body {
+  margin: 6px 0 0;
+  font-size: 13.5px;
+  line-height: 22px;
+}
+
+/* The trigger: a mention in the link blue, underlined while the pointer is on it */
+.mention {
+  font-weight: 600;
+  color: var(--link);
+  text-decoration: underline transparent;
+  text-underline-offset: 2px;
+  transition: text-decoration-color 120ms;
+}
+
+.tile[data-at='mention'] .mention {
+  text-decoration-color: currentColor;
+}
+
+.reactions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.reaction {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 9px 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.reaction .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.addReaction {
+  padding: 0 7px;
+}
+
+/* The reply field: no wider than the open card on small tiles, so no sliver of it shows beside the card */
+.composer {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  width: min(290px, calc(100% - 28px));
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text-2);
+}
+
+.composer .icon {
+  margin-left: auto;
+}
+
+/*
+ * The hover card: under the mention, its arrow on the mention's middle. It fades in growing from 96% at the arrow, and
+ * leaves a little faster.
+ */
+.card {
+  position: absolute;
+  top: 64px;
+  left: 8px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  width: min(300px, calc(100% - 16px));
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow:
+    0 1px 3px light-dark(rgb(31 35 40 / 0.08), rgb(1 4 9 / 0.4)),
+    0 8px 24px light-dark(rgb(31 35 40 / 0.14), rgb(1 4 9 / 0.75));
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.96);
+  transform-origin: 27px 0;
+  transition:
+    opacity 100ms var(--ease),
+    transform 100ms var(--ease),
+    visibility 100ms;
+}
+
+.tile[data-open] .card {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-duration: 150ms;
+}
+
+/* The arrow: a square turned 45°, with the card's border on its two outer sides */
+.card::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 21px;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  background: var(--card);
+  transform: rotate(45deg);
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.avatar {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* The action: a solid pill; once clicked, an outlined Following */
+.follow {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 15px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-weight: 700;
+  color: var(--on-button);
+  background: var(--button);
+  transition:
+    background-color 120ms,
+    color 120ms,
+    border-color 120ms;
+}
+
+.tile[data-at='follow'] .follow {
+  background: var(--button-hover);
+}
+
+.tile[data-at='follow'][data-press] .follow {
+  background: var(--button-press);
+}
+
+.follow[data-following],
+.tile[data-at='follow'] .follow[data-following] {
+  border-color: var(--line);
+  color: var(--text);
+  background: transparent;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+.handle {
+  line-height: 17px;
+  color: var(--text-2);
+}
+
+.bio {
+  margin-top: 5px;
+  font-size: 12.5px;
+  line-height: 17px;
+  white-space: nowrap;
+}
+
+.counts {
+  display: flex;
+  gap: 12px;
+  margin-top: 7px;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  color: var(--text-2);
+}
+
+.counts b {
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * The pointer: an arrow off to the side, a pointing hand on the mention and the button. It moves the way a hand moves
+ * a mouse: slow out, quick through the middle, gentle landing.
+ */
+.pointer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  pointer-events: none;
+  transform: translate(calc(100cqw - 64px), 24px);
+  transition: transform 450ms cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+/* On the mention's right half, clear of the card's arrow */
+.tile[data-at='mention'] .pointer {
+  transform: translate(51px, 46px);
+}
+
+.tile[data-at='follow'] .pointer {
+  transform: translate(calc(var(--card-right) - 46px), 90px);
+}
+
+.arrow,
+.hand {
+  position: absolute;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.3));
+  stroke-linejoin: round;
+  transition:
+    opacity 100ms,
+    scale 120ms var(--ease);
+}
+
+.arrow {
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 20px;
+  fill: #1d1d1f;
+  stroke: #fff;
+  stroke-width: 1.4;
+}
+
+.hand {
+  top: -2px;
+  left: -10px;
+  width: 24px;
+  height: 24px;
+  fill: #fff;
+  stroke: #1d1d1f;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  opacity: 0;
+  transform-origin: 10px 2px;
+}
+
+.hand path + path {
+  fill: none;
+}
+
+.tile:is([data-at='mention'], [data-at='follow']) .arrow {
+  opacity: 0;
+}
+
+.tile:is([data-at='mention'], [data-at='follow']) .hand {
+  opacity: 1;
+}
+
+.tile[data-press] .hand {
+  scale: 0.9;
+}
+
+/* Wider tiles: "commented 2h ago" in full */
+@container (width >= 300px) {
+  .verb {
+    display: inline;
+  }
+}
+
+/* Wide enough for the reply field to show well past the card: it takes the full width */
+@container (width >= 420px) {
+  .composer {
+    width: auto;
+    right: 14px;
+  }
+}

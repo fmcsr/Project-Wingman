@@ -1,0 +1,567 @@
+/*
+ * A developer docs page in the idiom of API references: a white page (near-black in dark mode), a hairline header,
+ * 13px body text, inline code on gray chips and a dark code block in both themes. One accent, a sky blue, for the
+ * logo, the eyebrow and the table of contents' current section. The article's scroll offsets and the pointer's spots
+ * are measured by the component (--s0 … --s4, --toggle-x, …).
+ */
+.tile {
+  --page: light-dark(#ffffff, #0e1014);
+  --text: light-dark(#161a21, #e6e8ec);
+  --text-2: light-dark(#535a67, #9fa5b0);
+  --text-3: light-dark(#8a909b, #6b717c);
+  --line: light-dark(#e6e9ee, #23262d);
+  --track: light-dark(#e1e4ea, #2b2f37);
+  --chip: light-dark(#f0f2f5, #1b1e25);
+  --menu: light-dark(#ffffff, #171a20);
+  --accent: light-dark(#0b76b4, #52b7ee);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Smooth scrolling: eases in and out, slower than a hover, as a browser scrolls to an anchor */
+  --scroll-ease: cubic-bezier(0.45, 0, 0.2, 1);
+  --header-h: 48px;
+  --bar-h: 40px;
+  --row: 28px;
+  /* The open list on narrow tiles: five rows and its padding */
+  --panel-h: calc(5 * var(--row) + 18px);
+  --toc-w: 148px;
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--text);
+  background: var(--page);
+}
+
+.icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The site's header: logo and section, search, and a menu button on narrow tiles */
+.header {
+  position: absolute;
+  z-index: 3;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: var(--header-h);
+  padding: 0 14px 0 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--page);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.mark {
+  width: 20px;
+  height: 20px;
+  fill: var(--accent);
+}
+
+.section {
+  margin-left: 4px;
+  padding-left: 9px;
+  border-left: 1px solid var(--line);
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--text-2);
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  color: var(--text-2);
+}
+
+.searchText,
+.kbd {
+  display: none;
+}
+
+.burger {
+  color: var(--text-2);
+}
+
+.docs {
+  position: absolute;
+  inset: var(--header-h) 0 0;
+}
+
+/* The article's window: it never scrolls itself; the article inside moves up and down */
+.viewport {
+  position: absolute;
+  inset: var(--bar-h) 0 0;
+  overflow: hidden;
+}
+
+.article {
+  position: relative;
+  padding: 18px 16px 28px;
+  translate: 0 calc(-1 * var(--scroll, 0px));
+}
+
+.docs[data-ready] .article {
+  transition: translate 650ms var(--scroll-ease);
+}
+
+.tile[data-section='0'] .article {
+  --scroll: var(--s0, 0px);
+}
+
+/* Back to the top takes a little longer: it's the longest way */
+.tile[data-section='0'] .docs[data-ready] .article {
+  transition-duration: 950ms;
+}
+
+.tile[data-section='1'] .article {
+  --scroll: var(--s1, 0px);
+}
+
+.tile[data-section='2'] .article {
+  --scroll: var(--s2, 0px);
+}
+
+.tile[data-section='3'] .article {
+  --scroll: var(--s3, 0px);
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--accent);
+}
+
+.title {
+  margin: 4px 0 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: -0.02em;
+}
+
+.block {
+  margin-top: 22px;
+}
+
+/* A section heading: the anchor the list links to; a jump stops 16px above it */
+.heading {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 22px;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 16px;
+}
+
+.text {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--text-2);
+}
+
+.inline {
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 11.5px;
+  color: var(--text);
+  background: var(--chip);
+}
+
+/* Code blocks stay dark in both themes, as on most docs sites */
+.code {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  overflow: hidden;
+  border-radius: 8px;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 10.5px;
+  line-height: 17px;
+  white-space: pre;
+  color: #d5dbe5;
+  background: light-dark(#141821, #090b0f);
+  box-shadow: inset 0 0 0 1px light-dark(transparent, #1e222a);
+}
+
+.command {
+  color: #79c6f1;
+}
+
+.flag {
+  color: #a3abb9;
+}
+
+.string {
+  color: #f1c27d;
+}
+
+.updated {
+  margin: 28px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/*
+ * The table of contents. Narrow tiles (the default here): a bar under the header that names the current section and
+ * opens the list below it. Wide tiles: a column on the right with the list always showing.
+ */
+.toc {
+  position: absolute;
+  z-index: 2;
+  inset: 0 0 auto;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--bar-h);
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+  background: var(--page);
+}
+
+.barLabel {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.toggle {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 28px;
+  padding: 0 7px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  transition:
+    border-color 150ms var(--ease),
+    scale 120ms var(--ease);
+}
+
+.tile[data-open] .toggle {
+  border-color: var(--track);
+}
+
+.tile[data-click][data-pointer='toggle'] .toggle {
+  scale: 0.97;
+}
+
+/* The current section's name rolls up or down to the next one as the article scrolls */
+.ticker {
+  flex: 1;
+  height: 20px;
+  overflow: hidden;
+}
+
+.ticker > span {
+  display: block;
+  line-height: 20px;
+  translate: 0 calc(-20px * var(--section));
+  transition: translate 250ms var(--ease);
+}
+
+.chevron {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: var(--text-2);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: rotate 200ms var(--ease);
+}
+
+.tile[data-open] .chevron {
+  rotate: 180deg;
+}
+
+/*
+ * The list, on narrow tiles: a panel that unfolds under the bar and pushes the article down by its own height, so
+ * nothing ends up hidden under it
+ */
+.list {
+  position: absolute;
+  top: var(--bar-h);
+  right: 0;
+  left: 0;
+  height: var(--panel-h);
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--page);
+  clip-path: inset(0 0 100% 0);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    clip-path 250ms var(--ease),
+    opacity 200ms var(--ease),
+    visibility 250ms;
+}
+
+.tile[data-open] .list {
+  clip-path: inset(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.viewport {
+  translate: 0 var(--shift, 0px);
+  transition: translate 250ms var(--ease);
+}
+
+.tile[data-open] .viewport {
+  --shift: var(--panel-h);
+}
+
+.listTitle {
+  display: none;
+}
+
+/* The links stand on a 1px track; the indicator rides on it */
+.track {
+  position: relative;
+}
+
+.links {
+  margin: 0;
+  padding: 0 0 0 13px;
+  border-left: 1px solid var(--track);
+  list-style: none;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  height: var(--row);
+  font-size: 13px;
+  white-space: nowrap;
+  color: var(--text-2);
+  transition: color 200ms var(--ease);
+}
+
+.tile[data-pointer='target'] .link[data-spot]:not([aria-current]) {
+  color: var(--text);
+}
+
+.link[aria-current] {
+  font-weight: 500;
+  color: var(--accent);
+}
+
+/* The indicator: a 2px accent bar over the track next to the current link; its box is wider, so it can be pointed at */
+.indicator {
+  position: absolute;
+  top: 0;
+  left: -5px;
+  width: 11px;
+  height: var(--row);
+  translate: 0 calc(var(--row) * var(--section));
+  transition: translate 250ms var(--ease);
+}
+
+.indicator::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 4.5px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+}
+
+/* The pointer: over the article, on the bar's toggle, or on Making requests in the list; it dips when it clicks */
+.pointer {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 20px;
+  fill: #1d1d1f;
+  stroke: #fff;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.3));
+  transform-origin: 0 0;
+  translate: var(--px, -40px) var(--py, 0);
+}
+
+.docs[data-ready] .pointer {
+  transition:
+    translate 480ms cubic-bezier(0.45, 0, 0.25, 1),
+    scale 120ms var(--ease);
+}
+
+.tile[data-click] .pointer {
+  scale: 0.88;
+}
+
+.tile[data-pointer='away'] .docs {
+  --px: 62cqw;
+  --py: calc(100cqh - var(--header-h) - 120px);
+}
+
+.tile[data-pointer='toggle'] .docs {
+  --px: calc(var(--toggle-x, 0px) + 8px);
+  --py: calc(var(--toggle-y, 0px) - 2px);
+}
+
+.tile[data-pointer='target'] .docs {
+  --px: calc(var(--target-x, 0px) - 14px);
+  --py: calc(var(--target-y, 0px) - 3px);
+}
+
+/* Wide tiles: the list becomes a column beside the article, with its own heading */
+@container (width >= 460px) {
+  .docs {
+    --bar-h: 0px;
+  }
+
+  .search {
+    width: 168px;
+    height: 30px;
+    padding: 0 6px 0 9px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  .searchText {
+    display: block;
+    flex: 1;
+  }
+
+  .kbd {
+    display: block;
+    padding: 1px 5px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 11px;
+    color: var(--text-3);
+  }
+
+  .burger {
+    display: none;
+  }
+
+  .viewport {
+    right: calc(var(--toc-w) + 12px);
+  }
+
+  .article {
+    padding-left: 20px;
+  }
+
+  .toc {
+    inset: 0 0 0 auto;
+    width: var(--toc-w);
+    padding: 22px 14px 0 0;
+  }
+
+  .bar {
+    display: none;
+  }
+
+  .list {
+    position: static;
+    height: auto;
+    padding: 0;
+    border: 0;
+    background: none;
+    clip-path: none;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .tile[data-open] .viewport {
+    --shift: 0px;
+  }
+
+  .listTitle {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 16px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  /* No toggle here: the pointer goes straight to the link, and only its second click counts */
+  .tile[data-pointer='toggle'] .docs {
+    --px: calc(var(--target-x, 0px) - 14px);
+    --py: calc(var(--target-y, 0px) - 3px);
+  }
+
+  .tile[data-pointer='toggle'] .link[data-spot]:not([aria-current]) {
+    color: var(--text);
+  }
+
+  .tile[data-click][data-pointer='toggle'] .pointer {
+    scale: 1;
+  }
+
+  .tile[data-pointer='away'] .docs {
+    --px: 34cqw;
+  }
+}
+
+/* Wide tablets: a larger type scale and more air */
+@container (width >= 600px) {
+  .docs {
+    --toc-w: 176px;
+  }
+
+  .article {
+    padding: 26px 28px 32px;
+  }
+
+  .title {
+    font-size: 26px;
+    line-height: 32px;
+  }
+
+  .text {
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  .code {
+    font-size: 11.5px;
+    line-height: 18px;
+  }
+
+  .toc {
+    padding-top: 30px;
+  }
+}

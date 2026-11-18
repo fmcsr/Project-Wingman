@@ -1,6 +1,5 @@
 /** Section links shared by the header and the footer. */
 export const SECTION_LINKS = [
-  { href: '#elements', label: 'Elements' },
   { href: '#examples', label: 'Examples' },
   { href: '#features', label: 'Features' },
   { href: '#support', label: 'Support' },
@@ -13,6 +12,7 @@ export const SECTION_IDS = SECTION_LINKS.map((link) => link.href.slice(1));
 export const SIGN_IN_HREF = '/sign-in';
 export const SIGN_UP_HREF = '/sign-up';
 export const WORKSPACE_HREF = '/app';
+export const ELEMENTS_HREF = '/app/elements';
 
 /** Where people sponsor Project Wingman (GitHub Sponsors has to be set up on this account first). */
 export const SPONSOR_HREF = 'https://github.com/sponsors/fmcsr';

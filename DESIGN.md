@@ -24,31 +24,33 @@ Last updated: 2026-11-18 · Status: Applied to the landing page
 ## Page structure (information architecture)
 
 ```
-Header        Logo · Elements · Examples · Features · Support ········ Theme · Sign in   (sticky)
+Header        Logo · Examples · Features · Support ········ Theme · Sign in   (sticky)
 Hero          [ PROJECT WINGMAN ] · “Every PM needs a wingman.” · See examples / Get started free
-[01] Elements A bento grid of fifteen live elements, each with its name: “You've seen them. Now name them.”
-[02] Examples Before/after: Acme (marketing) · Orbit (analytics dashboard) · Wave (habits) · Muse (AI) · Stride (shopping)
-[03] Features A slowly moving marquee (with a pause button)
-[04] Support  A free account · Sponsor on GitHub
+[01] Examples “You've seen them. Now name them.” In two tabs:
+              With Wingman (default): a bento grid of fifteen live elements, each with its name
+              Without Wingman: before/after: Acme (marketing) · Orbit (dashboard) · Wave (habits) · Muse (AI) · Stride (shopping)
+[02] Features A slowly moving marquee (with a pause button)
+[03] Support  A free account · Sponsor on GitHub
 Footer        Text links · Back to top
 ```
 
-Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the free-account buttons lead here) and the signed-in library: `/app/mobile`, `/app/web`, `/app/watch` and one page per example at `/app/<platform>/<id>`, plus the brief at `/app/brief`. Once signed in, Sign in becomes Workspace in the header and the footer. Under the landing page's examples, “Explore the library” leads in.
+Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the free-account buttons lead here) and the signed-in library: `/app/mobile`, `/app/web`, `/app/watch`, `/app/elements` and one page per example at `/app/<platform>/<id>`, plus the brief at `/app/brief`. Once signed in, Sign in becomes Workspace in the header and the footer. Under the landing page's examples, “Explore all elements” (with Wingman) or “Explore the library” (without) leads in.
 
 - **The header isn't a bar, but it's sticky:** Fully transparent at the top of the page; as you scroll down it takes on a borderless frosted-glass background. Links go to sections, the logo goes back to the top, and the link of the section in view gets darker. Sections stop below the header thanks to `scroll-margin-top`.
 - **Footer:** Not a bar; text links sitting on the page background.
-- **Element gallery** (`src/landing/Gallery.tsx`, one file per tile in `src/landing/gallery/`): the first section to inspect, right under the hero, so the ways-to-explore guide sits here.
+- **Examples in two tabs** (`src/landing/Examples.tsx`): right under the hero, a segmented control (With Wingman, Without Wingman) shares a row with the ways-to-explore guide. With Wingman is open by default. The section's description and the way into the library under the examples follow the open tab; only the open tab is rendered, so the comparisons' scroll scenes don't run behind the gallery. The tabs follow the ARIA tabs pattern: one tab stop, arrow keys, Home and End.
+- **With Wingman: the element gallery** (`src/landing/Gallery.tsx`; the fifteen tiles are library elements, listed in `src/landing/gallery/tiles.ts`). Its way out leads to the library's Elements tab, which has all of them and forty more.
   - Fifteen elements people meet in apps every day but rarely know the names of, from four families: iOS (Dynamic Island, wheel picker, bottom sheet, swipe actions), productivity tools (command palette, live cursors, mention menu, drag and drop), data (activity rings, calendar heatmap, marker clusters) and micro-interactions (one-time code field, slide to confirm, toast stack, skeleton screen). None repeats an element the examples below already explain.
   - Each element is shown live where it lives (the top of an iPhone, a whiteboard, a kanban board, a map), in the same design type as the product people know it from, with our own names and data.
   - A bento grid of 264 px rows: a tile takes one cell, two side by side, two stacked or a 2 × 2 block, and in four columns the order fills seven rows with no gaps. Two columns under 1024 px (`grid-auto-flow: dense` moves small tiles up into the gaps), one under 640 px.
-  - A tile is its element on a slightly darker ground over a caption: a mono index and the name. Every tile is an example of its own (its own tab stop); the descriptions are in `src/catalog/gallery/`, one file per family.
+  - A tile is its element on a slightly darker ground over a caption: a mono index and the name. Every tile is an example of its own (its own tab stop), with its descriptions in its folder in `src/library/elements/`.
 - **The home page shows only five example projects:** The full library opens after sign-in.
 - **Example layout:**
   - Sites (Acme, Orbit): Each in its own scroll scene, full page width, one after another.
     - The window pins below the header. The scene grows by as much as the content overflows, and page scrolling is passed one to one into the window.
     - Users never scroll inside the window. Because the content really scrolls (`overflow: hidden` + `scrollTop`), Acme's sticky glass navbar keeps working.
   - Phones: All three in one row at every width. If they don't fit, they shrink together (`--phone-scale`; ~0.35 on a phone). In a narrow row, each heading keeps only the index and the name.
-- **Before/after:** every example is a comparison (`src/showcase/Compare.tsx`), the story of the product in one gesture.
+- **Without Wingman: before/after** (`src/landing/Comparisons.tsx`): every example is a comparison (`src/showcase/Compare.tsx`), the story of the product in one gesture.
   - The AI slop version a vague prompt produces (`src/demos/slop/`) lies on top of the Wingman version and is cut at a vertical line. Drag the line right and the slop grows; drag it left and the Wingman version grows. It starts in the middle and sways once when it first comes into view (not with reduced motion).
   - The line is white with a soft shadow, so it reads on any content. Its round knob is a slider: arrow keys move it by 5%, Page Up/Down by 20%, Home and End go to the edges. Small "AI slop" and "With Wingman" pills ride on each side of the knob, so they never cover an app's corners, and fade when their side gets narrow.
   - Both sides are inspectable, each as its own example (its own tab stop) with its own descriptions (`src/catalog/slopSites.ts`, `slopPhones.ts`). Slop elements carry the same names as their Wingman counterparts where the element is the same, so the two can be compared, and their concepts say what makes each one read as AI slop. Only the Wingman side counts toward the elements number in the project header. In the sites both versions scroll together, and the line stays put over the window.
@@ -76,13 +78,14 @@ Older library demos use `useInspectActivity()`, which holds the whole example: C
 
 ## Library
 
-- **Three tabs, Mobile, Web and Watch,** in a pill-shaped segmented control with the count of examples. Like a pattern gallery (Mobbin): category chips, and a search that matches names, inspirations and every element's name, aliases and terms (“bottom sheet” finds the apps that have one).
+- **Four tabs, Mobile, Web, Watch and Elements,** in a pill-shaped segmented control with the count of examples. Like a pattern gallery (Mobbin): category chips, and a search that matches names, inspirations and every element's name, aliases and terms (“bottom sheet” finds the apps that have one).
 - **Examples are fictional products** built from the patterns of well-known ones; real names only appear as “Inspired by”. No real logos or brands inside the demos.
   - Each one follows one familiar product's real screen closely, using Mobbin's screenshots as the reference: the same layout, type scale, color scheme and component shapes, so people recognize the design type at a glance. The name, logo, accent hue, icons, copy and data are our own, and so are the photos (free-license Unsplash photos, credited in each example's `photos/CREDITS.md`). People learn an element's name faster on a screen that looks like an app they use every day.
   - The library's footnote and each example's “Inspired by” line say the examples are fictional and not affiliated with those products.
 - **Mobile and Watch grids:** phones and watches scale to their column and can be inspected right there, like on the landing page. Each card's heading stays on one line so devices in a row line up. The watch is a 46 mm Apple Watch case (208 × 248 screen) with the Digital Crown and side button (`src/showcase/WatchFrame.tsx`).
 - **Web grid:** a still, scaled-down picture of each site at desktop width (1280 px); the whole card opens the site's page. Previews can't be focused or inspected.
-- **Example page:** the example at full size and all of its elements written out as a glossary: name, tag, variant, summary, “also called”, and each concept with its term and value (for the theme in use). Phones and watches stay in view on the left while the list scrolls; sites use the scroll scene, with the glossary below. Previous/next links walk through the tab (hidden when the tab holds a single example).
+- **Elements grid:** single elements in the landing gallery's bento grid (`src/showcase/TileGrid.module.css`), every tile inspectable in place with Add to brief, its name linking to its page, and its families as the category chips: Data, Forms, iOS, Micro-interactions, Navigation and Productivity. The grid runs alphabetically; `dense` packing fills the gaps the bigger tiles leave.
+- **Example page:** the example at full size and all of its elements written out as a glossary: name, tag, variant, summary, “also called”, and each concept with its term and value (for the theme in use). Phones, watches and elements stay in view on the left while the list scrolls (an element in a tile of its size class, at the size the gallery gives it on a desktop; the list calls its entries parts); sites use the scroll scene, with the glossary below. Previous/next links walk through the tab (hidden when the tab holds a single example).
 - The library loads separately from the landing page, so the public page stays light.
 
 ## Brief
@@ -121,6 +124,22 @@ Older library demos use `useInspectActivity()`, which holds the whole example: C
   - A size-guide text link and two stacked pill buttons (Add to Bag, Favorite).
   - Color comes from the photos; the one accent, a cobalt blue, marks the saving. The photo looks the same in both themes, so the page dots drawn on it stay dark in both.
   - Motion: every 5 seconds the photo slides on to the next colorway (five, recolored from the one product photo), and the page dots, the color picker's ring and the colorway name in the category line follow, so the gallery and the picker tell one story.
+
+## Watch demos
+
+The watch examples are dark by design (the display is off where it's black), the same in both themes, set in SF Compact, with everything kept inside the screen's 50 px corners as watchOS does. Between them they cover the watch's own elements: the face and its complications, the Smart Stack, activity rings, notifications and Now Playing.
+
+- **Almanac:** An analog face made for complications, modeled on Infograph: hour markers and a minute track, four circular complications as subdials (the date, a timer, the moon phase, activity rings), the next event curved along the bezel, and a corner complication in each rounded corner with its text following the curve. The hands rest at 10:09:30, as in product photos.
+  - Motion: the second hand sweeps once a minute; the minute hand steps on the minute with a short spring; the timer counts down and the heart rate changes now and then.
+- **Glance:** The Smart Stack, as turning the Digital Crown up from the face brings it: the time small at the top, a row of three circular widgets, then rectangular widgets (194 × 80, Apple's size for 46 mm) as rounded cards, the weather one tinted by its app.
+  - Motion: every 3 seconds the crown scrolls one widget on with a spring that overshoots slightly; the widget leaving shrinks and fades, the next one grows in, and the scroll indicator shows by the crown while it moves.
+- **Kinetic:** The Activity app: three concentric rings (Move, Exercise, Stand), each over a dark track of its own hue with its start arrow, Exercise past its goal with its end cap casting a shadow onto the ring beneath; below, each figure with an hourly chart.
+  - Motion: the rings draw in, staggered, while the figures count up; the closed ring pulses once (no fireworks); the crown scrolls down to the figures and back.
+- **Nudge:** A message notification from our own messaging app. The Short Look (the app icon large, the app's name and the sender) turns into the Long Look: the icon in the header, the message on a platter, Reply and Mark as Read as glass capsules and Dismiss last.
+  - Motion: the notification arrives over the dimmed face, becomes the Long Look, scrolls down to its actions and back, and is dismissed.
+- **Encore:** Now Playing: a background tinted by the album art, the title (a marquee when it's too long) and the artist, previous, play/pause inside a progress ring and next, then AirPlay, volume and more as glass circles, and the Digital Crown's volume indicator by the crown.
+  - Motion: the ring advances each second and the title scrolls; the crown turns the volume up or down; once a loop the next song starts and the art and the background crossfade.
+- **Pace:** A running workout's metrics view: the workout's icon in its goal ring, the elapsed time in yellow and one metric per line with small uppercase units, the time ticking once a second.
 
 ## Color tokens
 
@@ -179,6 +198,7 @@ Typefaces and metrics are taken one to one from LayerZero.
     - Productivity: the palette opens, a query types out and the results filter; cursors glide on curves while one drags a note and another types a cursor chat; a mention is typed and becomes a chip; a card is lifted, carried to the next column and dropped while the cards there make room.
     - Data: the rings draw in and Exercise wraps past its goal; a tooltip hops across the heatmap and today's cell steps up a shade; the map zooms into a cluster that splits into price markers, a callout opens, and on the way out they merge again.
     - Micro-interactions: the code's digits arrive and verify; the thumb slides to confirm; toasts arrive, a loading toast resolves, and the stack spreads out as it does on hover; skeleton rows shimmer, then load in turn.
+  - Elements tab: the other forty tiles follow the same rules. Each loop (6–12 s) shows the element's behavior the way the product people know it from does: a drawn pointer or finger where a hover, a drag, a press or a right-click is the story, typing at 70–110 ms a key, figures that count and charts that draw in, then a rest. Every tile holds still while one of its parts is inspected, and with reduced motion shows a still final state with every part in view.
   - The inspection outline slides between elements in 120 ms.
   - Theme changes cross-fade smoothly with View Transitions where supported.
   - With `prefers-reduced-motion`, the lines stay still and no shooting star appears, the before/after line doesn't sway, the examples and the gallery's tiles show their finished state, the Features marquee doesn't move (the cards sit in rows) and windows don't grow into place; other animations and smooth scrolling stop too. In the site scenes the content still moves with the page, at the same speed as normal scrolling.

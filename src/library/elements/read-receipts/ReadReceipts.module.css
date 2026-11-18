@@ -1,0 +1,418 @@
+/*
+ * A text conversation in the iMessage style, in iOS's light and dark colors: gray bubbles for them, system blue for
+ * you, a status line in secondary gray, and the composer at the bottom. The blue of the bubbles turns the ticks blue
+ * once the message is read.
+ */
+.tile {
+  --label: light-dark(#000, #fff);
+  --secondary: light-dark(rgb(60 60 67 / 0.6), rgb(235 235 245 / 0.6));
+  --tertiary: light-dark(rgb(60 60 67 / 0.3), rgb(235 235 245 / 0.3));
+  --background: light-dark(#fff, #000);
+  --received: light-dark(#e9e9eb, #262628);
+  --blue: light-dark(#007aff, #0a84ff);
+  --ios: cubic-bezier(0.32, 0.72, 0, 1);
+  /*
+   * What the thread scrolls by: the gap between messages (also left under the last one), a bubble, its status line
+   * and the typing indicator. With these, a message that hasn't arrived starts right at the composer, out of sight,
+   * and the older message above the conversation ends at the top edge once the typing indicator is up.
+   */
+  --gap: 10px;
+  --bubble: 34px;
+  --receipt: 19px;
+  --slot: 36px;
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  color: var(--label);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+}
+
+.tile svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The conversation above the composer; older messages fade out under the top edge as it scrolls */
+.viewport {
+  position: absolute;
+  inset: 0 0 50px;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, transparent, #000 10px);
+}
+
+/*
+ * The thread, newest at the bottom. Until the message is sent it sits lower, the new message and the typing
+ * indicator out of sight below; each arrival scrolls it up, the way a conversation moves.
+ */
+.thread {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 14px var(--gap);
+  translate: 0 calc(2 * var(--gap) + var(--bubble) + var(--receipt) + var(--slot));
+  transition:
+    translate 450ms var(--ios),
+    opacity 300ms ease;
+}
+
+.tile[data-sent] .thread {
+  translate: 0 calc(var(--gap) + var(--slot));
+}
+
+.tile[data-sent]:not([data-other='idle']) .thread {
+  translate: none;
+}
+
+/* Starting over: the thread fades out, scrolls back unseen, and fades in */
+.tile[data-dip] .thread {
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+/* Bubbles: one line each, 17px corners, a tail at the bottom corner on the speaker's side */
+.them,
+.me {
+  position: relative;
+  max-width: 85%;
+  margin-top: var(--gap);
+  padding: 7px 12px;
+  border-radius: 17px;
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.thread > :first-child {
+  margin-top: 0;
+}
+
+.them {
+  background: var(--received);
+}
+
+.me {
+  align-self: flex-end;
+  color: #fff;
+  background: var(--blue);
+}
+
+/* The tail: a curl of the bubble's color, cut into a hook by a shape in the page's color */
+.them::before,
+.them::after,
+.me::before,
+.me::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  height: 16px;
+}
+
+.me::before {
+  right: -5.5px;
+  border-right: 16px solid var(--blue);
+  border-bottom-left-radius: 13px 11px;
+}
+
+.me::after {
+  right: -10px;
+  bottom: 0.5px;
+  width: 10px;
+  border-bottom-left-radius: 8px;
+  background: var(--background);
+}
+
+.them::before {
+  left: -5.5px;
+  border-left: 16px solid var(--received);
+  border-bottom-right-radius: 13px 11px;
+}
+
+.them::after {
+  left: -10px;
+  bottom: 0.5px;
+  width: 10px;
+  border-bottom-right-radius: 8px;
+  background: var(--background);
+}
+
+/* The status line: right under your last message, the word on the left and the ticks on the right */
+.receipt {
+  display: flex;
+  align-self: flex-end;
+  align-items: center;
+  gap: 4px;
+  margin-top: 1px;
+  padding: 2px 2px 0 6px;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--secondary);
+}
+
+.words {
+  display: grid;
+  justify-items: end;
+}
+
+.word {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 200ms ease,
+    visibility 0s linear 200ms;
+}
+
+.tile[data-receipt='sending'] .word[data-for='sending'],
+.tile[data-receipt='sent'] .word[data-for='sent'],
+.tile[data-receipt='delivered'] .word[data-for='delivered'],
+.tile[data-receipt='read'] .word[data-for='read'] {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.read {
+  font-weight: 600;
+}
+
+.time {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The ticks: a clock while sending, one tick once sent, a second once delivered, both blue once read */
+.ticks {
+  display: block;
+  transition: color 250ms ease;
+}
+
+.ticks svg {
+  display: block;
+  width: 17px;
+  height: 11px;
+  stroke-width: 1.5;
+}
+
+.clock,
+.first,
+.second {
+  opacity: 0;
+  transition:
+    opacity 200ms ease,
+    translate 250ms var(--ios);
+}
+
+.second {
+  translate: -2px 0;
+}
+
+.tile[data-receipt='sending'] .clock,
+.tile:not([data-receipt='sending']) .first,
+.tile:is([data-receipt='delivered'], [data-receipt='read']) .second {
+  opacity: 1;
+  translate: none;
+}
+
+.tile[data-receipt='read'] .ticks {
+  color: var(--blue);
+}
+
+/* Their side: the typing indicator and the reply that takes its place, in one slot */
+.slot {
+  display: grid;
+  align-items: end;
+  height: var(--slot);
+  margin-top: var(--gap);
+}
+
+.slot > * {
+  grid-area: 1 / 1;
+  justify-self: start;
+}
+
+/* A gray bubble with three dots, its tail two small circles, as a thought bubble has */
+.typing {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 13px;
+  border-radius: 18px;
+  background: var(--received);
+  opacity: 0;
+  visibility: hidden;
+  scale: 0.6;
+  transform-origin: 0 100%;
+  transition:
+    opacity 150ms ease,
+    scale 350ms var(--ios),
+    visibility 0s linear 150ms;
+}
+
+.typing::before,
+.typing::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: var(--received);
+}
+
+.typing::before {
+  bottom: -2px;
+  left: -2px;
+  width: 12px;
+  height: 12px;
+}
+
+.typing::after {
+  bottom: -7px;
+  left: -7px;
+  width: 6px;
+  height: 6px;
+}
+
+.tile[data-other='typing'] .typing {
+  opacity: 1;
+  visibility: visible;
+  scale: none;
+  transition:
+    opacity 200ms ease,
+    scale 400ms var(--ios),
+    visibility 0s;
+}
+
+/* The dots light up in a wave, left to right; held still, they show one moment of it */
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8e8e93;
+}
+
+.dot:nth-child(1) {
+  opacity: 0.9;
+}
+
+.dot:nth-child(2) {
+  opacity: 0.6;
+}
+
+.dot:nth-child(3) {
+  opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tile:not([data-still]) .dot {
+    animation: wave 1.2s ease-in-out infinite;
+  }
+
+  .tile:not([data-still]) .dot:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+
+  .tile:not([data-still]) .dot:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  .tile[data-paused] .dot {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes wave {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+  }
+
+  30% {
+    opacity: 0.95;
+  }
+}
+
+.reply {
+  margin-top: 0;
+  opacity: 0;
+  visibility: hidden;
+  scale: 0.9;
+  transform-origin: 0 100%;
+  transition:
+    opacity 150ms ease,
+    scale 300ms var(--ios),
+    visibility 0s linear 150ms;
+}
+
+.tile[data-other='replied'] .reply {
+  opacity: 1;
+  visibility: visible;
+  scale: none;
+  transition:
+    opacity 200ms ease,
+    scale 350ms var(--ios),
+    visibility 0s;
+}
+
+/* The composer: the apps button, and a round field with its placeholder and the dictation mic */
+.composer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 50px;
+  padding: 0 10px;
+}
+
+.plus {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--secondary);
+  background: var(--received);
+}
+
+.plus svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
+.field {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  height: 34px;
+  padding: 0 9px 0 13px;
+  border: 1px solid light-dark(rgb(60 60 67 / 0.2), rgb(84 84 88 / 0.65));
+  border-radius: 17px;
+  font-size: 15px;
+  color: var(--tertiary);
+}
+
+.field svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--secondary);
+  stroke-width: 1.75;
+}

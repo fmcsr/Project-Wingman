@@ -1,0 +1,430 @@
+/*
+ * A retention report in an analytics tool: a white page with gray hairlines (a near-black one in dark mode) and a
+ * sequential scale of one indigo, mixed in OKLab from almost the page color at 0% to deep indigo at 100%. In dark mode
+ * the scale runs from a dim indigo to a bright one, so higher retention still stands out most.
+ */
+.tile {
+  --page: light-dark(#fff, #16171b);
+  --ink: light-dark(#1c2024, #eceef2);
+  --muted: light-dark(#697077, #9aa0aa);
+  --line: light-dark(#e7e9ec, #2b2e35);
+  --tip: light-dark(#1c2024, #33363e);
+  --lo: light-dark(oklch(0.975 0.012 272), oklch(0.25 0.03 272));
+  --hi: light-dark(oklch(0.46 0.19 272), oklch(0.64 0.16 272));
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  height: 100%;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--page);
+}
+
+/*
+ * Geometry: rows of 13px cells 2px apart, the cohort's start and size, then a column per week sharing what's left of
+ * the width. Narrower tiles show fewer weeks (the latest drop off on the right); the overlays below place themselves
+ * with these same numbers.
+ */
+.card {
+  --pad: 14px;
+  --label: 50px;
+  --users: 40px;
+  --lead: 8px;
+  --gap: 2px;
+  --head: 14px;
+  --cell: 13px;
+  --pitch: calc(var(--cell) + var(--gap));
+  --sep: 5px;
+  --weeks: 9;
+  --x0: calc(var(--label) + var(--users) + var(--lead) + var(--gap));
+  --colw: calc((100cqw - 2 * var(--pad) - var(--x0) - (var(--weeks) - 1) * var(--gap)) / var(--weeks));
+
+  height: 100%;
+  padding: 11px var(--pad) 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 18px;
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.subtitle {
+  display: none;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  color: var(--muted);
+}
+
+/* The color scale: the same mix as the cells, end to end */
+.scale {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.ramp {
+  width: 64px;
+  height: 8px;
+  border-radius: 2px;
+  background: linear-gradient(to right in oklab, var(--lo), var(--hi));
+  box-shadow: inset 0 0 0 1px light-dark(rgb(28 32 36 / 0.06), rgb(255 255 255 / 0.04));
+}
+
+.table {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.head,
+.row,
+.average {
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  height: var(--cell);
+  line-height: var(--cell);
+}
+
+.head {
+  height: var(--head);
+  color: var(--muted);
+}
+
+.label,
+.users {
+  flex: none;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: color 150ms var(--ease);
+}
+
+.label {
+  width: var(--label);
+}
+
+.users {
+  width: var(--users);
+  margin-right: calc(var(--lead) - var(--gap));
+  text-align: right;
+  color: var(--muted);
+}
+
+.week,
+.cell,
+.empty {
+  flex: none;
+  width: var(--colw);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.week {
+  transition: color 150ms var(--ease);
+}
+
+/* The hovered cell's column heading and row label step up to full ink */
+.week[data-current],
+.row[data-current] > .label,
+.row[data-current] > .users {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* A cell: the share mixed into the scale, ink text on the light end and white on the dark one */
+.cell {
+  height: var(--cell);
+  border-radius: 2px;
+  color: light-dark(var(--ink), #fff);
+  background: color-mix(in oklab, var(--hi) calc(var(--share) * 1%), var(--lo));
+  transition:
+    opacity 150ms var(--ease),
+    visibility 0s;
+}
+
+.cell[data-strong] {
+  color: #fff;
+}
+
+/* While the pointer is on a cell, everything outside its row and column fades back */
+.cell[data-dim] {
+  opacity: 0.35;
+}
+
+/* The average closes the table under a hairline, in bold */
+.average {
+  position: relative;
+  margin-top: var(--sep);
+  font-weight: 600;
+  transition: transform 320ms var(--ease);
+}
+
+.average::before {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--sep) / 2 - 1.5px);
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--line);
+}
+
+.average > .users {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.average > .users,
+.average > .cell {
+  transition:
+    opacity 160ms var(--ease),
+    visibility 0s;
+}
+
+/*
+ * Last week's table: every cohort is a cell short along the diagonal, the newest cohort isn't there yet and the
+ * average sits a row higher. When this week's numbers come in, the diagonal fills in from the top, 60ms a row, and
+ * the new row last, as the average makes room for it.
+ */
+.cell[data-latest],
+.row[data-new] {
+  transition:
+    opacity 240ms var(--ease) calc(var(--i, 8) * 60ms),
+    transform 320ms var(--ease) calc(var(--i, 8) * 60ms),
+    visibility 0s;
+}
+
+.tile[data-data='stale'] .cell[data-latest],
+.tile[data-data='stale'] .row[data-new] {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 200ms var(--ease),
+    transform 200ms var(--ease),
+    visibility 0s linear 200ms;
+}
+
+.tile[data-data='stale'] .row[data-new] {
+  transform: translateY(4px);
+}
+
+.tile[data-data='stale'] .average {
+  transform: translateY(calc(-1 * var(--pitch)));
+}
+
+.tile[data-data='filling'] .average {
+  transition-delay: 380ms;
+}
+
+/* Back to last week's table: the new numbers and the average's figures fade out while the rows move back */
+.tile[data-dip] .cell[data-latest],
+.tile[data-dip] .row[data-new],
+.tile[data-dip] .average > .users,
+.tile[data-dip] .average > .cell {
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+/* The hovered cell: a 1.5px ink outline, 1.5px outside it, which slides from cell to cell */
+.outline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(var(--colw) + 5px);
+  height: calc(var(--cell) + 5px);
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+  pointer-events: none;
+  transform: translate(
+    calc(var(--x0) + var(--c) * (var(--colw) + var(--gap)) - 2.5px),
+    calc(var(--head) + var(--gap) + var(--r) * var(--pitch) - 2.5px)
+  );
+  transition:
+    transform 180ms var(--ease),
+    opacity 150ms var(--ease);
+}
+
+/* The tooltip sits over the middle of the hovered cell and moves with it; only the bubble can be pointed at */
+.tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  transform: translate(
+    calc(var(--x0) + var(--c) * (var(--colw) + var(--gap)) + var(--colw) / 2),
+    calc(var(--head) + var(--gap) + var(--r) * var(--pitch))
+  );
+  transition: transform 180ms var(--ease);
+}
+
+.bubble {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 14px;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--tip);
+  box-shadow: 0 4px 12px light-dark(rgb(16 24 40 / 0.16), rgb(0 0 0 / 0.4));
+  transform: translate(-50%, calc(-100% - 8px));
+  pointer-events: auto;
+  transition:
+    opacity 150ms var(--ease),
+    visibility 0s;
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border: 5px solid transparent;
+  border-top-color: var(--tip);
+  border-bottom-width: 0;
+}
+
+.tipValue {
+  font-weight: 600;
+}
+
+.tipDetail {
+  color: rgb(255 255 255 / 0.7);
+}
+
+.tile:not([data-hover]) .outline,
+.tile:not([data-hover]) .bubble {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 180ms var(--ease),
+    opacity 150ms var(--ease),
+    visibility 0s linear 150ms;
+}
+
+/*
+ * The pointer: on a cell, its tip lands right of the number; between cells it rests in the empty corner under the
+ * diagonal. Black with a white rim, as on a Mac in either theme.
+ */
+.pointer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 13px;
+  height: 18px;
+  fill: #000;
+  stroke: #fff;
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.25));
+  transform: translate(
+    calc(var(--x0) + var(--c) * (var(--colw) + var(--gap)) + var(--colw) * 0.72),
+    calc(var(--head) + var(--gap) + var(--r) * var(--pitch) + 5px)
+  );
+  transition: transform 560ms cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+.tile:not([data-hover]) .pointer {
+  transform: translate(
+    calc(var(--x0) + (var(--weeks) - 1.6) * (var(--colw) + var(--gap))),
+    calc(var(--head) + var(--gap) + 6.4 * var(--pitch))
+  );
+}
+
+/*
+ * Narrower tiles keep the weeks about 40px wide, so "Week 0" and "100%" fit: the latest weeks drop off on the right,
+ * a column at a time, down to Week 0–4 on the narrowest phones.
+ */
+@container (max-width: 509px) {
+  .card {
+    --weeks: 8;
+  }
+
+  .table [data-col='8'] {
+    display: none;
+  }
+}
+
+@container (max-width: 459px) {
+  .card {
+    --weeks: 7;
+  }
+
+  .table [data-col='7'] {
+    display: none;
+  }
+}
+
+@container (max-width: 419px) {
+  .card {
+    --pad: 12px;
+    --label: 46px;
+    --users: 36px;
+    --lead: 6px;
+    --weeks: 6;
+  }
+
+  .table [data-col='6'] {
+    display: none;
+  }
+
+  .week {
+    font-size: 9.5px;
+  }
+
+  .ramp {
+    width: 44px;
+  }
+}
+
+@container (max-width: 349px) {
+  .card {
+    --weeks: 5;
+  }
+
+  .table [data-col='5'] {
+    display: none;
+  }
+}
+
+@container (min-width: 500px) {
+  .subtitle {
+    display: inline;
+  }
+}
+
+@container (min-width: 640px) {
+  .card {
+    --pad: 18px;
+    --label: 60px;
+    --users: 48px;
+    --lead: 12px;
+  }
+
+  .table {
+    font-size: 10.5px;
+  }
+}

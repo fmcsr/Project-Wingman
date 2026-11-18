@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import {
   acmeSlopSpecs,
-  gallerySpecs,
   museSlopSpecs,
   orbitSlopSpecs,
   showcaseSpecs,
@@ -16,8 +16,21 @@ const WIDTHS = [
   { width: 390, height: 844 },
 ];
 
-/** The element gallery's tiles (src/landing/gallery/tiles.ts), each an example of its own. */
+/**
+ * The element gallery's tiles (src/landing/gallery/tiles.ts), each an example of its own, in the examples' With
+ * Wingman tab. They're library elements, so the library's test checks their descriptions, on each element's page.
+ */
 const GALLERY_TILES = 15;
+
+/** The comparisons, in the Without Wingman tab: both sides of two sites and three phones. */
+const COMPARISON_SIDES = 10;
+
+/** Opens one of the examples' tabs; With Wingman is open when the page loads. */
+async function openTab(page: Page, name: 'With Wingman' | 'Without Wingman') {
+  const tab = page.getByRole('tab', { name, exact: true });
+  await tab.click();
+  await expect(tab).toHaveAttribute('aria-selected', 'true');
+}
 
 /** The AI slop side of each comparison has its own descriptions; the Wingman sides share showcaseSpecs. */
 const SLOP_SPECS: Record<string, readonly UiElementSpec[]> = {
@@ -28,9 +41,8 @@ const SLOP_SPECS: Record<string, readonly UiElementSpec[]> = {
   'Stride shopping app': strideSlopSpecs,
 };
 
-/** The descriptions an example draws on: the gallery's tiles share gallerySpecs. */
-function specsFor(label: string, section: string) {
-  if (section === 'elements') return gallerySpecs;
+/** The descriptions a comparison side draws on. */
+function specsFor(label: string) {
   const slop = /^(.+), AI slop version, interactive example$/.exec(label);
   if (!slop) return showcaseSpecs;
   const specs = SLOP_SPECS[slop[1]];
@@ -41,20 +53,23 @@ function specsFor(label: string, section: string) {
 // Motion stays on here, as most visitors see the page: the demos' moving parts are rendered and checked too
 test.describe('landing page', () => {
   for (const viewport of WIDTHS) {
-    test(`shows the gallery's tiles and the ten example pictures without errors at ${viewport.width} px`, async ({
-      page,
-    }) => {
+    test(`shows both tabs of examples without errors at ${viewport.width} px`, async ({ page }) => {
       const errors = trackErrors(page);
       await page.setViewportSize(viewport);
       await page.goto('/');
       await settle(page);
 
-      await expect(page.locator(`#elements ${SURFACE}`)).toHaveCount(GALLERY_TILES);
-      await expect(page.locator(`#examples ${SURFACE}`)).toHaveCount(10);
-      expect.soft(await demoProblems(page)).toEqual([]);
-      expect.soft(await horizontalOverflow(page)).toBe(0);
-      for (const { label, section, all } of await inspectIds(page)) {
-        const known = new Set(specsFor(label, section).map((spec) => spec.id));
+      await expect(page.locator(`#examples ${SURFACE}`)).toHaveCount(GALLERY_TILES);
+      expect.soft(await demoProblems(page), 'With Wingman').toEqual([]);
+      expect.soft(await horizontalOverflow(page), 'With Wingman: sideways scroll').toBe(0);
+
+      await openTab(page, 'Without Wingman');
+      await settle(page);
+      await expect(page.locator(`#examples ${SURFACE}`)).toHaveCount(COMPARISON_SIDES);
+      expect.soft(await demoProblems(page), 'Without Wingman').toEqual([]);
+      expect.soft(await horizontalOverflow(page), 'Without Wingman: sideways scroll').toBe(0);
+      for (const { label, all } of await inspectIds(page)) {
+        const known = new Set(specsFor(label).map((spec) => spec.id));
         const undescribed = all.filter((id) => !known.has(id));
         expect.soft(undescribed, `${label}: elements without a description`).toEqual([]);
       }
@@ -62,25 +77,40 @@ test.describe('landing page', () => {
     });
   }
 
-  test('shows every gallery and AI slop description at one of the two widths', async ({ page }) => {
+  test('shows every AI slop description at one of the two widths', async ({ page }) => {
     const shown = new Map<string, Set<string>>();
-    const inGallery = new Set<string>();
     for (const viewport of WIDTHS) {
       await page.setViewportSize(viewport);
       await page.goto('/');
+      await openTab(page, 'Without Wingman');
       await settle(page);
-      for (const { label, section, shown: ids } of await inspectIds(page)) {
+      for (const { label, shown: ids } of await inspectIds(page)) {
         shown.set(label, new Set([...(shown.get(label) ?? []), ...ids]));
-        if (section === 'elements') for (const id of ids) inGallery.add(id);
       }
     }
-    const neverInGallery = gallerySpecs.map((spec) => spec.id).filter((id) => !inGallery.has(id));
-    expect.soft(neverInGallery, 'gallery: descriptions never shown').toEqual([]);
     for (const [name, specs] of Object.entries(SLOP_SPECS)) {
       const ids = shown.get(`${name}, AI slop version, interactive example`) ?? new Set();
       const neverShown = specs.map((spec) => spec.id).filter((id) => !ids.has(id));
       expect.soft(neverShown, `${name}, AI slop version: descriptions never shown`).toEqual([]);
     }
+  });
+
+  test('switches between the tabs with the keyboard', async ({ page }) => {
+    await page.goto('/');
+    const withTab = page.getByRole('tab', { name: 'With Wingman', exact: true });
+    const withoutTab = page.getByRole('tab', { name: 'Without Wingman', exact: true });
+    const panel = page.getByRole('tabpanel');
+
+    await withTab.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(withoutTab).toBeFocused();
+    await expect(withoutTab).toHaveAttribute('aria-selected', 'true');
+    await expect(panel.getByRole('slider')).toHaveCount(5);
+
+    await page.keyboard.press('Home');
+    await expect(withTab).toBeFocused();
+    await expect(withTab).toHaveAttribute('aria-selected', 'true');
+    await expect(panel.locator(SURFACE)).toHaveCount(GALLERY_TILES);
   });
 });
 
@@ -89,6 +119,7 @@ test.describe('landing page, with reduced motion', () => {
 
   test('moves each comparison line with the keyboard', async ({ page }) => {
     await page.goto('/');
+    await openTab(page, 'Without Wingman');
     const sliders = page.getByRole('slider');
     await expect(sliders).toHaveCount(5);
 
@@ -108,6 +139,7 @@ test.describe('landing page, with reduced motion', () => {
     test(`keeps each AI slop site within its Wingman site at ${width} px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto('/');
+      await openTab(page, 'Without Wingman');
       await settle(page);
 
       const sites = await page.evaluate(() =>
@@ -147,6 +179,7 @@ test.describe('landing page, with reduced motion', () => {
     const ring = showcaseSpecs.find((spec) => spec.id === 'progress-ring');
     if (!ring) throw new Error('Wave has no progress ring description');
     await page.goto('/');
+    await openTab(page, 'Without Wingman');
     // Move Wave's comparison line to the left edge, so the whole phone shows the Wingman version
     await page
       .getByRole('slider', { name: 'Compare the AI slop and Wingman versions of Wave habit tracker' })

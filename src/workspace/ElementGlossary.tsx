@@ -8,18 +8,19 @@ import styles from './ElementGlossary.module.css';
 /**
  * Every element of an example written out, in the order it appears: what it is, what people call it, and the
  * terms and values to brief a coding tool with. Each one can go into the brief. Color values follow the theme
- * in use, like the balloons.
+ * in use, like the balloons. An element from the Elements tab lists its parts.
  */
 export function ElementGlossary({ example }: { example: LibraryExample }) {
   const id = useId();
   const theme = useTheme();
   const { name, specs } = example;
+  const parts = example.platform === 'elements';
 
   return (
     <section className={styles.section} aria-labelledby="glossary-title">
-      <p className={styles.kicker}>[ Elements ]</p>
+      <p className={styles.kicker}>{parts ? '[ Parts ]' : '[ Elements ]'}</p>
       <h2 id="glossary-title" className={styles.title}>
-        {specs.length} elements in {name}
+        {parts ? `${specs.length} parts of ${name}` : `${specs.length} elements in ${name}`}
       </h2>
       <ol className={styles.list}>
         {specs.map((spec) => (

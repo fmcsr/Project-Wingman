@@ -1,0 +1,367 @@
+/*
+ * Nudge follows a watchOS notification, which is dark by design: the same in both themes. The black is the display
+ * switched off, so only the icon, the text and the glass of the buttons light up. Nudge's own coral marks the app (its
+ * icon and its name); everything else is the system's white and translucent gray.
+ *
+ * The loop is driven by three attributes on the root: data-look (face, short, long, gone), data-scrolled (the crown
+ * has scrolled down to Dismiss) and data-crown (the scroll indicator is out). Each state sets its own transitions.
+ * The parts come in reading order; z-index keeps the icon and the indicator on top, and the header over the content.
+ */
+.app {
+  --accent: #ff6b45;
+  --platter: rgb(255 255 255 / 0.11);
+  --glass: rgb(255 255 255 / 0.15);
+  --spring: cubic-bezier(0.32, 0.72, 0, 1);
+  /* The Digital Crown: settles a hair past its mark and comes back */
+  --crown: cubic-bezier(0.3, 1.25, 0.5, 1);
+
+  position: relative;
+  isolation: isolate;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'SF Compact', 'SF Compact Display', -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  color: #fff;
+  background: #000;
+}
+
+/* The watch face behind: a plain digital time. It dims and steps back while the notification is up */
+.face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 8px;
+  transition:
+    opacity 450ms ease-out,
+    filter 450ms ease-out,
+    transform 550ms var(--spring);
+}
+
+.app:is([data-look='short'], [data-look='long']) .face {
+  opacity: 0.35;
+  filter: blur(4px);
+  transform: scale(0.94);
+}
+
+.date {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.6);
+}
+
+.faceTime {
+  font-family: 'SF Compact Rounded', 'SF Compact', -apple-system, 'SF Pro Rounded', system-ui, sans-serif;
+  font-size: 64px;
+  font-weight: 600;
+  line-height: 70px;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * The app icon: one element for both looks. It's laid out at its Short Look size, a 104px circle in the middle; the
+ * Long Look shrinks it into the header with a transform, so it reads as one icon moving.
+ */
+.icon {
+  position: absolute;
+  top: 44px;
+  left: 52px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px) scale(0.55);
+  /* Put away: it fades where it is, then jumps back to the middle unseen */
+  transition:
+    opacity 250ms ease-out,
+    visibility 0s 250ms,
+    transform 0s 250ms;
+}
+
+.app[data-look='short'] .icon {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  /* It lands with the tap on the wrist: a spring that overshoots a touch */
+  transition:
+    opacity 180ms ease-out,
+    transform 600ms cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+/* Into the header: from a 104px circle centered at 104, 96 to a 24px one centered at 32, 20 */
+.app:is([data-look='long'], [data-look='gone']) .icon {
+  transform: translate(-72px, -76px) scale(0.2308);
+}
+
+.app[data-look='long'] .icon {
+  opacity: 1;
+  visibility: visible;
+  transition: transform 520ms var(--spring);
+}
+
+.glyph {
+  display: block;
+  fill: none;
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bubble {
+  fill: #fff;
+  stroke: none;
+}
+
+.arcs {
+  stroke-width: 1.8;
+}
+
+/*
+ * Short Look: the app's name in its color and a one-line title, the sender, under the icon. Its box starts above the
+ * icon, so the whole Short Look is one part; the icon sits on top of it as a part of its own.
+ */
+.short {
+  position: absolute;
+  top: 38px;
+  left: 18px;
+  right: 18px;
+  padding-top: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition:
+    opacity 150ms ease-out,
+    visibility 0s 150ms,
+    transform 0s 150ms;
+}
+
+.app[data-look='short'] .short {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 300ms ease-out 140ms,
+    transform 450ms var(--spring) 140ms;
+}
+
+.shortApp {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--accent);
+}
+
+.shortTitle {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 22px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Long Look: a black sheet over the face, the content scrolling under a header that stays put */
+.long {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  transition: visibility 0s 450ms;
+}
+
+.app[data-look='long'] .long {
+  visibility: visible;
+  transition: none;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  transition: opacity 400ms ease-out;
+}
+
+.app[data-look='long'] .backdrop {
+  opacity: 1;
+  transition: opacity 300ms ease-out;
+}
+
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 38px;
+  padding: 2px 20px 0 52px;
+  background: #000;
+  opacity: 0;
+  transition: opacity 250ms ease-out;
+}
+
+.app[data-look='long'] .header {
+  opacity: 1;
+  transition: opacity 300ms ease-out 200ms;
+}
+
+/* Content scrolled under the header fades out at its edge instead of being cut */
+.header::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background: linear-gradient(#000, rgb(0 0 0 / 0));
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+.app[data-scrolled] .header::after {
+  opacity: 1;
+}
+
+.appName {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--accent);
+}
+
+.time {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The scrolling content: 7px from the screen's sides, leaving the scroll indicator its own lane by the crown */
+.scroller {
+  position: absolute;
+  top: 40px;
+  left: 7px;
+  right: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-bottom: 32px;
+  opacity: 0;
+  transform: translateY(56px);
+  transition:
+    opacity 300ms ease-in,
+    transform 400ms ease-in;
+}
+
+/* It slides up once the Short Look's text is gone, so the two never overlap */
+.app[data-look='long'] .scroller {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 250ms ease-out 120ms,
+    transform 520ms var(--spring) 120ms;
+}
+
+/* The crown turns: 40px brings Dismiss clear of the bottom curve and the photo all the way under the header */
+.app[data-look='long'][data-crown] .scroller {
+  transition: transform 650ms var(--crown);
+}
+
+.app[data-look='long'][data-scrolled] .scroller {
+  transform: translateY(-40px);
+}
+
+/* The message on a platter: the photo beside the sender's name and the text under it */
+.platter {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  column-gap: 8px;
+  padding: 10px 12px 11px 10px;
+  border-radius: 20px;
+  background: var(--platter);
+}
+
+.avatar {
+  grid-row: span 2;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sender {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.text {
+  font-size: 16px;
+  line-height: 20px;
+}
+
+/* Action buttons: full-width capsules of Liquid Glass, a translucent fill with a hairline of light along the top */
+.action {
+  display: grid;
+  place-items: center;
+  height: 40px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  background: var(--glass);
+  box-shadow:
+    inset 0 0.5px 0 rgb(255 255 255 / 0.3),
+    inset 0 0 0 0.5px rgb(255 255 255 / 0.08);
+}
+
+/* The Digital Crown scroll indicator, by the crown: a short track and a thumb that follows the scroll */
+.scrollbar {
+  position: absolute;
+  top: 48px;
+  right: 2px;
+  z-index: 2;
+  width: 4px;
+  height: 36px;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.22);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 400ms ease-out,
+    visibility 0s 400ms;
+}
+
+.app[data-crown] .scrollbar {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 150ms ease-out;
+}
+
+.thumb {
+  display: block;
+  height: 16px;
+  border-radius: 2px;
+  background: #fff;
+  transition: transform 650ms var(--crown);
+}
+
+.app[data-scrolled] .thumb {
+  transform: translateY(20px);
+}

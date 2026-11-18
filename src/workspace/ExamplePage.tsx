@@ -11,8 +11,9 @@ import { ElementGlossary } from './ElementGlossary';
 import styles from './ExamplePage.module.css';
 
 /**
- * One example at full size, with every element written out next to it (phones and watches) or below it (sites).
- * Sites use the scroll scene: the window pins and page scrolling scrolls the site.
+ * One example at full size, with every element written out next to it (phones, watches and elements) or below it
+ * (sites). Sites use the scroll scene: the window pins and page scrolling scrolls the site. An element shows in a
+ * tile of its size class, at the size the gallery gives it on a desktop.
  */
 export function ExamplePage({ example }: { example: LibraryExample }) {
   useDocumentTitle(`${example.name} · Library · Project Wingman`);
@@ -57,6 +58,15 @@ export function ExamplePage({ example }: { example: LibraryExample }) {
           {example.platform === 'web' ? (
             <div className={styles.webLayout}>
               <BrowserFrame url={example.url ?? `${example.id}.app`}>{surface}</BrowserFrame>
+              <ElementGlossary example={example} />
+            </div>
+          ) : example.platform === 'elements' ? (
+            <div className={styles.elementLayout}>
+              <div className={styles.elementColumn}>
+                <div className={styles.elementTile} data-size={example.size}>
+                  {surface}
+                </div>
+              </div>
               <ElementGlossary example={example} />
             </div>
           ) : (

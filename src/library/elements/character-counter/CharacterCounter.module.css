@@ -1,0 +1,293 @@
+/*
+ * A social app's post composer, white (black in dark mode): a round avatar, 15px text, the reply setting and the
+ * toolbar's icons in the app's blue, and a pill Post button in the text color. The counter's amber and red only show
+ * near and past the limit.
+ */
+.tile {
+  --bg: light-dark(#fff, #000);
+  --ink: light-dark(#0f1419, #e7e9ea);
+  --muted: light-dark(#536471, #71767b);
+  --line: light-dark(#eff3f4, #2f3336);
+  --accent: light-dark(#1a7fe6, #3b97f5);
+  --amber: light-dark(#e8a200, #ffc233);
+  --over: light-dark(#e5283c, #ff4d5e);
+  --track: light-dark(#e6ecf0, #2f3336);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.tile svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.composer {
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px;
+}
+
+.body {
+  display: flex;
+  gap: 10px;
+}
+
+.avatar {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/*
+ * The text box shows the last five lines: the text sits on its bottom edge and runs up out of view, as a text box
+ * scrolled to its caret would show it
+ */
+.field {
+  position: relative;
+  height: 100px;
+  overflow: hidden;
+}
+
+.text {
+  position: absolute;
+  inset: auto 0 0;
+  margin: 0;
+  font-size: 15px;
+  line-height: 20px;
+  overflow-wrap: break-word;
+}
+
+/* The characters past the limit, on a red tint; there only once the post is over */
+.overflow {
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--over) 22%, transparent);
+  visibility: hidden;
+}
+
+.overflow[data-shown] {
+  visibility: visible;
+}
+
+/* A drawn caret in the app's blue that takes no room; it blinks once the keys stop */
+.caret {
+  display: inline-block;
+  width: 2px;
+  height: 19px;
+  margin-right: -2px;
+  vertical-align: -4px;
+  background: var(--accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tile:not([data-typing]) .caret {
+    animation: blink 1s steps(1) infinite;
+  }
+
+  .tile[data-paused] .caret {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.audience {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 16px;
+  color: var(--accent);
+}
+
+.audience svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  margin-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.tool {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  color: var(--accent);
+}
+
+.tool text {
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 6.5px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  fill: currentColor;
+  stroke: none;
+}
+
+/* Poll and schedule join the toolbar where there's room */
+.wide {
+  display: none;
+}
+
+/*
+ * The counter: a 30px box so nothing moves when the ring grows. Far from the limit the ring is drawn at two thirds
+ * size with no number; within 20 it grows to full size and shows what's left. The stroke thins as it grows, so it
+ * stays 2px on screen.
+ */
+.counter {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin-left: auto;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg) scale(0.667);
+  transition: transform 200ms var(--ease);
+}
+
+.tile:not([data-state='ok']) .ring {
+  transform: rotate(-90deg);
+}
+
+.track,
+.tile .progress {
+  stroke-width: 3;
+  transition: stroke-width 200ms var(--ease);
+}
+
+.track {
+  stroke: var(--track);
+}
+
+.tile .progress {
+  stroke: var(--accent);
+  stroke-linecap: butt;
+  stroke-dasharray: var(--dash);
+  stroke-dashoffset: var(--offset);
+  transition:
+    stroke-dashoffset 100ms linear,
+    stroke 200ms ease,
+    stroke-width 200ms var(--ease);
+}
+
+.tile:not([data-state='ok']) :is(.track, .progress) {
+  stroke-width: 2;
+}
+
+.tile[data-state='warn'] .progress {
+  stroke: var(--amber);
+}
+
+.tile[data-state='over'] .progress {
+  stroke: var(--over);
+}
+
+.left {
+  position: relative;
+  font-size: 13px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 150ms ease,
+    visibility 0s linear 150ms;
+}
+
+.left[data-shown] {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.tile[data-state='over'] .left {
+  color: var(--over);
+}
+
+.divider {
+  flex: none;
+  width: 1px;
+  height: 28px;
+  margin-inline: 10px;
+  background: var(--line);
+}
+
+/* Post: a pill in the text color; past the limit it fades to half, and can't be pressed */
+.post {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  height: 34px;
+  padding-inline: 16px;
+  border-radius: 17px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--bg);
+  background: var(--ink);
+  transition: opacity 150ms ease;
+}
+
+.post[data-disabled] {
+  opacity: 0.5;
+}
+
+@container (min-width: 340px) {
+  .wide {
+    display: block;
+  }
+}
+
+/* Room to spare: the composer reads at its own size, with the toolbar under the text as in the app */
+@container (min-width: 420px) {
+  .composer {
+    padding-inline: 16px;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .toolbar {
+    margin-left: 50px;
+  }
+}

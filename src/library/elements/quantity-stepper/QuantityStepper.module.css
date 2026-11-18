@@ -1,0 +1,223 @@
+/*
+ * A stay search's guests popover in the travel-site idiom: a white panel with a soft shadow (near-black in dark mode),
+ * hairlines between the rows and round outlined buttons in grays; no accent, the counts carry it. The geometry
+ * (--pad, --head, --row-h, --button, --value, --gap) is shared with the pointer, which finds the buttons from it.
+ */
+.tile {
+  --panel: light-dark(#fff, #1f1f1f);
+  --ink: light-dark(#222, #f2f2f2);
+  --muted: light-dark(#6a6a6a, #a3a3a3);
+  --line: light-dark(#ebebeb, #303030);
+  --button-line: light-dark(#b0b0b0, #5e5e5e);
+  --button-ink: light-dark(#6a6a6a, #bdbdbd);
+  --off-line: light-dark(#ebebeb, #2e2e2e);
+  --off-ink: light-dark(#d4d4d4, #4a4a4a);
+  --pad: 14px;
+  --head: 36px;
+  --row-h: 48px;
+  --button: 28px;
+  --value: 28px;
+  --gap: 4px;
+
+  display: grid;
+  place-items: center;
+  height: 100%;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+}
+
+/* The popover: as wide as the tile allows, up to 360px; three 48px rows under a 32px head */
+.popover {
+  position: relative;
+  width: clamp(206px, 100cqw - 24px, 360px);
+  padding: 4px var(--pad);
+  border-radius: 16px;
+  background: var(--panel);
+  box-shadow:
+    0 0 0 1px light-dark(rgb(0 0 0 / 0.04), rgb(255 255 255 / 0.07)),
+    0 6px 20px light-dark(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.55));
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: calc(var(--head) - 4px);
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.total {
+  font-size: 12.5px;
+  line-height: 16px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: var(--row-h);
+  border-top: 1px solid var(--line);
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.ages {
+  font-size: 12.5px;
+  line-height: 16px;
+  color: var(--muted);
+}
+
+/* Adults' full age range needs about 100px; narrower rows say "Ages 13+" */
+.long {
+  display: none;
+}
+
+.stepper {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--gap);
+}
+
+/* A round outlined button; the glyph and the ring darken under the pointer and the button gives when pressed */
+.button {
+  display: grid;
+  place-items: center;
+  width: var(--button);
+  height: var(--button);
+  border: 1px solid var(--button-line);
+  border-radius: 50%;
+  color: var(--button-ink);
+  transition:
+    border-color 150ms var(--ease-out),
+    color 150ms var(--ease-out),
+    transform 120ms var(--ease-out);
+}
+
+.button svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+}
+
+.button[data-hover]:not([aria-disabled='true']) {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.button[data-pressed] {
+  transform: scale(0.9);
+}
+
+/* Off at the row's minimum: both the ring and the glyph fade, and a press does nothing */
+.button[aria-disabled='true'] {
+  border-color: var(--off-line);
+  color: var(--off-ink);
+}
+
+/* The refusal: a press on an off button only shakes it, 2px either way */
+.button[data-refused] {
+  animation: refuse 360ms var(--ease-out);
+}
+
+@keyframes refuse {
+  20% {
+    transform: translateX(-2px);
+  }
+
+  45% {
+    transform: translateX(2px);
+  }
+
+  70% {
+    transform: translateX(-1px);
+  }
+}
+
+/* The count: a strip of digits behind a one-digit window, so a change rolls the next one in from below or above */
+.value {
+  width: var(--value);
+  height: 20px;
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 20px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.digits {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(calc(var(--count) * -20px));
+  transition: transform 260ms var(--ease-out);
+}
+
+/*
+ * The pointer: black with a white rim, as on a Mac in either theme. It's pinned to the popover's top right corner
+ * and travels from there to the middle of a button: + is the last in the row, − two widths and gaps further in.
+ */
+.pointer {
+  --x: calc(var(--pad) + var(--button) / 2 + var(--column) * (var(--button) + var(--value) + 2 * var(--gap)));
+  --y: calc(var(--head) + var(--row) * var(--row-h) + var(--row-h) / 2);
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 18px;
+  height: 22px;
+  fill: #000;
+  stroke: #fff;
+  stroke-width: 1.25;
+  pointer-events: none;
+  transform: translate(calc(20px - var(--x)), calc(var(--y) + 1px));
+  transition: transform 480ms cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+.tile[data-still] .pointer {
+  visibility: hidden;
+}
+
+@container (min-width: 264px) {
+  .long {
+    display: inline;
+  }
+
+  .short {
+    display: none;
+  }
+}
+
+@container (min-width: 340px) {
+  .tile {
+    --pad: 18px;
+    --button: 30px;
+  }
+
+  .popover {
+    border-radius: 18px;
+  }
+}

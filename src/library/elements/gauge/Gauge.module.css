@@ -1,0 +1,343 @@
+/*
+ * A personal finance app's credit score card: a white card (near-black in dark mode) in neutral grays, the dial's
+ * five bands running from red through amber to green, and green only for the change. The dial grows with the card;
+ * from 440px a list of the factors behind the score sits beside it.
+ */
+.tile {
+  --page: light-dark(#fff, #16181d);
+  --ink: light-dark(#111318, #f3f4f6);
+  --muted: light-dark(#666b74, #9ca1aa);
+  --line: light-dark(#ebecef, #272a31);
+  --zone-0: light-dark(oklch(0.6 0.19 25), oklch(0.65 0.18 25));
+  --zone-1: light-dark(oklch(0.71 0.16 50), oklch(0.72 0.15 52));
+  --zone-2: light-dark(oklch(0.81 0.155 86), oklch(0.82 0.14 90));
+  --zone-3: light-dark(oklch(0.74 0.17 136), oklch(0.76 0.16 135));
+  --zone-4: light-dark(oklch(0.6 0.15 152), oklch(0.68 0.15 155));
+  --up-ink: light-dark(#0b7a55, #4fd6a2);
+  --up-fill: light-dark(#e1f5ec, rgb(79 214 162 / 0.14));
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --size: min(248px, 100cqw - 32px);
+
+  height: 100%;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--page);
+}
+
+.tile svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 14px 16px 12px;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* The report's date crossfades when the refresh comes in */
+.updated {
+  display: grid;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.updated > span {
+  grid-area: 1 / 1;
+  text-align: right;
+  transition: opacity 200ms var(--ease);
+}
+
+.after,
+.tile[data-refreshed] .before {
+  opacity: 0;
+}
+
+.tile[data-refreshed] .after {
+  opacity: 1;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  min-height: 0;
+}
+
+/* The dial with the scale row under it: the arc's ends and the change sit 30px above the gauge's bottom */
+.gauge {
+  position: relative;
+  flex: none;
+  width: var(--size);
+  padding-bottom: 30px;
+}
+
+.dial {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.tile .zone {
+  stroke-width: 13;
+  stroke-linecap: butt;
+}
+
+.tile .cap {
+  stroke: none;
+}
+
+/* The marker: a disc in the card's color with an ink ring, lifted off the arc by a soft shadow */
+.tile .marker circle {
+  fill: var(--page);
+  stroke: var(--ink);
+  stroke-width: 3.5;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.28));
+}
+
+/* The figure and its band, standing on the arc's base line; only the text itself can be pointed at, not the marker */
+.readout {
+  position: absolute;
+  right: 0;
+  bottom: 30px;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.readout > * {
+  pointer-events: auto;
+}
+
+.value {
+  font-size: calc(var(--size) * 0.225);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+
+.band {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.swatch {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* 300 and 850 under the arc's two ends (6.75% in from each side of the dial), the change between them */
+.scale {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 22px;
+  font-size: 11px;
+  line-height: 22px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.min,
+.max {
+  position: absolute;
+  top: 0;
+  translate: -50% 0;
+}
+
+.min {
+  left: 6.75%;
+}
+
+.max {
+  left: 93.25%;
+}
+
+.change {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 22px;
+  padding: 0 8px 0 6px;
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--up-ink);
+  background: var(--up-fill);
+  translate: -50% 0;
+}
+
+.change svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.25;
+}
+
+/* The band and the change wait until the marker lands, then fade in; the change pops in */
+.band,
+.change {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 220ms var(--ease),
+    scale 320ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    visibility 0s linear 220ms;
+}
+
+.change {
+  scale: 0.8;
+}
+
+.tile[data-landed] .band,
+.tile[data-landed] .change {
+  opacity: 1;
+  visibility: visible;
+  scale: 1;
+  transition:
+    opacity 220ms var(--ease),
+    scale 320ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    visibility 0s;
+}
+
+/* The refresh's new 6 points: the badge pops once */
+.tile[data-refreshed] .change {
+  animation: pop 420ms var(--ease);
+}
+
+@keyframes pop {
+  40% {
+    scale: 1.14;
+  }
+}
+
+/* While the loop goes back to the start, the marker and the readout fade out and back */
+.marker,
+.readout {
+  transition: opacity 240ms var(--ease);
+}
+
+.tile[data-dim] .marker,
+.tile[data-dim] .readout,
+.tile[data-dim] .change {
+  opacity: 0;
+}
+
+/* What shapes the score, beside the dial on a wider card */
+.factors {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  max-width: 300px;
+  min-width: 0;
+}
+
+.factorsTitle {
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--muted);
+}
+
+.factor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.factor:last-child {
+  border-bottom: 0;
+}
+
+.factorName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.factorValue {
+  flex: none;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@container (min-width: 340px) {
+  .card {
+    padding: 16px 20px 12px;
+  }
+}
+
+/* A wide card: the dial on the left, the factors beside it */
+@container (min-width: 440px) {
+  .tile {
+    --size: 204px;
+  }
+
+  .body {
+    justify-content: flex-start;
+  }
+
+  .factors {
+    display: flex;
+  }
+}
+
+@container (min-width: 540px) {
+  .tile {
+    --size: 216px;
+  }
+
+  .body {
+    gap: 40px;
+  }
+
+  .card {
+    padding: 16px 24px 12px;
+  }
+}
