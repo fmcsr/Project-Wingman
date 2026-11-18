@@ -1,0 +1,256 @@
+/*
+ * A web sign-in's verification step on the page's gray, in zinc neutrals with one blue for focus and green for
+ * success.
+ */
+.tile {
+  --ink: light-dark(#18181b, #fafafa);
+  --muted: light-dark(#71717a, #a1a1aa);
+  --box: light-dark(#fff, #18181b);
+  --box-border: light-dark(#d4d4d8, #3f3f46);
+  --fill: light-dark(#e4e4e7, #27272a);
+  --accent: light-dark(#2563eb, #3b82f6);
+  --ring: light-dark(rgb(37 99 235 / 0.18), rgb(59 130 246 / 0.3));
+  --success: light-dark(#16a34a, #22c55e);
+
+  display: grid;
+  place-items: center;
+  height: 100%;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+}
+
+.tile svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 10px;
+  border-radius: 9px;
+  color: var(--ink);
+  background: var(--fill);
+}
+
+.badge svg {
+  width: 18px;
+  height: 18px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 21px;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--muted);
+}
+
+.destination {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/*
+ * Six slots in a row; the field is one input underneath, so typing or pasting fills them left to right. The slots
+ * share the tile's width less 14px at each side: about 29px wide at the narrowest tile, at most 44px.
+ */
+.field {
+  --gap: 6px;
+  --size: clamp(28px, (100cqw - 28px - 5 * var(--gap)) / 6, 44px);
+
+  display: flex;
+  gap: var(--gap);
+  margin-top: 14px;
+}
+
+.slot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--size);
+  height: calc(var(--size) * 1.12);
+  border: 1px solid var(--box-border);
+  border-radius: 8px;
+  background: var(--box);
+  box-shadow: 0 1px 2px light-dark(rgb(0 0 0 / 0.05), rgb(0 0 0 / 0.3));
+  font-size: calc(var(--size) * 0.5);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  transition:
+    border-color 150ms var(--ease-out),
+    box-shadow 150ms var(--ease-out),
+    background-color 150ms var(--ease-out);
+}
+
+/* The slot that takes the next digit: the accent border and a 3px focus ring */
+.slot[data-active] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* A digit lands with a short rise and fade; it's always laid out, so nothing shifts */
+.digit {
+  opacity: 0;
+  transform: translateY(3px) scale(0.9);
+  transition:
+    opacity 120ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+.slot[data-filled] .digit {
+  opacity: 1;
+  transform: none;
+}
+
+/* A drawn caret, since the real input underneath is invisible: 2px wide, blinking every 1.1 s */
+.caret {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 42%;
+  border-radius: 1px;
+  background: var(--ink);
+  opacity: 0;
+  transform: translate(-50%, -50%);
+}
+
+.slot[data-active] .caret {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .slot[data-active] .caret {
+    animation: blink 1.1s steps(1) infinite;
+  }
+
+  .spinner {
+    animation: spin 700ms linear infinite;
+  }
+
+  .tile[data-paused] .caret,
+  .tile[data-paused] .spinner {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Sending: the field can't be edited, so the digits dim while the code is checked */
+.tile[data-status='verifying'] .digit {
+  opacity: 0.45;
+}
+
+/* Verified: the borders turn green one after another, left to right */
+.tile[data-status='verified'] .slot {
+  border-color: var(--success);
+  background: color-mix(in oklab, var(--success) 6%, var(--box));
+  transition-delay: calc(var(--i) * 45ms);
+}
+
+/* One line under the field: the countdown, then Verifying… and Verified in its place */
+.status {
+  display: grid;
+  margin-top: 12px;
+  font-size: 12.5px;
+  line-height: 18px;
+  color: var(--muted);
+}
+
+.resend,
+.verifying,
+.verified {
+  grid-area: 1 / 1;
+  justify-self: center;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 200ms var(--ease-out),
+    visibility 0s linear 200ms;
+}
+
+.resend[data-shown],
+.verifying[data-shown],
+.verified[data-shown] {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.countdown {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.verifying,
+.verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.spinner {
+  width: 13px;
+  height: 13px;
+  border: 1.75px solid var(--fill);
+  border-top-color: var(--muted);
+  border-radius: 50%;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.verified {
+  font-weight: 500;
+  color: var(--success);
+}
+
+.verified svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2;
+}
+
+@container (min-width: 300px) {
+  .slot {
+    border-radius: 10px;
+  }
+}
+
+@container (min-width: 360px) {
+  .field {
+    --gap: 8px;
+  }
+
+  .title {
+    font-size: 17px;
+  }
+}

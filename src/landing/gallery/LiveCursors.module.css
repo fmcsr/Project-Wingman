@@ -1,0 +1,355 @@
+/*
+ * A whiteboard in the FigJam idiom: a plain canvas (no dot grid), white sections with their names, sticky notes in
+ * soft paper colors with dark ink in both themes, gray connectors. Color belongs to the people: each has their own
+ * for the cursor, its name tag, their selection, their chat bubble and the ring around their face.
+ */
+.tile {
+  --canvas: light-dark(#f1f1ef, #1e1e21);
+  --section: light-dark(#ffffff, #29292d);
+  --section-line: light-dark(#e1e1de, #38383d);
+  --title: light-dark(#4a4a48, #c8c8cd);
+  --connector: light-dark(#9b9b97, #75757b);
+  --panel: light-dark(#ffffff, #2c2c30);
+  --ink: #1f1f1f;
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--canvas);
+}
+
+/* Each person's color, for everything of theirs */
+.imani {
+  --person: #e2366b;
+}
+
+.kofi {
+  --person: #0b74de;
+}
+
+.rosa {
+  --person: #17895f;
+}
+
+/*
+ * The board in its own pixels. Every tile shows the 328px around the section and the pink note; wider ones move it
+ * over and show more of the board, each part only once it fits whole: the goal on the right (476px and up), the
+ * interviews the ideas came from on the left (700px), the next sprint (900px), which sits low, clear of the facepile.
+ */
+.board {
+  position: absolute;
+  top: calc(50% - 107px);
+  left: calc(50% - 164px);
+  width: 328px;
+  height: 214px;
+}
+
+.connectors {
+  position: absolute;
+  top: 0;
+  left: -320px;
+  overflow: visible;
+  pointer-events: none;
+  fill: none;
+  stroke: var(--connector);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.connectors marker path {
+  fill: var(--connector);
+  stroke: none;
+}
+
+.fromInterviews,
+.toGoal,
+.toNext,
+.goal,
+.next,
+.interviews {
+  display: none;
+}
+
+.section {
+  position: absolute;
+  border: 1px solid var(--section-line);
+  border-radius: 12px;
+  background: var(--section);
+}
+
+.sectionTitle {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+  color: var(--title);
+}
+
+/* Sticky notes: paper squares with a small shadow, the same soft colors in both themes */
+.note {
+  position: absolute;
+  width: 66px;
+  height: 66px;
+  padding: 7px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.12),
+    0 2px 6px rgb(0 0 0 / 0.06);
+}
+
+.yellow {
+  --paper: light-dark(#ffe38f, #f1d16f);
+}
+
+.green {
+  --paper: light-dark(#bfecc9, #9fd7ae);
+}
+
+.blue {
+  --paper: light-dark(#c6e1fa, #a3c9ee);
+}
+
+.pink {
+  --paper: light-dark(#fcd0e2, #efb3cd);
+}
+
+.orange {
+  --paper: light-dark(#ffd7b3, #f2bd8f);
+}
+
+.violet {
+  --paper: light-dark(#ddd0fb, #c4b2f1);
+}
+
+/* The note Kofi carries: placed by the clock. Held, it grows 4% and a deeper shadow fades in (--lift: 0 → 1) */
+.moving {
+  top: 0;
+  left: 0;
+  z-index: 1;
+  will-change: transform;
+}
+
+.moving::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 12px 24px -6px rgb(0 0 0 / 0.3);
+  opacity: var(--lift, 0);
+}
+
+/* A shape with a label, FigJam's rounded rectangle */
+.goal {
+  position: absolute;
+  top: 120px;
+  left: 352px;
+  place-items: center;
+  width: 114px;
+  height: 48px;
+  padding: 0 10px;
+  border: 1.5px solid light-dark(#5b5b58, #a3a3a8);
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--title);
+  background: var(--section);
+}
+
+/* Someone else's selection: a box in their color with square handles at the corners */
+.selection {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  z-index: 2;
+  width: 72px;
+  height: 72px;
+  border: 1.5px solid var(--person);
+  opacity: 0;
+  visibility: hidden;
+}
+
+.handle {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid var(--person);
+  border-radius: 1px;
+  background: #fff;
+}
+
+.handle:nth-child(1) {
+  top: -4px;
+  left: -4px;
+}
+
+.handle:nth-child(2) {
+  top: -4px;
+  right: -4px;
+}
+
+.handle:nth-child(3) {
+  bottom: -4px;
+  left: -4px;
+}
+
+.handle:nth-child(4) {
+  right: -4px;
+  bottom: -4px;
+}
+
+/* A cursor: the arrow in the person's color, outlined in white, with their name in a tag at its tail */
+.cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  will-change: transform;
+}
+
+.arrow {
+  flex: none;
+  width: 14px;
+  height: 20px;
+  fill: var(--person);
+  stroke: #fff;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.3));
+}
+
+.label {
+  margin: 15px 0 0 -4px;
+  padding: 1px 6px 2px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 15px;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--person);
+}
+
+/* Cursor chat: the tag opens into a bubble with what's being typed, pointing back at the arrow */
+.bubble {
+  position: absolute;
+  top: 17px;
+  left: 11px;
+  display: grid;
+  padding: 4px 10px 6px;
+  border-radius: 3px 14px 14px;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--person);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.16);
+  opacity: 0;
+  visibility: hidden;
+  transform-origin: 0 0;
+}
+
+.bubbleName {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 13px;
+  opacity: 0.8;
+}
+
+.bubbleText {
+  min-height: 16px;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+/* Who's here: faces ringed in their colors, overlapping, on a floating panel at the top right */
+.facepile {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  padding: 4px 5px 4px 9px;
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow:
+    0 0 0 1px light-dark(rgb(0 0 0 / 0.06), rgb(255 255 255 / 0.06)),
+    0 2px 8px light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.4));
+}
+
+.face,
+.more {
+  width: 24px;
+  height: 24px;
+  margin-left: -4px;
+  border: 2px solid var(--panel);
+  border-radius: 50%;
+}
+
+.face {
+  object-fit: cover;
+  box-shadow: 0 0 0 1.5px var(--person);
+}
+
+.more {
+  display: grid;
+  place-items: center;
+  margin-left: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: light-dark(#55554f, #c2c2c7);
+  background: light-dark(#ececea, #3a3a3f);
+}
+
+/* Desktop and up: the goal comes in on the right */
+@container (width >= 476px) {
+  .board {
+    left: calc(50% - 240px);
+  }
+
+  .goal {
+    display: grid;
+  }
+
+  .toGoal {
+    display: inline;
+  }
+}
+
+/* Tablets: the interviews on the left, with their arrow into the ideas */
+@container (width >= 700px) {
+  .board {
+    left: calc(50% - 126px);
+  }
+
+  .interviews,
+  .fromInterviews {
+    display: inline;
+  }
+}
+
+/* The widest tiles: the next sprint after the goal */
+@container (width >= 900px) {
+  .board {
+    left: calc(50% - 225px);
+  }
+
+  .next,
+  .toNext {
+    display: inline;
+  }
+}

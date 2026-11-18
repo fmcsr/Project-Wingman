@@ -30,6 +30,7 @@ export function valueFor(value: string | ThemedValue, theme: 'light' | 'dark') {
   return typeof value === 'string' ? value : value[theme];
 }
 
+export { gallerySpecs } from './gallery';
 export { homeIndicator, statusBar } from './shared';
 export { museSlopSpecs, strideSlopSpecs, waveSlopSpecs } from './slopPhones';
 export { acmeSlopSpecs, orbitSlopSpecs } from './slopSites';

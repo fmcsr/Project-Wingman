@@ -1,0 +1,274 @@
+/*
+ * A team chat thread in the Slack idiom: white (near-black in dark mode), rounded-square faces, bold names, a
+ * bordered composer with its toolbar, and an autocomplete list that floats over the thread. The chat's blue is the
+ * one accent: the highlighted person, mention chips, the query being typed and the send button.
+ */
+.tile {
+  --bg: light-dark(#ffffff, #1a1d21);
+  --text: light-dark(#1d1c1d, #d1d2d3);
+  --muted: light-dark(#616061, #a3a4a6);
+  --line: light-dark(#bdbcbe, #565856);
+  --popover: light-dark(#ffffff, #222529);
+  --popover-line: light-dark(rgb(29 28 29 / 0.13), rgb(255 255 255 / 0.12));
+  --accent: light-dark(#1a64b0, #4ba3e3);
+  --highlight: light-dark(#1a64b0, #1b5c9e);
+  --chip: light-dark(#e6f0fa, rgb(75 163 227 / 0.16));
+  --chip-text: light-dark(#1a64b0, #74b9ee);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/*
+ * The first message at the top, the latest reply at the bottom. The menu is as wide as the composer and covers the
+ * reply whole when it opens; with two rows it ends below the first message, so no line is ever half hidden.
+ */
+.thread {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 0;
+  overflow: hidden;
+  padding: 12px 12px 10px;
+}
+
+.message {
+  display: grid;
+  flex: none;
+  grid-template-columns: 28px minmax(0, 1fr);
+  column-gap: 8px;
+}
+
+.messageFace {
+  grid-row: span 2;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.messageHead {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.author {
+  font-weight: 700;
+}
+
+.time {
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The composer: a bordered box with the text on top and the toolbar under it */
+.composer {
+  position: relative;
+  flex: none;
+  margin: 0 10px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.field {
+  padding: 7px 10px 1px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  transition: opacity 250ms var(--ease-out);
+}
+
+/* A finished mention: the person's name in a tinted pill, kept on one line */
+.chip {
+  padding: 1px 2px;
+  border-radius: 4px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--chip-text);
+  background: var(--chip);
+}
+
+/* Fresh from the menu: the tint flashes a little stronger, then settles */
+.chipNew {
+  animation: chip-in 600ms var(--ease-out);
+}
+
+.tile[data-still] .chipNew {
+  animation: none;
+}
+
+@keyframes chip-in {
+  from {
+    background: light-dark(#c9def4, rgb(75 163 227 / 0.38));
+  }
+}
+
+/* The "@" and what follows it while the menu is open: in the accent, not yet a chip */
+.query {
+  color: var(--accent);
+}
+
+.query[data-idle] {
+  position: absolute;
+  visibility: hidden;
+}
+
+/* Blinks like a text caret; solid while keys are being typed, and holds when the tile does */
+.caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 17px;
+  margin-left: 1px;
+  vertical-align: -4px;
+  background: var(--text);
+  animation: caret-blink 1060ms steps(1) infinite;
+}
+
+.tile[data-typing] .caret,
+.tile[data-still] .caret {
+  animation: none;
+}
+
+.tile[data-paused] .caret {
+  animation-play-state: paused;
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Starting over: the text fades out and comes back as it was */
+.tile[data-dip] .field {
+  opacity: 0;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  height: 32px;
+  padding: 0 5px 1px 10px;
+  color: var(--muted);
+}
+
+.format {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.send {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 24px;
+  margin-left: auto;
+  border-radius: 5px;
+  color: #fff;
+  background: var(--highlight);
+}
+
+.send .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* The menu: floats over the thread just above the composer, as wide as it, three rows at most */
+.menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  left: 0;
+  padding: 3px;
+  border: 1px solid var(--popover-line);
+  border-radius: 8px;
+  background: var(--popover);
+  box-shadow: 0 4px 16px light-dark(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.5));
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 4px;
+  transition:
+    opacity 120ms var(--ease-out),
+    translate 120ms var(--ease-out),
+    visibility 120ms;
+}
+
+.tile[data-open] .menu {
+  opacity: 1;
+  visibility: visible;
+  translate: none;
+}
+
+.option {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  column-gap: 8px;
+  align-items: center;
+  padding: 3px 7px;
+  border-radius: 5px;
+}
+
+.face {
+  grid-row: span 2;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.name,
+.role {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.name {
+  font-weight: 600;
+  line-height: 15px;
+}
+
+.role {
+  font-size: 11px;
+  line-height: 13px;
+  color: var(--muted);
+}
+
+/* The first match: what ↵ will insert */
+.option[aria-selected='true'] {
+  color: #fff;
+  background: var(--highlight);
+}
+
+.option[aria-selected='true'] .role {
+  color: rgb(255 255 255 / 0.82);
+}

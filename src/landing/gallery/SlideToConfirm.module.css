@@ -1,0 +1,263 @@
+/*
+ * How far the thumb is along the track, from 0 to 1. Registered as a number so it can transition: the thumb, the
+ * fill behind it and the fading label all follow this one value, so they move as one.
+ */
+@property --slide-to-confirm {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+/* An iOS confirmation screen in the system colors: blue for the thumb, green once the money is sent */
+.tile {
+  --label: light-dark(#000, #fff);
+  --secondary: light-dark(rgb(60 60 67 / 0.6), rgb(235 235 245 / 0.6));
+  --track: light-dark(#efeff4, #2c2c2e);
+  --accent: light-dark(#007aff, #0a84ff);
+  --fill: light-dark(color-mix(in oklab, #007aff 18%, #efeff4), color-mix(in oklab, #0a84ff 30%, #2c2c2e));
+  --success: light-dark(#34c759, #30d158);
+
+  display: grid;
+  place-items: center;
+  height: 100%;
+  container-type: size;
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  color: var(--label);
+  background: light-dark(#fff, #1c1c1e);
+}
+
+.tile svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding-inline: 16px;
+  text-align: center;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.title {
+  margin-top: 8px;
+  font-family: -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 26px;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+}
+
+.recipient {
+  margin-top: 1px;
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--secondary);
+}
+
+/*
+ * The track: a 56px pill with the 48px thumb inset 4px. It's a container, so the thumb's travel is the track's width
+ * less 56px at any tile width.
+ */
+.track {
+  --travel: calc(100cqw - 56px);
+
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  height: 56px;
+  margin-top: 18px;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--track);
+  container-type: inline-size;
+}
+
+/* A finger's drag: it eases in, keeps pace and slows into the end */
+.track[data-drag] {
+  transition: --slide-to-confirm 900ms cubic-bezier(0.55, 0, 0.3, 1);
+}
+
+/* Everything on the track; it fades out after Sent, and back in once the thumb is back at the start */
+.layer {
+  position: absolute;
+  inset: 0;
+  transition: opacity 250ms ease;
+}
+
+.track[data-hidden] .layer {
+  opacity: 0;
+}
+
+/*
+ * The hint is centered in the part of the track right of the resting thumb. As the thumb comes, it drifts right at
+ * 0.4 times the thumb's pace and dims, and the letters just ahead of the thumb fade out (a 32px soft edge), so the
+ * thumb only catches up with the label past a third of the way.
+ */
+.hint {
+  position: absolute;
+  inset: 0 0 0 56px;
+  display: grid;
+  place-items: center;
+  opacity: calc(1 - var(--slide-to-confirm) * 0.6);
+  transform: translateX(calc(var(--slide-to-confirm) * var(--travel) * 0.4));
+  mask-image: linear-gradient(
+    90deg,
+    transparent calc(var(--slide-to-confirm) * var(--travel) * 0.6 - 4px),
+    #000 calc(var(--slide-to-confirm) * var(--travel) * 0.6 + 28px)
+  );
+}
+
+/*
+ * The light sweep: a band of full contrast (black on the light track, white on the dark one) in a 300% wide
+ * gradient, clipped to the letters and moved across them
+ */
+.label {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  color: transparent;
+  background: linear-gradient(90deg, var(--secondary) 42%, var(--label) 50%, var(--secondary) 58%) 100% 0 / 300%
+    100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .label {
+    animation: sweep 2.4s linear infinite;
+  }
+
+  .tile[data-paused] .label {
+    animation-play-state: paused;
+  }
+}
+
+/* The band crosses the label in the first 1.5 s, then rests */
+@keyframes sweep {
+  62.5%,
+  100% {
+    background-position: 0 0;
+  }
+}
+
+/*
+ * The fill: a pill from the start of the track to 4px past the thumb, so its rounded end wraps the thumb. It fades in
+ * over the first few pixels of the drag.
+ */
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(56px + var(--slide-to-confirm) * var(--travel));
+  border-radius: 28px;
+  background: var(--fill);
+  opacity: calc(var(--slide-to-confirm) * 12);
+  transition: background-color 250ms ease;
+}
+
+/* At rest there's nothing to fill: hidden, so it can't catch the pointer around the thumb either */
+.track[data-idle] .fill {
+  visibility: hidden;
+}
+
+.sent {
+  position: absolute;
+  inset: 0 56px 0 0;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 250ms ease,
+    visibility 0s linear 250ms;
+}
+
+.thumb {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--accent);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.12),
+    0 3px 8px rgb(0 0 0 / 0.12);
+  transform: translateX(calc(var(--slide-to-confirm) * var(--travel)));
+  transition:
+    background-color 250ms ease,
+    color 250ms ease;
+}
+
+.arrow,
+.check {
+  grid-area: 1 / 1;
+  width: 22px;
+  height: 22px;
+  transition:
+    opacity 200ms ease,
+    transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.check {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+/* Sent: the track turns green, the thumb turns white with a check, and the label reads Sent */
+.track[data-sent] .fill {
+  background: var(--success);
+}
+
+.track[data-sent] .sent {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.track[data-sent] .thumb {
+  color: var(--success);
+  background: #fff;
+}
+
+.track[data-sent] .arrow {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.track[data-sent] .check {
+  opacity: 1;
+  transform: none;
+}
+
+/* The narrowest tiles: a little less margin, and a smaller label so it fits beside the thumb a third of the way */
+@container (max-width: 259px) {
+  .sheet {
+    padding-inline: 12px;
+  }
+}
+
+@container (max-width: 239px) {
+  .label {
+    font-size: 14px;
+  }
+}

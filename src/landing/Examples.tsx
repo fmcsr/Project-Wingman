@@ -14,7 +14,6 @@ import { acmeSlopSpecs, museSlopSpecs, orbitSlopSpecs, showcaseSpecs, strideSlop
 import { InspectSurface } from '../inspector/InspectSurface';
 import { InspectorLayerHost } from '../inspector/InspectorLayer';
 import { BrowserFrame } from '../showcase/BrowserFrame';
-import { InteractionGuide } from '../showcase/InteractionGuide';
 import { PhoneFrame } from '../showcase/PhoneFrame';
 import { ButtonLink } from './ButtonLink';
 import { WORKSPACE_HREF } from './links';
@@ -101,13 +100,12 @@ export function Examples() {
       <div className="container">
         <SectionHeader
           id="examples-title"
-          index="[01]"
+          index="[02]"
           label="Examples"
           title="Same idea."
           muted="Better words."
           description="Drag the line on each example. On the left, what an AI coding tool builds from a vague prompt. On the right, what it builds from a Wingman brief that names every element. Hover either side to learn the names."
         />
-        <InteractionGuide />
       </div>
 
       <div className={`container ${styles.stage}`}>

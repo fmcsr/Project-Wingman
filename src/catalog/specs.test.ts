@@ -1,10 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import { LIBRARY } from '../library';
 import { acme, muse, orbit, stride, wave } from '../library/showcase';
-import { acmeSlopSpecs, museSlopSpecs, orbitSlopSpecs, showcaseSpecs, strideSlopSpecs, waveSlopSpecs } from '.';
+import {
+  acmeSlopSpecs,
+  gallerySpecs,
+  museSlopSpecs,
+  orbitSlopSpecs,
+  showcaseSpecs,
+  strideSlopSpecs,
+  waveSlopSpecs,
+} from '.';
 import type { UiElementSpec } from '.';
 
-/** Every list of element descriptions: each library example's, the landing page's shared one and the AI slop sides'. */
+/**
+ * Every list of element descriptions: each library example's, the landing page's shared one, the AI slop sides' and
+ * the element gallery's.
+ */
 const LISTS: [string, readonly UiElementSpec[]][] = [
   ...LIBRARY.map((example): [string, readonly UiElementSpec[]] => [`${example.platform}/${example.id}`, example.specs]),
   ['showcaseSpecs', showcaseSpecs],
@@ -13,6 +24,7 @@ const LISTS: [string, readonly UiElementSpec[]][] = [
   ['waveSlopSpecs', waveSlopSpecs],
   ['museSlopSpecs', museSlopSpecs],
   ['strideSlopSpecs', strideSlopSpecs],
+  ['gallerySpecs', gallerySpecs],
 ];
 
 function duplicates(values: string[]) {

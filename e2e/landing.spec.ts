@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import {
   acmeSlopSpecs,
+  gallerySpecs,
   museSlopSpecs,
   orbitSlopSpecs,
   showcaseSpecs,
@@ -15,6 +16,9 @@ const WIDTHS = [
   { width: 390, height: 844 },
 ];
 
+/** The element gallery's tiles (src/landing/gallery/tiles.ts), each an example of its own. */
+const GALLERY_TILES = 15;
+
 /** The AI slop side of each comparison has its own descriptions; the Wingman sides share showcaseSpecs. */
 const SLOP_SPECS: Record<string, readonly UiElementSpec[]> = {
   'Acme marketing site': acmeSlopSpecs,
@@ -24,7 +28,9 @@ const SLOP_SPECS: Record<string, readonly UiElementSpec[]> = {
   'Stride shopping app': strideSlopSpecs,
 };
 
-function specsFor(label: string) {
+/** The descriptions an example draws on: the gallery's tiles share gallerySpecs. */
+function specsFor(label: string, section: string) {
+  if (section === 'elements') return gallerySpecs;
   const slop = /^(.+), AI slop version, interactive example$/.exec(label);
   if (!slop) return showcaseSpecs;
   const specs = SLOP_SPECS[slop[1]];
@@ -35,17 +41,20 @@ function specsFor(label: string) {
 // Motion stays on here, as most visitors see the page: the demos' moving parts are rendered and checked too
 test.describe('landing page', () => {
   for (const viewport of WIDTHS) {
-    test(`shows ten example pictures without errors at ${viewport.width} px`, async ({ page }) => {
+    test(`shows the gallery's tiles and the ten example pictures without errors at ${viewport.width} px`, async ({
+      page,
+    }) => {
       const errors = trackErrors(page);
       await page.setViewportSize(viewport);
       await page.goto('/');
       await settle(page);
 
-      await expect(page.locator(SURFACE)).toHaveCount(10);
+      await expect(page.locator(`#elements ${SURFACE}`)).toHaveCount(GALLERY_TILES);
+      await expect(page.locator(`#examples ${SURFACE}`)).toHaveCount(10);
       expect.soft(await demoProblems(page)).toEqual([]);
       expect.soft(await horizontalOverflow(page)).toBe(0);
-      for (const { label, all } of await inspectIds(page)) {
-        const known = new Set(specsFor(label).map((spec) => spec.id));
+      for (const { label, section, all } of await inspectIds(page)) {
+        const known = new Set(specsFor(label, section).map((spec) => spec.id));
         const undescribed = all.filter((id) => !known.has(id));
         expect.soft(undescribed, `${label}: elements without a description`).toEqual([]);
       }
@@ -53,16 +62,20 @@ test.describe('landing page', () => {
     });
   }
 
-  test('shows every AI slop description at one of the two widths', async ({ page }) => {
+  test('shows every gallery and AI slop description at one of the two widths', async ({ page }) => {
     const shown = new Map<string, Set<string>>();
+    const inGallery = new Set<string>();
     for (const viewport of WIDTHS) {
       await page.setViewportSize(viewport);
       await page.goto('/');
       await settle(page);
-      for (const { label, shown: ids } of await inspectIds(page)) {
+      for (const { label, section, shown: ids } of await inspectIds(page)) {
         shown.set(label, new Set([...(shown.get(label) ?? []), ...ids]));
+        if (section === 'elements') for (const id of ids) inGallery.add(id);
       }
     }
+    const neverInGallery = gallerySpecs.map((spec) => spec.id).filter((id) => !inGallery.has(id));
+    expect.soft(neverInGallery, 'gallery: descriptions never shown').toEqual([]);
     for (const [name, specs] of Object.entries(SLOP_SPECS)) {
       const ids = shown.get(`${name}, AI slop version, interactive example`) ?? new Set();
       const neverShown = specs.map((spec) => spec.id).filter((id) => !ids.has(id));

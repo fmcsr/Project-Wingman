@@ -80,7 +80,10 @@ export function demoProblems(page: Page) {
   );
 }
 
-/** Per example on the page: every `data-inspect` id in it, and the ones on screen (laid out, not display: none). */
+/**
+ * Per example on the page: the section it's in, every `data-inspect` id in it, and the ones on screen (laid out, not
+ * display: none).
+ */
 export function inspectIds(page: Page) {
   return page.evaluate((surface) => {
     return [...document.querySelectorAll(surface)].map((example) => {
@@ -88,6 +91,7 @@ export function inspectIds(page: Page) {
       const ids = (list: Element[]) => [...new Set(list.map((element) => element.getAttribute('data-inspect') ?? ''))];
       return {
         label: example.getAttribute('aria-label') ?? '',
+        section: example.closest('section[id]')?.id ?? '',
         all: ids(elements),
         shown: ids(elements.filter((element) => element.getClientRects().length > 0)),
       };

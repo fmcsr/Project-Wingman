@@ -1,0 +1,450 @@
+/*
+ * A file manager in neutral grays with the toasts over it: white cards with a hairline border and a soft shadow in
+ * light mode, near-black ones in dark mode. Green is the only color, for finished work.
+ */
+.tile {
+  --ink: light-dark(#171717, #ededed);
+  --muted: light-dark(#737373, #a1a1a1);
+  --line: light-dark(#f0f0f0, #1f1f1f);
+  --toast-bg: light-dark(#fff, #171717);
+  --toast-border: light-dark(#ededed, #2e2e2e);
+  --success: light-dark(#16a34a, #22c55e);
+
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: light-dark(#fff, #0a0a0a);
+}
+
+.tile svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The app behind, faint so the toasts stand out */
+.app {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  opacity: 0.5;
+}
+
+.sidebar {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  flex: none;
+  width: 128px;
+  padding: 12px 8px;
+  border-right: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.navItem {
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: var(--muted);
+}
+
+.navItem[data-current] {
+  font-weight: 500;
+  color: var(--ink);
+  background: light-dark(#f4f4f4, #1a1a1a);
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 52px;
+  padding-inline: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.folder {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.upload {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding-inline: 12px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: light-dark(#fff, #0a0a0a);
+  background: var(--ink);
+}
+
+.columns {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px 6px 40px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding-inline: 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.file svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+}
+
+.fileName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.fileSize {
+  flex: none;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/*
+ * The toaster: a region at the bottom right, as wide as a toast (356px, or the tile less its margins) and 8px
+ * larger all round. Toasts are 70px tall, so the ones behind the front one can take its height. Collapsed, each
+ * older toast sits 14px higher and 5% smaller; spread out, they stand 14px apart.
+ */
+.toaster {
+  --edge: 10px;
+  --gap: 14px;
+  --h: 70px;
+  --ease: cubic-bezier(0.21, 1.02, 0.73, 1);
+
+  position: absolute;
+  right: calc(var(--edge) - 8px);
+  bottom: calc(var(--edge) - 8px);
+  width: calc(min(356px, 100cqw - 2 * var(--edge)) + 16px);
+  height: calc(var(--h) + 2 * var(--gap) + 16px);
+  transition: height 400ms var(--ease);
+}
+
+.toaster[data-expanded] {
+  height: calc(3 * var(--h) + 2 * var(--gap) + 16px);
+}
+
+.list {
+  position: absolute;
+  inset: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.toast {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  height: var(--h);
+  padding-inline: 12px;
+  border: 1px solid var(--toast-border);
+  border-radius: 8px;
+  background: var(--toast-bg);
+  box-shadow: 0 4px 12px light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.45));
+  font-size: 13px;
+  transition:
+    transform 400ms var(--ease),
+    opacity 400ms ease,
+    visibility 0s;
+}
+
+/* A toast that comes in rises from below the window with a little spring, opaque before it covers the old front */
+.toast[data-slot='front'] {
+  z-index: 3;
+  transition:
+    transform 500ms cubic-bezier(0.2, 1.25, 0.4, 1),
+    opacity 200ms ease,
+    visibility 0s;
+}
+
+.toast[data-slot='second'] {
+  z-index: 2;
+  transform: translateY(calc(-1 * var(--gap))) scale(0.95);
+}
+
+.toast[data-slot='third'] {
+  z-index: 1;
+  transform: translateY(calc(-2 * var(--gap))) scale(0.9);
+}
+
+/* Past three, the oldest fades out as it slides up behind the others */
+.toast[data-slot='gone'] {
+  z-index: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(calc(-3 * var(--gap))) scale(0.85);
+  transition:
+    transform 400ms var(--ease),
+    opacity 400ms ease,
+    visibility 0s linear 400ms;
+}
+
+.toast[data-slot='waiting'] {
+  z-index: 4;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(100%);
+  transition:
+    transform 400ms var(--ease),
+    opacity 400ms ease,
+    visibility 0s linear 400ms;
+}
+
+/* Spread out: full size, a toast's height plus 14px apart */
+.toaster[data-expanded] .toast[data-slot='second'] {
+  transform: translateY(calc(-1 * (100% + var(--gap))));
+}
+
+.toaster[data-expanded] .toast[data-slot='third'] {
+  transform: translateY(calc(-2 * (100% + var(--gap))));
+}
+
+/*
+ * Collapsed, only the front toast shows its content; the ones behind are bare cards, and so is one on its way out.
+ * The front's content fades quickly as it steps back, so it doesn't show through the toast coming in.
+ */
+.toast > * {
+  transition:
+    opacity 400ms ease,
+    visibility 0s;
+}
+
+.toaster:not([data-expanded]) .toast:is([data-slot='second'], [data-slot='third']) > *,
+.toast[data-slot='gone'] > * {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 150ms ease,
+    visibility 0s linear 150ms;
+}
+
+/* The close button sits on the top-left corner, a third of it off the card */
+.close {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--toast-border);
+  border-radius: 50%;
+  color: var(--ink);
+  background: var(--toast-bg);
+  transform: translate(-35%, -35%);
+}
+
+.close svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.25;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.icon > * {
+  grid-area: 1 / 1;
+}
+
+.icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Finished: a green disc with a check pops in where the spinner was */
+.success {
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 200ms ease,
+    transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.icon .success circle {
+  fill: var(--success);
+  stroke: none;
+}
+
+.icon .success path {
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.icon:not([data-loading]) .success {
+  opacity: 1;
+  transform: none;
+}
+
+/* Twelve bars, each fading from full to 15% over 1.2 s, one a tenth of a second after the other */
+.spinner {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.icon[data-loading] .spinner {
+  opacity: 1;
+}
+
+.bar {
+  position: absolute;
+  top: 46%;
+  left: 38%;
+  width: 24%;
+  height: 8%;
+  border-radius: 6px;
+  background: var(--muted);
+  transform: rotate(calc(var(--i) * 30deg)) translate(146%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bar {
+    animation: fade-bar 1.2s linear infinite;
+    animation-delay: calc(var(--i) * 0.1s - 1.2s);
+  }
+
+  .tile[data-paused] .bar {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes fade-bar {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.15;
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.title,
+.description {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.title {
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.description {
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  height: 24px;
+  padding-inline: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--toast-bg);
+  background: var(--ink);
+}
+
+/*
+ * The pointer: it comes in from the tile's right edge and rests on the front toast while the stack is spread out,
+ * then leaves the way it came. Black with a white rim, as on a Mac in either theme.
+ */
+.tile .pointer {
+  position: absolute;
+  z-index: 5;
+  bottom: 24px;
+  left: calc(100% + 24px);
+  width: 20px;
+  height: 24px;
+  fill: #000;
+  stroke: #fff;
+  stroke-width: 1.25;
+  pointer-events: none;
+  transition: transform 700ms cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+.tile .pointer[data-over] {
+  transform: translate(calc(-1 * min(356px, 100cqw - 2 * var(--edge)) * 0.42 - 34px), 4px);
+}
+
+@container (min-width: 300px) {
+  .toaster {
+    --edge: 16px;
+  }
+
+  .toast {
+    padding-inline: 16px;
+  }
+}
+
+/* Room for the app's sidebar; the toasts keep to the bottom right, 356px wide */
+@container (min-width: 440px) {
+  .sidebar {
+    display: flex;
+  }
+
+  .toaster {
+    --edge: 20px;
+  }
+}
