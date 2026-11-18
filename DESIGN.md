@@ -24,20 +24,22 @@ Last updated: 2026-11-18 · Status: Applied to the landing page
 ## Page structure (information architecture)
 
 ```
-Header        Logo · Elements · Examples · Features · Support ········ Theme · Sign in   (sticky)
+Header        Logo · Examples · Features · Support ········ Theme · Sign in   (sticky)
 Hero          [ PROJECT WINGMAN ] · “Every PM needs a wingman.” · See examples / Get started free
-[01] Elements A bento grid of fifteen live elements, each with its name: “You've seen them. Now name them.”
-[02] Examples Before/after: Acme (marketing) · Orbit (analytics dashboard) · Wave (habits) · Muse (AI) · Stride (shopping)
-[03] Features A slowly moving marquee (with a pause button)
-[04] Support  A free account · Sponsor on GitHub
+[01] Examples “You've seen them. Now name them.” In two tabs:
+              With Wingman (default): a bento grid of fifteen live elements, each with its name
+              Without Wingman: before/after: Acme (marketing) · Orbit (dashboard) · Wave (habits) · Muse (AI) · Stride (shopping)
+[02] Features A slowly moving marquee (with a pause button)
+[03] Support  A free account · Sponsor on GitHub
 Footer        Text links · Back to top
 ```
 
-Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the free-account buttons lead here) and the signed-in library: `/app/mobile`, `/app/web`, `/app/watch`, `/app/elements` and one page per example at `/app/<platform>/<id>`, plus the brief at `/app/brief`. Once signed in, Sign in becomes Workspace in the header and the footer. Under the landing page's examples, “Explore the library” leads in.
+Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the free-account buttons lead here) and the signed-in library: `/app/mobile`, `/app/web`, `/app/watch`, `/app/elements` and one page per example at `/app/<platform>/<id>`, plus the brief at `/app/brief`. Once signed in, Sign in becomes Workspace in the header and the footer. Under the landing page's examples, “Explore all elements” (with Wingman) or “Explore the library” (without) leads in.
 
 - **The header isn't a bar, but it's sticky:** Fully transparent at the top of the page; as you scroll down it takes on a borderless frosted-glass background. Links go to sections, the logo goes back to the top, and the link of the section in view gets darker. Sections stop below the header thanks to `scroll-margin-top`.
 - **Footer:** Not a bar; text links sitting on the page background.
-- **Element gallery** (`src/landing/Gallery.tsx`; the fifteen tiles are library elements, listed in `src/landing/gallery/tiles.ts`): the first section to inspect, right under the hero, so the ways-to-explore guide sits here.
+- **Examples in two tabs** (`src/landing/Examples.tsx`): right under the hero, a segmented control (With Wingman, Without Wingman) shares a row with the ways-to-explore guide. With Wingman is open by default. The section's description and the way into the library under the examples follow the open tab; only the open tab is rendered, so the comparisons' scroll scenes don't run behind the gallery. The tabs follow the ARIA tabs pattern: one tab stop, arrow keys, Home and End.
+- **With Wingman: the element gallery** (`src/landing/Gallery.tsx`; the fifteen tiles are library elements, listed in `src/landing/gallery/tiles.ts`). Its way out leads to the library's Elements tab, which has all of them and forty more.
   - Fifteen elements people meet in apps every day but rarely know the names of, from four families: iOS (Dynamic Island, wheel picker, bottom sheet, swipe actions), productivity tools (command palette, live cursors, mention menu, drag and drop), data (activity rings, calendar heatmap, marker clusters) and micro-interactions (one-time code field, slide to confirm, toast stack, skeleton screen). None repeats an element the examples below already explain.
   - Each element is shown live where it lives (the top of an iPhone, a whiteboard, a kanban board, a map), in the same design type as the product people know it from, with our own names and data.
   - A bento grid of 264 px rows: a tile takes one cell, two side by side, two stacked or a 2 × 2 block, and in four columns the order fills seven rows with no gaps. Two columns under 1024 px (`grid-auto-flow: dense` moves small tiles up into the gaps), one under 640 px.
@@ -48,7 +50,7 @@ Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the free-accoun
     - The window pins below the header. The scene grows by as much as the content overflows, and page scrolling is passed one to one into the window.
     - Users never scroll inside the window. Because the content really scrolls (`overflow: hidden` + `scrollTop`), Acme's sticky glass navbar keeps working.
   - Phones: All three in one row at every width. If they don't fit, they shrink together (`--phone-scale`; ~0.35 on a phone). In a narrow row, each heading keeps only the index and the name.
-- **Before/after:** every example is a comparison (`src/showcase/Compare.tsx`), the story of the product in one gesture.
+- **Without Wingman: before/after** (`src/landing/Comparisons.tsx`): every example is a comparison (`src/showcase/Compare.tsx`), the story of the product in one gesture.
   - The AI slop version a vague prompt produces (`src/demos/slop/`) lies on top of the Wingman version and is cut at a vertical line. Drag the line right and the slop grows; drag it left and the Wingman version grows. It starts in the middle and sways once when it first comes into view (not with reduced motion).
   - The line is white with a soft shadow, so it reads on any content. Its round knob is a slider: arrow keys move it by 5%, Page Up/Down by 20%, Home and End go to the edges. Small "AI slop" and "With Wingman" pills ride on each side of the knob, so they never cover an app's corners, and fade when their side gets narrow.
   - Both sides are inspectable, each as its own example (its own tab stop) with its own descriptions (`src/catalog/slopSites.ts`, `slopPhones.ts`). Slop elements carry the same names as their Wingman counterparts where the element is the same, so the two can be compared, and their concepts say what makes each one read as AI slop. Only the Wingman side counts toward the elements number in the project header. In the sites both versions scroll together, and the line stays put over the window.

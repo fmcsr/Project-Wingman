@@ -1,7 +1,3 @@
-.section {
-  padding-block: 96px 0;
-}
-
 /* The balloon layer covers the whole grid, so a balloon can reach past its tile */
 .stage {
   position: relative;

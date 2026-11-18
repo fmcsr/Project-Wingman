@@ -11,19 +11,20 @@ understand. Next, it will write that brief from everyday descriptions like “th
 
 ## A look inside
 
-Right under the hero, a gallery runs fifteen elements from apps people use every day, each working the way it does
-there: the Dynamic Island, a command palette, live cursors, marker clusters, a toast stack and more. Every part of each
-one can be inspected:
+Right under the hero, the examples open on their With Wingman tab: a gallery of fifteen elements from apps people use
+every day, each working the way it does there (the Dynamic Island, a command palette, live cursors, marker clusters, a
+toast stack and more). Every part of each one can be inspected:
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/gallery-dark.png">
   <img alt="The landing page's element gallery: fifteen live elements in a bento grid, each with its name under it: Dynamic Island, command palette, wheel picker, activity rings, bottom sheet, calendar heatmap, one-time code field, slide to confirm, swipe actions, marker clusters, live cursors, mention menu, toast stack, drag and drop and skeleton screen" src="docs/screenshots/gallery-light.png">
 </picture>
 
-Each example further down is a before/after: drag the line to compare the AI slop a vague prompt produces with the
-same product built from a Wingman brief. Hover anything on either side to learn what it's called. Click to pin the
-full explanation: how it looks, how it behaves, and the exact CSS behind it. The examples switch to dark mode with the
-page (products that are dark by design stay dark), and the balloons show the values for the theme you're in.
+The other tab, Without Wingman, has two sites and three phones as before/afters: drag the line to compare the AI slop a
+vague prompt produces with the same product built from a Wingman brief. Hover anything on either side to learn what it's
+called. Click to pin the full explanation: how it looks, how it behaves, and the exact CSS behind it. The examples
+switch to dark mode with the page (products that are dark by design stay dark), and the balloons show the values for the
+theme you're in.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/phones-dark.png">
@@ -75,10 +76,10 @@ navigation, productivity), each live in the gallery's bento grid and with its ow
 
 ## Current status: landing page, sign-in, the library and the brief
 
-An English landing page with a sticky header (with a theme toggle), a hero, an element gallery, examples, feature cards,
-a support section and a footer. Right under the hero, the gallery runs fifteen elements people meet in apps every day
-but rarely know the names of (the Dynamic Island, a command palette, live cursors, marker clusters, a toast stack and
-more), each live in a tile of a bento grid with its name under it and every part of it inspectable. The examples section
+An English landing page with a sticky header (with a theme toggle), a hero, the examples in two tabs, feature cards, a
+support section and a footer. The examples open on With Wingman: a gallery of fifteen elements people meet in apps every
+day but rarely know the names of (the Dynamic Island, a command palette, live cursors, marker clusters, a toast stack
+and more), each live in a tile of a bento grid with its name under it and every part of it inspectable. Without Wingman
 has five projects (a marketing site, an analytics dashboard and three mobile apps), each a before/after comparison with
 a line to drag: on the left, the AI slop a vague prompt produces; on the right, the same product built from a Wingman
 brief. On both sides nearly every element shows its name on hover, a summary after a two-second pause and the full
@@ -171,8 +172,9 @@ setting (light or dark) and can be switched from the header. All visual decision
 
 ```
 src/
-  landing/     Landing page sections: header, theme toggle, hero, element gallery (its tiles are library elements,
-               listed in gallery/tiles.ts), examples, feature cards, support, footer
+  landing/     Landing page sections: header, theme toggle, hero, the examples (Examples.tsx: the With Wingman tab's
+               gallery, Gallery.tsx, and the Without Wingman tab's comparisons, Comparisons.tsx), feature cards,
+               support, footer
   auth/        Sign-in and sign-up pages, the session store (no backend yet) and the dev account
   workspace/   The signed-in area: the library's tabs, search and grids, and each example's page with its glossary
   brief/       The brief: its store (in localStorage), the Markdown writer, the Add to brief button and the brief page

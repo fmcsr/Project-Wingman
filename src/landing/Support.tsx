@@ -31,7 +31,7 @@ export function Support() {
       <div className="container">
         <SectionHeader
           id="support-title"
-          index="[04]"
+          index="[03]"
           label="Support"
           title="Free for everyone."
           muted="Kept alive by sponsors."

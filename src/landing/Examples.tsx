@@ -1,218 +1,120 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
-import { AcmeSite } from '../demos/AcmeSite';
-import { MuseApp } from '../demos/MuseApp';
-import { OrbitDashboard } from '../demos/OrbitDashboard';
-import { AcmeSlop } from '../demos/slop/AcmeSlop';
-import { MuseSlop } from '../demos/slop/MuseSlop';
-import { OrbitSlop } from '../demos/slop/OrbitSlop';
-import { StrideSlop } from '../demos/slop/StrideSlop';
-import { WaveSlop } from '../demos/slop/WaveSlop';
-import { StrideApp } from '../demos/StrideApp';
-import { WaveApp } from '../demos/WaveApp';
-import { acmeSlopSpecs, museSlopSpecs, orbitSlopSpecs, showcaseSpecs, strideSlopSpecs, waveSlopSpecs } from '../catalog';
-import { InspectSurface } from '../inspector/InspectSurface';
-import { InspectorLayerHost } from '../inspector/InspectorLayer';
-import { BrowserFrame } from '../showcase/BrowserFrame';
-import { PhoneFrame } from '../showcase/PhoneFrame';
+import { useRef, useState } from 'react';
+import type { KeyboardEvent } from 'react';
+import { InteractionGuide } from '../showcase/InteractionGuide';
 import { ButtonLink } from './ButtonLink';
-import { WORKSPACE_HREF } from './links';
+import { Comparisons } from './Comparisons';
+import { Gallery } from './Gallery';
+import { ELEMENTS_HREF, WORKSPACE_HREF } from './links';
 import { SectionHeader } from './SectionHeader';
 import styles from './Examples.module.css';
 
-type ProjectId = 'acme' | 'orbit' | 'wave' | 'muse' | 'stride';
+type TabId = 'with' | 'without';
 
-/** Design width of the phone frame (matches PhoneFrame.module.css). */
-const PHONE_WIDTH = 300;
-const PHONE_COUNT = 3;
-
-type ProjectMetaProps = {
-  index: string;
-  name: string;
-  kind: string;
-  count?: number;
+type Tab = {
+  id: TabId;
+  label: string;
+  /** The section's description while the tab is open. */
+  description: string;
+  /** The way into the library under the tab's examples. */
+  more: { text: string; href: string; label: string };
 };
 
-function ProjectMeta({ index, name, kind, count }: ProjectMetaProps) {
-  return (
-    <div className={styles.meta}>
-      <span className={styles.index}>{index}</span>
-      <h3 className={styles.name}>{name}</h3>
-      <span className={styles.kind}>{kind}</span>
-      {count ? <span className={styles.count}>{count} elements</span> : null}
-    </div>
-  );
-}
-
-/** The vague prompt behind the AI slop side; the Wingman side comes from a brief that names every element. */
-function Prompt({ children }: { children: string }) {
-  return (
-    <p className={styles.prompt}>
-      <span className={styles.promptLabel}>Vague prompt</span>
-      <span className={styles.promptText}>“{children}”</span>
-    </p>
-  );
-}
-
-/** Scale that fits the three phones in a single row at any width; capped at 1 (actual size). */
-function usePhoneScale() {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
-
-  useLayoutEffect(() => {
-    const row = rowRef.current;
-    if (!row) return;
-    const update = () => {
-      const gap = parseFloat(getComputedStyle(row).columnGap) || 0;
-      setScale(Math.min(1, (row.clientWidth - gap * (PHONE_COUNT - 1)) / (PHONE_COUNT * PHONE_WIDTH)));
-    };
-    update();
-    const observer = new ResizeObserver(update);
-    observer.observe(row);
-    return () => observer.disconnect();
-  }, []);
-
-  return { rowRef, scale };
-}
+const TABS: Tab[] = [
+  {
+    id: 'with',
+    label: 'With Wingman',
+    description:
+      'Fifteen elements from apps you use every day, working the way they do there. Each has a name your AI coding tool understands, and so does every part of it.',
+    more: {
+      text: "There's a lot more inside: forms, navigation, charts and the small interactions in between, every part explained.",
+      href: ELEMENTS_HREF,
+      label: 'Explore all elements',
+    },
+  },
+  {
+    id: 'without',
+    label: 'Without Wingman',
+    description:
+      'What an AI coding tool builds from a vague prompt, next to the same product built from a Wingman brief that names every element. Drag the line on each example and hover either side to learn the names.',
+    more: {
+      text: "There's a lot more inside: a library of mobile apps, websites and watch apps, every element explained.",
+      href: WORKSPACE_HREF,
+      label: 'Explore the library',
+    },
+  },
+];
 
 /**
- * Demo on the home page: five example projects, each as a before/after comparison. On the left, the AI slop a vague
- * prompt produces; on the right, the same product built from a Wingman brief. Both sides are inspectable, so the same
- * element can be seen done both ways. The full library opens after sign-in, so only a few projects are shown here. Sites scroll in their own windows as the page
- * scrolls; phones sit in one row. Balloons are drawn on a shared layer that covers all the frames.
+ * The examples, right under the hero, in two tabs next to the ways to explore them. With Wingman, the default, is
+ * the element gallery: elements from apps people use every day, live and inspectable. Without Wingman puts the AI
+ * slop a vague prompt produces next to the same products built from a Wingman brief, on two sites and three phones.
+ * Only the open tab is rendered, so the comparisons' scroll scenes don't run behind the gallery.
  */
 export function Examples() {
-  const [counts, setCounts] = useState<Partial<Record<ProjectId, number>>>({});
-  const onCount = useMemo(() => {
-    const update = (id: ProjectId) => (count: number) => setCounts((current) => ({ ...current, [id]: count }));
-    return {
-      acme: update('acme'),
-      orbit: update('orbit'),
-      wave: update('wave'),
-      muse: update('muse'),
-      stride: update('stride'),
-    };
-  }, []);
-  const { rowRef, scale } = usePhoneScale();
+  const [tab, setTab] = useState<TabId>('with');
+  const buttons = useRef<Partial<Record<TabId, HTMLButtonElement | null>>>({});
+  const current = TABS.find((entry) => entry.id === tab) ?? TABS[0];
+
+  // Tabs pattern: one tab stop; the arrow keys, Home and End move between the tabs and open them
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const index = TABS.findIndex((entry) => entry.id === tab);
+    const target = {
+      ArrowLeft: index - 1,
+      ArrowRight: index + 1,
+      Home: 0,
+      End: TABS.length - 1,
+    }[event.key];
+    if (target === undefined) return;
+    event.preventDefault();
+    const next = TABS[(target + TABS.length) % TABS.length];
+    setTab(next.id);
+    buttons.current[next.id]?.focus();
+  };
 
   return (
     <section id="examples" className={styles.section} aria-labelledby="examples-title">
       <div className="container">
         <SectionHeader
           id="examples-title"
-          index="[02]"
+          index="[01]"
           label="Examples"
-          title="Same idea."
-          muted="Better words."
-          description="Drag the line on each example. On the left, what an AI coding tool builds from a vague prompt. On the right, what it builds from a Wingman brief that names every element. Hover either side to learn the names."
+          title="You've seen them."
+          muted="Now name them."
+          description={current.description}
         />
+        <div className={styles.controls}>
+          <div role="tablist" aria-label="Examples" className={styles.tabs} onKeyDown={onKeyDown}>
+            {TABS.map((entry) => (
+              <button
+                key={entry.id}
+                ref={(button) => {
+                  buttons.current[entry.id] = button;
+                }}
+                id={`examples-tab-${entry.id}`}
+                type="button"
+                role="tab"
+                aria-selected={entry.id === tab}
+                aria-controls="examples-panel"
+                tabIndex={entry.id === tab ? 0 : -1}
+                className={styles.tab}
+                onClick={() => setTab(entry.id)}
+              >
+                {entry.label}
+              </button>
+            ))}
+          </div>
+          <InteractionGuide />
+        </div>
       </div>
 
-      <div className={`container ${styles.stage}`}>
-        <InspectorLayerHost className={styles.layer}>
-          <div className={styles.scenes}>
-            <BrowserFrame
-              url="acme.app"
-              label="Acme marketing site"
-              before={
-                <InspectSurface specs={acmeSlopSpecs} label="Acme marketing site, AI slop version" fill>
-                  <AcmeSlop />
-                </InspectSurface>
-              }
-              header={
-                <div className={styles.siteHeader}>
-                  <ProjectMeta index="[01]" name="Acme" kind="Marketing site" count={counts.acme} />
-                  <Prompt>Make a landing page for my product-planning SaaS.</Prompt>
-                </div>
-              }
-            >
-              <InspectSurface specs={showcaseSpecs} label="Acme marketing site" onCount={onCount.acme}>
-                <AcmeSite />
-              </InspectSurface>
-            </BrowserFrame>
-
-            <BrowserFrame
-              url="app.orbit.io"
-              label="Orbit analytics dashboard"
-              before={
-                <InspectSurface specs={orbitSlopSpecs} label="Orbit analytics dashboard, AI slop version" fill>
-                  <OrbitSlop />
-                </InspectSurface>
-              }
-              header={
-                <div className={styles.siteHeader}>
-                  <ProjectMeta index="[02]" name="Orbit" kind="Analytics dashboard" count={counts.orbit} />
-                  <Prompt>Build an analytics dashboard for my startup.</Prompt>
-                </div>
-              }
-            >
-              <InspectSurface specs={showcaseSpecs} label="Orbit analytics dashboard" onCount={onCount.orbit}>
-                <OrbitDashboard />
-              </InspectSurface>
-            </BrowserFrame>
-
-            <div ref={rowRef} className={styles.phones} style={{ '--phone-scale': scale } as CSSProperties}>
-              <div className={styles.phoneProject}>
-                <ProjectMeta index="[03]" name="Wave" kind="Habit tracker" count={counts.wave} />
-                <PhoneFrame
-                  before={
-                    <InspectSurface specs={waveSlopSpecs} label="Wave habit tracker, AI slop version" fill>
-                      <WaveSlop />
-                    </InspectSurface>
-                  }
-                  label="Wave habit tracker"
-                >
-                  <InspectSurface specs={showcaseSpecs} label="Wave habit tracker" onCount={onCount.wave} fill>
-                    <WaveApp />
-                  </InspectSurface>
-                </PhoneFrame>
-                <Prompt>Make a habit tracker app.</Prompt>
-              </div>
-
-              <div className={styles.phoneProject}>
-                <ProjectMeta index="[04]" name="Muse" kind="AI assistant" count={counts.muse} />
-                <PhoneFrame
-                  before={
-                    <InspectSurface specs={museSlopSpecs} label="Muse AI assistant, AI slop version" fill>
-                      <MuseSlop />
-                    </InspectSurface>
-                  }
-                  label="Muse AI assistant"
-                >
-                  <InspectSurface specs={showcaseSpecs} label="Muse AI assistant" onCount={onCount.muse} fill>
-                    <MuseApp />
-                  </InspectSurface>
-                </PhoneFrame>
-                <Prompt>Make an AI chat app.</Prompt>
-              </div>
-
-              <div className={styles.phoneProject}>
-                <ProjectMeta index="[05]" name="Stride" kind="Shopping" count={counts.stride} />
-                <PhoneFrame
-                  before={
-                    <InspectSurface specs={strideSlopSpecs} label="Stride shopping app, AI slop version" fill>
-                      <StrideSlop />
-                    </InspectSurface>
-                  }
-                  label="Stride shopping app"
-                >
-                  <InspectSurface specs={showcaseSpecs} label="Stride shopping app" onCount={onCount.stride} fill>
-                    <StrideApp />
-                  </InspectSurface>
-                </PhoneFrame>
-                <Prompt>Build a product page for a sneaker shop.</Prompt>
-              </div>
-            </div>
-          </div>
-        </InspectorLayerHost>
+      <div id="examples-panel" role="tabpanel" aria-labelledby={`examples-tab-${tab}`}>
+        {tab === 'with' ? <Gallery /> : <Comparisons />}
       </div>
 
       <div className={`container ${styles.more}`}>
-        <p className={styles.moreText}>
-          There's a lot more inside: a library of mobile apps and websites, every element explained.
-        </p>
-        <ButtonLink href={WORKSPACE_HREF} variant="primary" size="lg">
-          Explore the library
+        <p className={styles.moreText}>{current.more.text}</p>
+        <ButtonLink href={current.more.href} variant="primary" size="lg">
+          {current.more.label}
         </ButtonLink>
       </div>
     </section>

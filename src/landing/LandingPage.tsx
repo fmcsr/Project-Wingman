@@ -1,13 +1,15 @@
 import { useDocumentTitle } from '../router';
 import { Examples } from './Examples';
 import { Features } from './Features';
-import { Gallery } from './Gallery';
 import { Hero } from './Hero';
 import { SiteFooter } from './SiteFooter';
 import { SiteHeader } from './SiteHeader';
 import { Support } from './Support';
 
-/** The landing page: hero, the element gallery, before/after examples, feature cards and how to support Wingman. */
+/**
+ * The landing page: hero, the examples (the element gallery with Wingman, before/after comparisons without), feature
+ * cards and how to support Wingman.
+ */
 export function LandingPage() {
   useDocumentTitle("Project Wingman · The PM's best friend for design");
 
@@ -16,7 +18,6 @@ export function LandingPage() {
       <SiteHeader />
       <main>
         <Hero />
-        <Gallery />
         <Examples />
         <Features />
         <Support />
