@@ -199,6 +199,6 @@ with no description logs a warning to the console during development.
 
 | Input | Preview (summary) | Pinned (full explanation) | Closes |
 | --- | --- | --- | --- |
-| Mouse | Hover, wait 280 ms | Click | Click outside, click the same element again, Esc |
+| Mouse | Hover (the name shows at once), wait 2 s | Click | Click outside, click the same element again, Esc |
 | Touch | — | Tap | Tap outside (scrolling doesn't close it) |
 | Keyboard | Tab into an example, move with the arrow keys | Enter | Esc, Tab out |
