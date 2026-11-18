@@ -30,7 +30,7 @@ test.beforeEach(async ({ context }) => {
   await signIn(context);
 });
 
-for (const platform of ['mobile', 'web', 'watch']) {
+for (const platform of ['mobile', 'web', 'watch', 'elements']) {
   test(`the ${platform} tab and each of its examples' pages`, async ({ page }) => {
     const errors = trackErrors(page);
 

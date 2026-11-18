@@ -325,3 +325,48 @@ a.name:hover {
     transform: none;
   }
 }
+
+/* On a phone the four tabs share the row: tighter padding and type; on the narrowest screens the counts go */
+@media (max-width: 479px) {
+  .tabs {
+    display: flex;
+    width: 100%;
+  }
+
+  .tab {
+    flex: 1 1 auto;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 8px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 359px) {
+  .tabCount {
+    display: none;
+  }
+}
+
+/* Elements tab: the tile's name opens its page; the count of its parts sits at the right */
+.tileName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.tileName:hover {
+  text-decoration: underline;
+}
+
+.tileCount {
+  flex: none;
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--color-text-faint);
+}

@@ -19,6 +19,7 @@ export const PLATFORMS: { platform: Platform; label: string }[] = [
   { platform: 'mobile', label: 'Mobile' },
   { platform: 'web', label: 'Web' },
   { platform: 'watch', label: 'Watch' },
+  { platform: 'elements', label: 'Elements' },
 ];
 
 /** Whether a URL segment or a saved value names a platform. */
@@ -53,4 +54,4 @@ export function matchesQuery(example: LibraryExample, query: string) {
   return haystack.some((text) => text.toLowerCase().includes(needle));
 }
 
-export type { Category, LibraryExample, Platform } from './types';
+export type { Category, LibraryExample, Platform, TileSize } from './types';

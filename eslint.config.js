@@ -20,7 +20,7 @@ export default defineConfig([
   {
     // useDemoMotion() returns { ref, started, playing, final }. Because of the `ref` field, the compiler rule takes
     // the whole object for a ref and reports every read of the plain state next to it during render
-    files: ['src/demos/**', 'src/library/**', 'src/landing/gallery/**'],
+    files: ['src/demos/**', 'src/library/**'],
     rules: { 'react-hooks/refs': 'off' },
   },
   {

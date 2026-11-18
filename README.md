@@ -33,8 +33,9 @@ page (products that are dark by design stay dark), and the balloons show the val
 ### The library
 
 Behind sign-in, the library holds more than thirty apps, sites and watch apps, each modeled on a product people use
-every day: the same layout and component shapes, with its own name, colors, copy and real photos. Every element can be
-inspected the same way and added to a brief. Here Lanes, a board in the style of Jira, explains its WIP limit:
+every day: the same layout and component shapes, with its own name, colors, copy and real photos. An Elements tab adds
+single elements, starting with the gallery's fifteen. Every element can be inspected the same way and added to a brief.
+Here Lanes, a board in the style of Jira, explains its WIP limit:
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/inspect-dark.png">
@@ -79,13 +80,14 @@ while you inspect them.
 Wingman is free: an account opens the library and the brief builder. People who find it useful can sponsor it on
 GitHub (`SPONSOR_HREF` in `src/landing/links.ts`; GitHub Sponsors has to be set up on that account).
 
-Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to the library (`/app/mobile`, `/app/web`, `/app/watch`):
-mobile apps, websites and Apple Watch apps in three tabs, each a fictional product built from the patterns of
-well-known ones (“inspired by” Spotify, Airbnb, Stripe, Notion, Figma, VS Code and others). Phones and watches can be
-inspected right in the grid; every example also has its own page (`/app/<platform>/<id>`) with all of its elements
-written out. A search finds examples by name or by
-element (“bottom sheet”, “toast”). There's no auth backend yet: email and password sign-in only works with the development
-account below, and Google sign-in and sign-ups show a “not connected yet” message.
+Sign-in (`/sign-in`) and sign-up (`/sign-up`) pages lead to the library (`/app/mobile`, `/app/web`, `/app/watch`,
+`/app/elements`): mobile apps, websites and Apple Watch apps in three tabs, each a fictional product built from the
+patterns of well-known ones (“inspired by” Spotify, Airbnb, Stripe, Notion, Figma, VS Code and others), and a fourth tab
+of single elements in the gallery's bento grid, filtered by family (data, iOS, micro-interactions,
+productivity). Phones, watches and elements can be inspected right in the grid; every example also has its own page
+(`/app/<platform>/<id>`) with all of its elements written out. A search finds examples by name or by element (“bottom
+sheet”, “toast”). There's no auth backend yet: email and password sign-in only works with the development account below,
+and Google sign-in and sign-ups show a “not connected yet” message.
 
 Any element in the library can go into a brief: choose **Add to brief** in its pinned explanation or in the example's
 element list. The brief page (`/app/brief`) adds what you're building and a note per element, and turns it all into
@@ -160,19 +162,20 @@ setting (light or dark) and can be switched from the header. All visual decision
 
 ```
 src/
-  landing/     Landing page sections: header, theme toggle, hero, element gallery (one file per tile in gallery/),
-               examples, feature cards, support, footer
+  landing/     Landing page sections: header, theme toggle, hero, element gallery (its tiles are library elements,
+               listed in gallery/tiles.ts), examples, feature cards, support, footer
   auth/        Sign-in and sign-up pages, the session store (no backend yet) and the dev account
   workspace/   The signed-in area: the library's tabs, search and grids, and each example's page with its glossary
   brief/       The brief: its store (in localStorage), the Markdown writer, the Add to brief button and the brief page
-  library/     The library: types, the registry, and one folder per example (mobile/<id>, web/<id>, watch/<id>)
+  library/     The library: types, the registry, and one folder per example (mobile/<id>, web/<id>, watch/<id>,
+               elements/<id>; elements share their photos in elements/photos/)
   demos/       The landing page's five examples: AcmeSite, OrbitDashboard, WaveApp, MuseApp, StrideApp (+ StatusBar),
                their motion (motion.ts: entrances, live parts that hold while inspected), and in slop/ the AI slop
                version each one is compared with
-  catalog/     Element descriptions (English, typed data) for those five, the gallery's tiles (gallery/, one file per
-               family) and elements every phone shares
+  catalog/     Element descriptions (English, typed data) for those five, plus elements every phone shares
   inspector/   The “inspect element” layer: InspectSurface, explainer balloon, positioning
-  showcase/    Frames and the interaction guide: the browser frame as a scroll scene (useScrollScene), a scalable phone
+  showcase/    Frames and the interaction guide: the browser frame as a scroll scene (useScrollScene), a scalable phone,
+               the watch, and the elements' bento grid (TileGrid.module.css)
   brand/       Logo and the hero's animated line art (with the shooting star)
   styles/      Design tokens (light-dark) and global styles
   router.tsx   A tiny client-side router: current path, links, redirects, page titles
@@ -187,7 +190,7 @@ docs/
 Create a folder; the library picks it up on its own (`import.meta.glob` in `src/library/index.ts`):
 
 ```
-src/library/<mobile|web|watch>/<id>/
+src/library/<mobile|web|watch|elements>/<id>/
   <Name>.tsx         the demo (a named export)
   <Name>.module.css  its styles
   specs.ts           a UiElementSpec for every data-inspect id the demo uses
@@ -200,18 +203,37 @@ src/library/<mobile|web|watch>/<id>/
 - **Mobile** fills a 280 × 600 phone screen and starts with the shared `<StatusBar />`; reuse the `statusBar` and
   `homeIndicator` specs from `src/catalog`. **Watch** fills a 208 × 248 Apple Watch screen (46 mm). **Web** sets
   `container-type: inline-size` and works from about 340 px to 1150 px wide; it can be taller than the window.
+  **Elements** set `size` (see below) and fill their tile with `container-type: size`.
 - **Names are fictional;** real products go in `inspiredBy`.
 - **Same design type, our own identity:** follow one familiar product's real screen closely (layout, type scale, color
   scheme, component shapes) so people recognize it, with our own name, logo, accent hue, copy and data. No real logos,
   mascots or brand marks.
 - **Real photos:** anything that stands for a photo (avatars, video frames, food, places) is a free-license Unsplash
-  photo, stored in the example's `photos/` folder and listed in its `CREDITS.md`.
+  photo, stored in the example's `photos/` folder and listed in its `CREDITS.md`. Elements share
+  `src/library/elements/photos/`, where a portrait's file name is the person's first name everywhere it appears.
+
+### Adding an element
+
+An element is a library example with `platform: 'elements'`, its family as the `category` (Data, iOS,
+Micro-interactions, Productivity) and a `size` that says how much of the bento grid its tile takes. The
+grid is the same on the landing page and in the library, so a tile must look right across these picture sizes (CSS
+px); its own page shows it at the desktop size, or full width on a phone:
+
+| `size` | Width | Height | Desktop (4 columns) | Tablet (2 columns) | Phone (1 column) |
+| --- | --- | --- | --- | --- | --- |
+| `small` | 230–606 | 214 | 230–274 | 286–478 | 328–606 |
+| `wide` | 328–973 | 214 | 476–564 | 592–973 | 328–606 |
+| `tall` | 230–606 | 374–494 | 230–274 × 494 | 286–478 × 494 | 328–606 × 374 |
+| `big` | 328–973 | 374–494 | 476–564 × 494 | 592–973 × 494 | 328–606 × 374 |
+
+To show one on the landing page too, add it to `src/landing/gallery/tiles.ts` and check that the four-column grid
+still fills its rows.
 
 ## Adding a UI element
 
 1. Write the description: add a `UiElementSpec` to the example's `specs.ts` (for the landing page's five, the matching
-   file in `src/catalog/`; for a gallery tile, its family's file in `src/catalog/gallery/`), with the demo's real CSS
-   values in its `value` fields. A color that differs by theme is `{ light, dark }`.
+   file in `src/catalog/`), with the demo's real CSS values in its `value` fields. A color that differs by theme is
+   `{ light, dark }`.
 2. Mark it in the demo: add a `data-inspect="<id>"` attribute to the element.
 
 Hover, click, touch, keyboard, outline, balloon, the element counter and the glossary all work automatically. An id

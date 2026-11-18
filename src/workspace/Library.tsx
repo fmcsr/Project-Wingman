@@ -7,13 +7,15 @@ import type { Category, LibraryExample, Platform } from '../library';
 import { Link, useDocumentTitle } from '../router';
 import { FitPhone } from '../showcase/FitPhone';
 import { InteractionGuide } from '../showcase/InteractionGuide';
+import tiles from '../showcase/TileGrid.module.css';
 import { FitWatch } from '../showcase/WatchFrame';
 import { SitePreview } from './SitePreview';
 import styles from './Library.module.css';
 
 /**
- * The library: mobile apps, websites and watch apps in three tabs, like a pattern gallery. Phones and watches can be
- * inspected right in the grid; sites open on their own page, where there's room to scroll through them.
+ * The library: mobile apps, websites, watch apps and single elements in four tabs, like a pattern gallery. Phones,
+ * watches and elements can be inspected right in the grid; sites open on their own page, where there's room to
+ * scroll through them.
  */
 export function Library({ platform }: { platform: Platform }) {
   const label = platformLabel(platform);
@@ -28,7 +30,8 @@ export function Library({ platform }: { platform: Platform }) {
   }
 
   const examples = examplesFor(platform);
-  const categories = [...new Set(examples.map((example) => example.category))].sort();
+  // Alphabetical regardless of case, so iOS sits among the other families
+  const categories = [...new Set(examples.map((example) => example.category))].sort((a, b) => a.localeCompare(b));
   const shown = examples.filter(
     (example) => (!category || example.category === category) && matchesQuery(example, query),
   );
@@ -97,12 +100,16 @@ export function Library({ platform }: { platform: Platform }) {
       </div>
 
       <p className={styles.summary} aria-live="polite">
-        {shown.length} {shown.length === 1 ? 'example' : 'examples'} · {elementCount} elements
+        {platform === 'elements'
+          ? `${shown.length} ${shown.length === 1 ? 'element' : 'elements'} · ${elementCount} parts`
+          : `${shown.length} ${shown.length === 1 ? 'example' : 'examples'} · ${elementCount} elements`}
       </p>
 
       {shown.length === 0 ? (
         <div className={styles.empty}>
-          <p>No {label.toLowerCase()} examples match “{query}”.</p>
+          <p>
+            No {platform === 'elements' ? 'elements' : `${label.toLowerCase()} examples`} match “{query}”.
+          </p>
           <button
             type="button"
             className={styles.chip}
@@ -120,6 +127,16 @@ export function Library({ platform }: { platform: Platform }) {
             <WebCard key={example.id} example={example} />
           ))}
         </ul>
+      ) : platform === 'elements' ? (
+        <div className={styles.stage}>
+          <InspectorLayerHost className={styles.layer}>
+            <ul className={tiles.grid}>
+              {shown.map((example) => (
+                <ElementCard key={example.id} example={example} />
+              ))}
+            </ul>
+          </InspectorLayerHost>
+        </div>
       ) : (
         <div className={styles.stage}>
           <InspectorLayerHost className={styles.layer}>
@@ -164,6 +181,31 @@ function DeviceCard({ example }: { example: LibraryExample }) {
         </InspectSurface>
       </Frame>
       <p className={styles.inspired}>Inspired by {example.inspiredBy.join(', ')}</p>
+    </li>
+  );
+}
+
+/** An element's tile in the bento grid, inspectable in place; its name opens the element's page. */
+function ElementCard({ example }: { example: LibraryExample }) {
+  const { Component } = example;
+  return (
+    <li className={tiles.tile} data-size={example.size}>
+      <div className={tiles.picture}>
+        <InspectSurface
+          label={example.name}
+          specs={example.specs}
+          fill
+          renderAction={(spec) => <AddToBrief example={example} specId={spec.id} tone="balloon" />}
+        >
+          <Component />
+        </InspectSurface>
+      </div>
+      <div className={tiles.caption}>
+        <Link href={`/app/elements/${example.id}`} className={styles.tileName}>
+          {example.name}
+        </Link>
+        <span className={styles.tileCount}>{example.specs.length} parts</span>
+      </div>
     </li>
   );
 }

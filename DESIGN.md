@@ -33,15 +33,15 @@ Hero          [ PROJECT WINGMAN ] · “Every PM needs a wingman.” · See exam
 Footer        Text links · Back to top
 ```
 
-Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the free-account buttons lead here) and the signed-in library: `/app/mobile`, `/app/web`, `/app/watch` and one page per example at `/app/<platform>/<id>`, plus the brief at `/app/brief`. Once signed in, Sign in becomes Workspace in the header and the footer. Under the landing page's examples, “Explore the library” leads in.
+Other pages: `/sign-in` and `/sign-up` (the header's Sign in and the free-account buttons lead here) and the signed-in library: `/app/mobile`, `/app/web`, `/app/watch`, `/app/elements` and one page per example at `/app/<platform>/<id>`, plus the brief at `/app/brief`. Once signed in, Sign in becomes Workspace in the header and the footer. Under the landing page's examples, “Explore the library” leads in.
 
 - **The header isn't a bar, but it's sticky:** Fully transparent at the top of the page; as you scroll down it takes on a borderless frosted-glass background. Links go to sections, the logo goes back to the top, and the link of the section in view gets darker. Sections stop below the header thanks to `scroll-margin-top`.
 - **Footer:** Not a bar; text links sitting on the page background.
-- **Element gallery** (`src/landing/Gallery.tsx`, one file per tile in `src/landing/gallery/`): the first section to inspect, right under the hero, so the ways-to-explore guide sits here.
+- **Element gallery** (`src/landing/Gallery.tsx`; the fifteen tiles are library elements, listed in `src/landing/gallery/tiles.ts`): the first section to inspect, right under the hero, so the ways-to-explore guide sits here.
   - Fifteen elements people meet in apps every day but rarely know the names of, from four families: iOS (Dynamic Island, wheel picker, bottom sheet, swipe actions), productivity tools (command palette, live cursors, mention menu, drag and drop), data (activity rings, calendar heatmap, marker clusters) and micro-interactions (one-time code field, slide to confirm, toast stack, skeleton screen). None repeats an element the examples below already explain.
   - Each element is shown live where it lives (the top of an iPhone, a whiteboard, a kanban board, a map), in the same design type as the product people know it from, with our own names and data.
   - A bento grid of 264 px rows: a tile takes one cell, two side by side, two stacked or a 2 × 2 block, and in four columns the order fills seven rows with no gaps. Two columns under 1024 px (`grid-auto-flow: dense` moves small tiles up into the gaps), one under 640 px.
-  - A tile is its element on a slightly darker ground over a caption: a mono index and the name. Every tile is an example of its own (its own tab stop); the descriptions are in `src/catalog/gallery/`, one file per family.
+  - A tile is its element on a slightly darker ground over a caption: a mono index and the name. Every tile is an example of its own (its own tab stop), with its descriptions in its folder in `src/library/elements/`.
 - **The home page shows only five example projects:** The full library opens after sign-in.
 - **Example layout:**
   - Sites (Acme, Orbit): Each in its own scroll scene, full page width, one after another.
@@ -76,13 +76,14 @@ Older library demos use `useInspectActivity()`, which holds the whole example: C
 
 ## Library
 
-- **Three tabs, Mobile, Web and Watch,** in a pill-shaped segmented control with the count of examples. Like a pattern gallery (Mobbin): category chips, and a search that matches names, inspirations and every element's name, aliases and terms (“bottom sheet” finds the apps that have one).
+- **Four tabs, Mobile, Web, Watch and Elements,** in a pill-shaped segmented control with the count of examples. Like a pattern gallery (Mobbin): category chips, and a search that matches names, inspirations and every element's name, aliases and terms (“bottom sheet” finds the apps that have one).
 - **Examples are fictional products** built from the patterns of well-known ones; real names only appear as “Inspired by”. No real logos or brands inside the demos.
   - Each one follows one familiar product's real screen closely, using Mobbin's screenshots as the reference: the same layout, type scale, color scheme and component shapes, so people recognize the design type at a glance. The name, logo, accent hue, icons, copy and data are our own, and so are the photos (free-license Unsplash photos, credited in each example's `photos/CREDITS.md`). People learn an element's name faster on a screen that looks like an app they use every day.
   - The library's footnote and each example's “Inspired by” line say the examples are fictional and not affiliated with those products.
 - **Mobile and Watch grids:** phones and watches scale to their column and can be inspected right there, like on the landing page. Each card's heading stays on one line so devices in a row line up. The watch is a 46 mm Apple Watch case (208 × 248 screen) with the Digital Crown and side button (`src/showcase/WatchFrame.tsx`).
 - **Web grid:** a still, scaled-down picture of each site at desktop width (1280 px); the whole card opens the site's page. Previews can't be focused or inspected.
-- **Example page:** the example at full size and all of its elements written out as a glossary: name, tag, variant, summary, “also called”, and each concept with its term and value (for the theme in use). Phones and watches stay in view on the left while the list scrolls; sites use the scroll scene, with the glossary below. Previous/next links walk through the tab (hidden when the tab holds a single example).
+- **Elements grid:** single elements in the landing gallery's bento grid (`src/showcase/TileGrid.module.css`), every tile inspectable in place with Add to brief, its name linking to its page, and its families as the category chips: Data, iOS, Micro-interactions and Productivity. The grid runs alphabetically; `dense` packing fills the gaps the bigger tiles leave.
+- **Example page:** the example at full size and all of its elements written out as a glossary: name, tag, variant, summary, “also called”, and each concept with its term and value (for the theme in use). Phones, watches and elements stay in view on the left while the list scrolls (an element in a tile of its size class, at the size the gallery gives it on a desktop; the list calls its entries parts); sites use the scroll scene, with the glossary below. Previous/next links walk through the tab (hidden when the tab holds a single example).
 - The library loads separately from the landing page, so the public page stays light.
 
 ## Brief

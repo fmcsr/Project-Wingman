@@ -15,70 +15,6 @@
   pointer-events: none;
 }
 
-/*
- * A bento grid of 264px rows. A tile takes one cell (small), two side by side (wide), two stacked (tall) or a 2 × 2
- * block (big). In the order of TILES the four columns fill seven rows with no gaps; in two columns, `dense` moves
- * small tiles up into the gaps the full-width ones leave. Each tile is its picture over a 48px caption, so pictures
- * are 214px tall (494px for tall and big tiles).
- */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-auto-rows: 264px;
-  grid-auto-flow: dense;
-  gap: 16px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.tile {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  background: var(--color-surface);
-  overflow: hidden;
-}
-
-.tile[data-size='wide'] {
-  grid-column: span 2;
-}
-
-.tile[data-size='tall'] {
-  grid-row: span 2;
-}
-
-.tile[data-size='big'] {
-  grid-column: span 2;
-  grid-row: span 2;
-}
-
-/* The live element, on a slightly darker ground than the caption */
-.picture {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  background: var(--color-surface-2);
-}
-
-.caption {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: none;
-  height: 48px;
-  margin: 0;
-  padding-inline: 16px;
-  border-top: 1px solid var(--color-border);
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 20px;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-}
-
 .index {
   flex: none;
   font-family: var(--font-mono);
@@ -92,31 +28,4 @@
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* Two columns on tablets: wide and big tiles take the full width */
-@media (max-width: 1023px) {
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* One column on phones; tall and big tiles get a shorter double height (374px pictures) */
-@media (max-width: 639px) {
-  .grid {
-    grid-template-columns: minmax(0, 1fr);
-    grid-auto-rows: auto;
-    gap: 12px;
-  }
-
-  .tile[data-size] {
-    grid-column: auto;
-    grid-row: auto;
-    height: 264px;
-  }
-
-  .tile[data-size='tall'],
-  .tile[data-size='big'] {
-    height: 424px;
-  }
 }
