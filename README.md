@@ -78,8 +78,8 @@ Out of scope for now (later phases): a real auth backend (sign-ups open once it 
 ## Before going live
 
 - [ ] **Remove the dev sign-in account.** Delete `src/auth/devAccount.ts` and `src/auth/DevAccountNote.tsx`, and
-      their uses in `session.ts`, `SignInPage.tsx` and `Workspace.tsx` (search for `TODO(before launch)`). It only
-      works in development builds, but it must not ship.
+      their uses in `session.ts`, `SignInPage.tsx`, `Workspace.tsx` and the end-to-end tests' sign-in
+      (`e2e/checks.ts`; search for `TODO(before launch)`). It only works in development builds, but it must not ship.
 - [ ] Connect a real auth provider for email and password, Google sign-in and sign-ups (`src/auth/session.ts`).
 - [ ] Configure the host to serve `index.html` for app routes (`/sign-in`, `/sign-up`, `/app`).
 
@@ -101,6 +101,33 @@ npm run dev
 
 To try the signed-in area while developing, sign in with the dev account `fatih123` / `fatih123` (the sign-in page
 has a “Fill in” shortcut). It only works with `npm run dev` and must be removed before launch.
+
+### Checks
+
+| Command | What it does |
+| --- | --- |
+| `npm run check` | Type check, lint, unit tests and the production build, in that order |
+| `npm run lint` | ESLint with typescript-eslint and the React Hooks rules |
+| `npm test` | Unit tests (Vitest), in a couple of seconds |
+| `npm run test:e2e` | End-to-end tests (Playwright on Chromium), in under a minute |
+
+- **Unit tests** sit next to the code (`*.test.ts`): the library registry, every element description (complete, with
+  unique ids, and every landing page description in use), the photo credits (each file in a `photos/` folder listed in
+  its `CREDITS.md` with its Unsplash link and license) and the brief (the saved items it keeps, the Markdown it writes).
+- **End-to-end tests** (`e2e/`) open the landing page, the library's tabs and every example's page at 1440 and 390 px:
+  no console errors, nothing focusable or scrollable inside a demo, no sideways scrolling, every `data-inspect` id
+  described and every description shown. On the landing page they also move the comparison lines with the keyboard,
+  keep each AI slop site within its Wingman site's height, and hover an element through name tag, balloon, pin and
+  Esc. They start a dev server on port 5199, or use the one running there; install the browser once with
+  `npx playwright install chromium`.
+
+CI (`.github/workflows/ci.yml`) runs them all on every pull request and push to `main`, and keeps the Playwright report
+when the end-to-end tests fail. It runs on macOS, where the examples' system fonts are the ones they're designed with;
+on Linux they fall back to wider fonts, which changes what the end-to-end tests measure. The checks need Node.js
+22.13+. Rules turned down for an intentional pattern are in `eslint.config.js`, each with its reason.
+typescript-eslint still needs TypeScript 6's API, so `typescript` is TypeScript 6 and `tsc` is TypeScript 7
+(`@typescript/native`), as the TypeScript 7.0 release notes suggest. The scripts call TypeScript 7 by its path, since
+both packages offer a `tsc` command and npm may link either one.
 
 ## Stack
 
@@ -128,6 +155,7 @@ src/
   styles/      Design tokens (light-dark) and global styles
   router.tsx   A tiny client-side router: current path, links, redirects, page titles
   theme.ts     Light/dark theme: read, set, subscribe to changes
+e2e/           End-to-end checks (Playwright); unit tests sit next to the code as *.test.ts
 docs/
   screenshots/ Images used in this README
 ```
