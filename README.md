@@ -11,22 +11,39 @@ understand. Next, it will write that brief from everyday descriptions like “th
 
 ## A look inside
 
-Each example is a before/after: drag the line to compare the AI slop a vague prompt produces with the same product
-built from a Wingman brief. Hover anything on either side to learn what it's called. Click to pin the full
-explanation: how it looks, how it behaves, and the exact CSS behind it. The examples switch to dark mode with the page
-(products that are dark by design stay dark), and the balloons show the values for the theme you're in.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/inspect-dark.png">
-  <img alt="The Acme example in its scroll scene, split by the before/after line: the AI slop version on the left, the Wingman version on the right with its frosted-glass navbar's explanation pinned" src="docs/screenshots/inspect-light.png">
-</picture>
-
-Three mobile apps side by side, each split between its AI slop and Wingman versions, with a preview of Muse's Liquid
-Glass navbar:
+Each example on the landing page is a before/after: drag the line to compare the AI slop a vague prompt produces with
+the same product built from a Wingman brief. Hover anything on either side to learn what it's called. Click to pin the
+full explanation: how it looks, how it behaves, and the exact CSS behind it. The examples switch to dark mode with the
+page (products that are dark by design stay dark), and the balloons show the values for the theme you're in.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/phones-dark.png">
   <img alt="The Wave, Muse and Stride phone examples in one row, each split down the middle between the AI slop version and the Wingman version, with a balloon describing Muse's Liquid Glass navbar" src="docs/screenshots/phones-light.png">
+</picture>
+
+### The library
+
+Behind sign-in, the library holds more than thirty apps, sites and watch apps, each modeled on a product people use
+every day: the same layout and component shapes, with its own name, colors, copy and real photos. Every element can be
+inspected the same way and added to a brief. Here Lanes, a board in the style of Jira, explains its WIP limit:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/inspect-dark.png">
+  <img alt="Lanes, a kanban board in the style of Jira, with the In progress column over its limit and the WIP limit's explanation pinned: what it is, what people call it and the CSS behind it" src="docs/screenshots/inspect-light.png">
+</picture>
+
+Apps for the phone and the watch:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/library-apps-dark.png">
+  <img alt="Eight library examples: Loop (a photo feed like Instagram), Flick (short videos like TikTok), Nest (stays like Airbnb), Vault (banking like Revolut), Kindred (dating like Tinder), Tempo (music like Spotify), Remedy (doctor booking like Zocdoc) and Pace (a workout on Apple Watch)" src="docs/screenshots/library-apps-light.png">
+</picture>
+
+And websites:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/library-sites-dark.png">
+  <img alt="Six library sites: Stream (streaming like Netflix), Shelf (a store like Amazon), Glyph (a code editor like VS Code), Conduit (automations like Zapier), Cadence (a calendar like Notion Calendar) and Lanes (a board like Jira)" src="docs/screenshots/library-sites-light.png">
 </picture>
 
 ## Current status: landing page, sign-in, the library and the brief
